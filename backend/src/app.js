@@ -24,8 +24,8 @@ class Servidor {
 
     const conexiones = new ManejadorConexiones();
     const botLLM = new BotLLM();
-    this.controller = new PartidaController(conexiones, db, botLLM);
-    this.manejador = new ManejadorMensajes(this.controller, conexiones);
+    this.partidaController = new PartidaController(conexiones, db, botLLM);
+    this.manejador = new ManejadorMensajes(this.partidaController, conexiones);
 
     this._configurarMiddleware();
     this._configurarRutasHttp();
@@ -38,7 +38,7 @@ class Servidor {
 
   _configurarRutasHttp() {
     const auth = new ManejadorAuth(new AuthController(db));
-    const partidas = new ManejadorPartidas(this.controller);
+    const partidas = new ManejadorPartidas(this.partidaController);
     const puntajes = new ManejadorPuntajes(new PuntajesController(db));
 
     this.app.use('/api', auth.router);

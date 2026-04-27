@@ -221,7 +221,7 @@ class PartidaController {
     this._broadcast(sala, 'uno-denunciado', { denuncianteId: jugadorId, acusado: res.acusado });
   }
 
-  desconectar(partidaId, jugadorId) {
+  async desconectar(partidaId, jugadorId) {
     const sala = this.persistencia.obtenerPartida(partidaId);
 
     if (!sala || sala.estado === 'terminada') return;
@@ -233,6 +233,11 @@ class PartidaController {
       nombreUsuario: info.nombreUsuario,
       mensaje: 'La partida fue cancelada por abandono',
     });
+
+    // El que abandona recibe -50; los demás no suman ni pierden.
+    await this.persistencia.guardarResultadoPartida(partidaId, [
+      { jugadorId, puesto: sala.jugadores.length, puntaje: 0, deltaGlobal: -50 },
+    ]);
 
     this.persistencia.eliminarPartida(partidaId);
   }

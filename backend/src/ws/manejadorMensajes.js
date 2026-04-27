@@ -53,7 +53,9 @@ class ManejadorMensajes {
 
     ws.on('close', () => {
       this.conexiones.desregistrar(jugadorId);
-      this.controller.desconectar(partidaId, jugadorId);
+      this.controller.desconectar(partidaId, jugadorId).catch((err) => {
+        console.error('[WS] Error al desconectar jugador:', err);
+      });
     });
   }
 }
