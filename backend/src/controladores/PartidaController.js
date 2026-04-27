@@ -10,96 +10,14 @@ class PartidaController {
     this.botLLM = botLLM;
   }
 
-  // ─── HTTP ────────────────────────────────────────────────────────────────
-
   listarPartidas() {
     return this.persistencia.listarPartidasDisponibles();
-  }
-
-  async crearPartida(jugadorId, maxJugadores, cantidadBots = 0) {
-    if (!jugadorId) return { ok: false, status: 400, error: 'jugadorId requerido' };
-
-    const jugador = await this.persistencia.obtenerJugador(jugadorId);
-    if (!jugador) return { ok: false, status: 404, error: 'Jugador no encontrado' };
-
-    const bots = parseInt(cantidadBots);
-    const total = 1 + bots;
-    const max = maxJugadores ? parseInt(maxJugadores) : total;
-
-    if (bots < 0 || bots > 3)
-      return { ok: false, status: 400, error: 'cantidadBots debe ser entre 0 y 3' };
-
-    if (total < 2 || total > 4)
-      return {
-        ok: false,
-        status: 400,
-        error: 'El total de jugadores (humanos + bots) debe ser entre 2 y 4',
-      };
-
-    const partidaId = uuidv4();
-    const sala = new SalaDeJuego(partidaId, jugadorId, max);
-    sala.agregarJugador(jugadorId, jugador.nombreUsuario);
-
-    for (let i = 0; i < bots; i++) {
-      sala.agregarBot(NOMBRES_BOTS[i]);
-    }
-
-    this.persistencia.guardarPartida(partidaId, sala);
-
-    return { ok: true, data: { partidaId, ...sala.resumenPublico() } };
   }
 
   obtenerPartida(id) {
     const sala = this.persistencia.obtenerPartida(id);
     if (!sala) return { ok: false, status: 404, error: 'Partida no encontrada' };
     return { ok: true, data: sala.resumenPublico() };
-  }
-
-  // ─── WebSocket ───────────────────────────────────────────────────────────
-
-  _broadcast(sala, evento, datos) {
-    this.conexiones.emitirATodos(
-      sala.jugadores.map((j) => j.jugadorId),
-      evento,
-      datos
-    );
-  }
-
-  async unirJugador(partidaId, jugadorId) {
-    const sala = this.persistencia.obtenerPartida(partidaId);
-
-    if (!sala) {
-      this.conexiones.emitirA(jugadorId, 'error', { mensaje: 'Partida no encontrada' });
-      return { error: 'Partida no encontrada' };
-    }
-
-    const jugador = await this.persistencia.obtenerJugador(jugadorId);
-
-    if (!jugador) {
-      this.conexiones.emitirA(jugadorId, 'error', { mensaje: 'Jugador no encontrado' });
-      return { error: 'Jugador no encontrado' };
-    }
-
-    if (!sala.jugadores.find((j) => j.jugadorId === jugadorId)) {
-      const resultado = sala.agregarJugador(jugadorId, jugador.nombreUsuario);
-
-      if (resultado.error) {
-        this.conexiones.emitirA(jugadorId, 'error', { mensaje: resultado.error });
-        return { error: resultado.error };
-      }
-
-      this._broadcast(sala, 'jugador-unido', {
-        jugadorId,
-        nombreUsuario: jugador.nombreUsuario,
-        totalJugadores: sala.jugadores.length,
-      });
-    }
-
-    this.conexiones.emitirA(jugadorId, 'estado-partida', {
-      estado: sala.estadoParaJugador(jugadorId),
-    });
-
-    return { ok: true };
   }
 
   iniciarPartida(partidaId, jugadorId) {
@@ -120,53 +38,6 @@ class PartidaController {
     this._broadcast(sala, 'turno-cambiado', {
       turno: sala.jugadorEnTurno().jugadorId,
       sentido: sala.sentido,
-    });
-
-    if (sala.turnoEsBot()) {
-      this._ejecutarTurnoBot(partidaId);
-    }
-  }
-
-  async jugarCarta(partidaId, jugadorId, cartaId, colorElegido) {
-    const sala = this.persistencia.obtenerPartida(partidaId);
-    const res = sala.jugarCarta(jugadorId, cartaId, colorElegido);
-
-    if (res.error) {
-      this.conexiones.emitirA(jugadorId, 'error', { mensaje: res.error });
-      return;
-    }
-
-    if (res.partidaTerminada) {
-      await this.persistencia.guardarResultadoPartida(partidaId, res.ranking);
-
-      this._broadcast(sala, 'partida-terminada', { ranking: res.ranking });
-
-      this.persistencia.eliminarPartida(partidaId);
-      return;
-    }
-
-    if (res.rondaTerminada) {
-      this._broadcast(sala, 'ronda-terminada', {
-        ganadorRonda: res.ganadorRonda,
-        puntosGanados: res.puntosGanados,
-        puntajesRonda: res.puntajesRonda,
-      });
-
-      for (const j of sala.jugadores) {
-        this.conexiones.emitirA(j.jugadorId, 'estado-partida', {
-          estado: sala.estadoParaJugador(j.jugadorId),
-        });
-      }
-
-      return;
-    }
-
-    this._broadcast(sala, 'carta-jugada', { jugadorId, carta: res.carta });
-
-    this._broadcast(sala, 'turno-cambiado', {
-      turno: sala.jugadorEnTurno().jugadorId,
-      sentido: sala.sentido,
-      penalidad: sala.penalidad,
     });
 
     if (sala.turnoEsBot()) {
@@ -219,6 +90,141 @@ class PartidaController {
     }
 
     this._broadcast(sala, 'uno-denunciado', { denuncianteId: jugadorId, acusado: res.acusado });
+  }
+
+  _broadcast(sala, evento, datos) {
+    this.conexiones.emitirATodos(
+      sala.jugadores.map((j) => j.jugadorId),
+      evento,
+      datos
+    );
+  }
+
+  async crearPartida(jugadorId, maxJugadores, cantidadBots = 0) {
+    if (!jugadorId) return { ok: false, status: 400, error: 'jugadorId requerido' };
+
+    const jugador = await this.persistencia.obtenerJugador(jugadorId);
+    if (!jugador) return { ok: false, status: 404, error: 'Jugador no encontrado' };
+
+    if (this.persistencia.jugadorEstaEnPartida(jugadorId))
+      return { ok: false, status: 409, error: 'Ya estás en una partida activa' };
+
+    const bots = parseInt(cantidadBots);
+    const total = 1 + bots;
+    const max = maxJugadores ? parseInt(maxJugadores) : total;
+
+    if (bots < 0 || bots > 3)
+      return { ok: false, status: 400, error: 'cantidadBots debe ser entre 0 y 3' };
+
+    if (total < 2 || total > 4)
+      return {
+        ok: false,
+        status: 400,
+        error: 'El total de jugadores (humanos + bots) debe ser entre 2 y 4',
+      };
+
+    const partidaId = uuidv4();
+    const sala = new SalaDeJuego(partidaId, jugadorId, max);
+    sala.agregarJugador(jugadorId, jugador.nombreUsuario);
+
+    for (let i = 0; i < bots; i++) {
+      sala.agregarBot(NOMBRES_BOTS[i]);
+    }
+
+    this.persistencia.guardarPartida(partidaId, sala);
+
+    return { ok: true, data: { partidaId, ...sala.resumenPublico() } };
+  }
+
+  async unirJugador(partidaId, jugadorId) {
+    const sala = this.persistencia.obtenerPartida(partidaId);
+
+    if (!sala) {
+      this.conexiones.emitirA(jugadorId, 'error', { mensaje: 'Partida no encontrada' });
+      return { error: 'Partida no encontrada' };
+    }
+
+    const jugador = await this.persistencia.obtenerJugador(jugadorId);
+
+    if (!jugador) {
+      this.conexiones.emitirA(jugadorId, 'error', { mensaje: 'Jugador no encontrado' });
+      return { error: 'Jugador no encontrado' };
+    }
+
+    const yaEstaEnEstaSala = sala.jugadores.find((j) => j.jugadorId === jugadorId);
+
+    if (!yaEstaEnEstaSala && this.persistencia.jugadorEstaEnPartida(jugadorId)) {
+      this.conexiones.emitirA(jugadorId, 'error', { mensaje: 'Ya estás en una partida activa' });
+      return { error: 'Ya estás en una partida activa' };
+    }
+
+    if (!yaEstaEnEstaSala) {
+      const resultado = sala.agregarJugador(jugadorId, jugador.nombreUsuario);
+
+      if (resultado.error) {
+        this.conexiones.emitirA(jugadorId, 'error', { mensaje: resultado.error });
+        return { error: resultado.error };
+      }
+
+      this._broadcast(sala, 'jugador-unido', {
+        jugadorId,
+        nombreUsuario: jugador.nombreUsuario,
+        totalJugadores: sala.jugadores.length,
+      });
+    }
+
+    this.conexiones.emitirA(jugadorId, 'estado-partida', {
+      estado: sala.estadoParaJugador(jugadorId),
+    });
+
+    return { ok: true };
+  }
+
+  async jugarCarta(partidaId, jugadorId, cartaId, colorElegido) {
+    const sala = this.persistencia.obtenerPartida(partidaId);
+    const res = sala.jugarCarta(jugadorId, cartaId, colorElegido);
+
+    if (res.error) {
+      this.conexiones.emitirA(jugadorId, 'error', { mensaje: res.error });
+      return;
+    }
+
+    if (res.partidaTerminada) {
+      await this.persistencia.guardarResultadoPartida(partidaId, res.ranking);
+
+      this._broadcast(sala, 'partida-terminada', { ranking: res.ranking });
+
+      this.persistencia.eliminarPartida(partidaId);
+      return;
+    }
+
+    if (res.rondaTerminada) {
+      this._broadcast(sala, 'ronda-terminada', {
+        ganadorRonda: res.ganadorRonda,
+        puntosGanados: res.puntosGanados,
+        puntajesRonda: res.puntajesRonda,
+      });
+
+      for (const j of sala.jugadores) {
+        this.conexiones.emitirA(j.jugadorId, 'estado-partida', {
+          estado: sala.estadoParaJugador(j.jugadorId),
+        });
+      }
+
+      return;
+    }
+
+    this._broadcast(sala, 'carta-jugada', { jugadorId, carta: res.carta });
+
+    this._broadcast(sala, 'turno-cambiado', {
+      turno: sala.jugadorEnTurno().jugadorId,
+      sentido: sala.sentido,
+      penalidad: sala.penalidad,
+    });
+
+    if (sala.turnoEsBot()) {
+      this._ejecutarTurnoBot(partidaId);
+    }
   }
 
   async desconectar(partidaId, jugadorId) {

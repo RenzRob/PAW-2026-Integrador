@@ -1,4 +1,4 @@
-const Jugador = require('../../modelo/Jugador');
+const Usuario = require('../../modelo/Usuario');
 
 class JugadorRepositorioMemoria {
   constructor() {
@@ -7,7 +7,7 @@ class JugadorRepositorioMemoria {
   }
 
   async registrarJugador(jugadorId, nombreUsuario) {
-    const jugador = new Jugador(jugadorId, nombreUsuario);
+    const jugador = new Usuario(jugadorId, nombreUsuario);
 
     this.jugadores.set(jugadorId, jugador);
 

@@ -1,5 +1,5 @@
 const pool = require('./conexion');
-const Jugador = require('../../modelo/Jugador');
+const Usuario = require('../../modelo/Usuario');
 
 class JugadorRepositorioMySQL {
   async registrarJugador(jugadorId, nombreUsuario) {
@@ -8,7 +8,7 @@ class JugadorRepositorioMySQL {
       nombreUsuario,
     ]);
 
-    return new Jugador(jugadorId, nombreUsuario);
+    return new Usuario(jugadorId, nombreUsuario);
   }
 
   async obtenerJugador(jugadorId) {
@@ -18,7 +18,7 @@ class JugadorRepositorioMySQL {
 
     if (!rows.length) return null;
 
-    return new Jugador(rows[0].id, rows[0].nombre_usuario);
+    return new Usuario(rows[0].id, rows[0].nombre_usuario);
   }
 
   async obtenerJugadorPorNombre(nombreUsuario) {
@@ -29,7 +29,7 @@ class JugadorRepositorioMySQL {
 
     if (!rows.length) return null;
 
-    return new Jugador(rows[0].id, rows[0].nombre_usuario);
+    return new Usuario(rows[0].id, rows[0].nombre_usuario);
   }
 
   async obtenerPuntajes() {

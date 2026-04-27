@@ -1,8 +1,8 @@
-class Jugador {
+class Usuario {
   constructor(jugadorId, nombreUsuario) {
     this.jugadorId = jugadorId;
     this.nombreUsuario = nombreUsuario;
   }
 }
 
-module.exports = Jugador;
+module.exports = Usuario;

@@ -48,6 +48,15 @@ class Persistencia {
       .filter((s) => s.estado === 'esperando')
       .map((s) => s.resumenPublico());
   }
+
+  jugadorEstaEnPartida(jugadorId) {
+    for (const sala of this.partidas.values()) {
+      if (sala.jugadores.some((j) => !j.esBot && j.jugadorId === jugadorId)) {
+        return true;
+      }
+    }
+    return false;
+  }
 }
 
 module.exports = new Persistencia();
