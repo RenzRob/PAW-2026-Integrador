@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es">
+  <%- include('partials/head.ejs') %>
+  <body>
+    <div class="container-auth">
+      <img src="/images/uno-logo.png" alt="UNO" class="logo-auth" />
+      <form class="auth-form" onsubmit="ingresar(event)">
+        <h1 class="auth-title">Ingresar</h1>
+        <label for="nombreUsuario">Nombre de usuario</label>
+        <input
+          type="text"
+          id="nombreUsuario"
+          name="nombreUsuario"
+          required
+          autofocus
+          autocomplete="off"
+        />
+        <p class="auth-error" id="error" hidden></p>
+        <button type="submit" class="btn-auth">INGRESAR</button>
+        <a href="/public/registrarse" class="auth-link">¿No tenés cuenta? Registrate</a>
+      </form>
+    </div>
+  </body>
+  <script>
+    async function ingresar(e) {
+      e.preventDefault();
+      const error = document.getElementById('error');
+      error.hidden = true;
+
+      const nombreUsuario = e.target.nombreUsuario.value.trim();
+
+      try {
+        const response = await fetch('/api/ingresar', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ nombreUsuario }),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          error.textContent = data.error || 'Error al ingresar.';
+          error.hidden = false;
+          return;
+        }
+
+        sessionStorage.setItem('jugadorId', data.jugadorId);
+        sessionStorage.setItem('nombreUsuario', data.nombreUsuario);
+        window.location.href = '/public/';
+      } catch (err) {
+        console.error(err);
+        error.textContent = 'Error de red o del servidor.';
+        error.hidden = false;
+      }
+    }
+  </script>
+</html>
