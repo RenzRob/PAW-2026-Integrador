@@ -318,6 +318,30 @@ class SalaDeJuego {
     return { nombreUsuario: jugador?.nombreUsuario };
   }
 
+  // Saca un jugador de la sala mientras está en 'esperando' (libera el slot).
+  // Si el jugador era el creador, devuelve el id del nuevo creador (primer humano restante)
+  // o null si no quedan humanos.
+  removerJugador(jugadorId) {
+    const idx = this.jugadores.findIndex((j) => j.jugadorId === jugadorId);
+    if (idx === -1) return { error: 'Jugador no estaba en la sala' };
+
+    const [jugador] = this.jugadores.splice(idx, 1);
+    delete this.puntajesRonda[jugadorId];
+
+    let nuevoCreadorId = this.creadorId;
+    if (jugadorId === this.creadorId) {
+      const nuevoCreador = this.jugadores.find((j) => !j.esBot);
+      nuevoCreadorId = nuevoCreador ? nuevoCreador.jugadorId : null;
+      this.creadorId = nuevoCreadorId;
+    }
+
+    return { ok: true, nombreUsuario: jugador.nombreUsuario, nuevoCreadorId };
+  }
+
+  cantidadHumanos() {
+    return this.jugadores.filter((j) => !j.esBot).length;
+  }
+
   estadoParaJugador(jugadorId) {
     const enMesa = this._cartaEnMesa() || null;
 

@@ -129,6 +129,11 @@
             cargarResumen();
             break;
           }
+          case 'jugador-salio': {
+            mostrarMensaje(`${datos.nombreUsuario || 'Un jugador'} salió de la sala.`);
+            cargarResumen();
+            break;
+          }
           case 'turno-cambiado': {
             elEstado.textContent = 'Partida en curso';
             btnIniciar.hidden = true;

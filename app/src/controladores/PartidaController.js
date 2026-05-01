@@ -254,6 +254,26 @@ class PartidaController {
 
     if (!sala || sala.estado === 'terminada') return;
 
+    // Si la partida todavía no arrancó, liberar el slot y dejar la sala viva
+    // (otros pueden seguir uniéndose). Solo si no quedan humanos, se elimina.
+    if (sala.estado === 'esperando') {
+      const res = sala.removerJugador(jugadorId);
+      if (res.error) return;
+
+      if (sala.cantidadHumanos() === 0) {
+        this.persistencia.eliminarPartida(partidaId);
+        return;
+      }
+
+      this._broadcast(sala, 'jugador-salio', {
+        jugadorId,
+        nombreUsuario: res.nombreUsuario,
+        nuevoCreadorId: res.nuevoCreadorId,
+        totalJugadores: sala.jugadores.length,
+      });
+      return;
+    }
+
     const info = sala.jugadorAbandonó(jugadorId);
 
     this._broadcast(sala, 'jugador-abandono', {
