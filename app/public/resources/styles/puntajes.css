@@ -9,48 +9,107 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 100vh;
+  min-height: 100vh;
+  padding: 20px;
+  box-sizing: border-box;
 }
 
 .puntajes-box {
   background: #eaf3fa;
   border-radius: 12px;
-  padding: 36px 32px 28px 32px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+  padding: 28px 32px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.12);
   display: flex;
   flex-direction: column;
   align-items: center;
-  min-width: 320px;
+  min-width: 360px;
+  max-width: 480px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.logo-puntajes {
+  width: 100px;
+  margin-bottom: 12px;
 }
 
 .puntajes-box h2 {
   color: #2e6da4;
-  margin-bottom: 18px;
+  margin: 0 0 18px 0;
   text-align: center;
 }
 
-.lista-puntajes {
-  list-style: none;
-  padding: 0;
-  margin-bottom: 18px;
+.tabla-puntajes {
   width: 100%;
+  margin-bottom: 20px;
+  max-height: 360px;
+  overflow-y: auto;
 }
 
-.lista-puntajes li {
+.tabla-puntajes table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.tabla-puntajes th,
+.tabla-puntajes td {
+  padding: 8px 12px;
+  font-size: 15px;
   color: #2e6da4;
-  font-size: 17px;
-  padding: 7px 0;
-  border-bottom: 1px solid #b0cbe6;
   text-align: left;
 }
 
-.lista-puntajes li:last-child {
-  border-bottom: none;
+.tabla-puntajes th {
+  font-weight: bold;
+  border-bottom: 2px solid #b0cbe6;
+  background: #eaf3fa;
+  position: sticky;
+  top: 0;
 }
 
-.siguiente-ronda {
-  color: #888;
-  font-size: 15px;
-  margin-top: 10px;
+.tabla-puntajes tr:not(:last-child) td {
+  border-bottom: 1px solid #d2e3f3;
+}
+
+.tabla-puntajes .puesto {
+  width: 48px;
   text-align: center;
+  font-weight: bold;
+}
+
+.tabla-puntajes .puntaje-valor {
+  text-align: right;
+  font-weight: bold;
+}
+
+.fila-actual td {
+  background: #fff8d6;
+  color: #8a6d00;
+}
+
+.vacio-puntajes {
+  text-align: center;
+  color: #888;
+  font-style: italic;
+  padding: 24px 12px;
+}
+
+.btn-puntajes {
+  background: #ffe14b;
+  color: #444;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: bold;
+  padding: 10px 28px;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  transition:
+    background 0.2s,
+    color 0.2s;
+}
+
+.btn-puntajes:hover {
+  background: #ffd600;
+  color: #222;
 }

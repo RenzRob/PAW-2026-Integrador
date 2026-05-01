@@ -4,15 +4,65 @@
   <body>
     <div class="container-puntajes">
       <div class="puntajes-box">
-        <h2>Puntajes</h2>
-        <ul class="lista-puntajes">
-          <li>Jugador 1: 120 puntos</li>
-          <li>Jugador 2: 80 puntos</li>
-          <li>Jugador 3: 60 puntos</li>
-          <li>Jugador 4: 40 puntos</li>
-        </ul>
-        <div class="siguiente-ronda">Siguiente ronda en 5 segundos...</div>
+        <img src="/images/uno-logo.png" alt="UNO" class="logo-puntajes" />
+        <h2>Ranking global</h2>
+        <div class="tabla-puntajes">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Jugador</th>
+                <th>Puntaje</th>
+              </tr>
+            </thead>
+            <tbody id="lista-puntajes">
+              <tr>
+                <td colspan="3" class="vacio-puntajes">Cargando...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <button class="btn-puntajes" onclick="window.location.href = '/public/'">VOLVER</button>
       </div>
     </div>
+    <script>
+      const jugadorActual = sessionStorage.getItem('jugadorId');
+
+      async function cargarPuntajes() {
+        const tbody = document.getElementById('lista-puntajes');
+        try {
+          const response = await fetch('/api/puntajes');
+          if (!response.ok) throw new Error('Error al cargar puntajes');
+          const puntajes = await response.json();
+
+          if (!Array.isArray(puntajes) || puntajes.length === 0) {
+            tbody.innerHTML =
+              '<tr><td colspan="3" class="vacio-puntajes">Todavía no hay puntajes registrados.</td></tr>';
+            return;
+          }
+
+          tbody.innerHTML = puntajes
+            .map((p, i) => {
+              const esActual = jugadorActual && p.jugadorId === jugadorActual;
+              const claseFila = esActual ? 'fila-actual' : '';
+              const medalla = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : i + 1;
+              return `
+                <tr class="${claseFila}">
+                  <td class="puesto">${medalla}</td>
+                  <td>${p.nombreUsuario}</td>
+                  <td class="puntaje-valor">${p.puntajeGlobal}</td>
+                </tr>
+              `;
+            })
+            .join('');
+        } catch (err) {
+          console.error(err);
+          tbody.innerHTML =
+            '<tr><td colspan="3" class="vacio-puntajes">Error al cargar el ranking.</td></tr>';
+        }
+      }
+
+      cargarPuntajes();
+    </script>
   </body>
 </html>
