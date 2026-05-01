@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ingresar nombre de jugador</title>
+    <link rel="stylesheet" href="/styles/inicio.css" />
+    <style>
+      body {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        background: #f7f7f7;
+      }
+      .nombre-form {
+        background: #fff;
+        padding: 2rem 2.5rem;
+        border-radius: 10px;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+        display: flex;
+        flex-direction: column;
+        gap: 1.2rem;
+        min-width: 320px;
+      }
+      .nombre-form label {
+        font-size: 1.1rem;
+        font-weight: 500;
+      }
+      .nombre-form input[type='text'] {
+        padding: 0.7rem 1rem;
+        border: 1px solid #bbb;
+        border-radius: 6px;
+        font-size: 1rem;
+        outline: none;
+        transition: border 0.2s;
+      }
+      .nombre-form input[type='text']:focus {
+        border-color: #007bff;
+      }
+      .nombre-form button {
+        padding: 0.7rem 1.2rem;
+        background: #007bff;
+        color: #fff;
+        border: none;
+        border-radius: 6px;
+        font-size: 1rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: background 0.2s;
+      }
+      .nombre-form button:hover {
+        background: #0056b3;
+      }
+    </style>
+  </head>
+  <body>
+    <form class="nombre-form" action="/" method="POST" onsubmit="solicitarCrearSala(event)">
+      <label for="nombreJugador">Nombre de jugador</label>
+      <input
+        type="text"
+        id="nombreJugador"
+        name="nombreJugador"
+        required
+        autofocus
+        autocomplete="off"
+      />
+      <button type="submit">Ingresar</button>
+    </form>
+  </body>
+  <script>
+    function solicitarCrearSala(e) {
+      // Evita que el formulario se envíe de la forma tradicional.
+      e.preventDefault();
+
+      const form = e.target;
+      const nombre_jugador = form.nombreJugador.value;
+      const payload = {
+        nombre_jugador,
+      };
+      // { jugadorId, maxJugadores, cantidadBots }
+
+      // Envía la solicitud POST con el payload en formato JSON.
+      fetch('/api/partidas', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      })
+        .then((response) => {
+          if (response.redirected) window.location.href = response.url;
+          else if (response.ok) window.location.href = '/salas';
+          else {
+            console.error('Error al crear la sala:', response);
+            alert('Error al crear la sala.');
+          }
+        })
+        .catch((error) => {
+          console.error('Error de red o del servidor:', error);
+          alert('Error de red o del servidor.');
+        });
+    }
+  </script>
+</html>

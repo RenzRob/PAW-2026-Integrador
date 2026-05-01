@@ -6,7 +6,7 @@
       <div class="form-crear-sala">
         <h1>Crear nueva sala</h1>
 
-        <form action="/crear-sala" method="POST" onsubmit="enviarCrearSala(event)">
+        <form action="/public/crear-sala" method="POST" onsubmit="enviarCrearSala(event)">
           <label for="nombre-sala">Nombre de sala</label>
           <input
             type="text"
@@ -30,7 +30,7 @@
           />
 
           <div class="botones-crear">
-            <button type="button" class="btn-crear" onclick="window.location.href = '/'">
+            <button type="button" class="btn-crear" onclick="window.location.href = '/public/'">
               CANCELAR
             </button>
             <button type="submit" class="btn-crear">CREAR PARTIDA</button>
@@ -52,9 +52,10 @@
         nombre_sala,
         num_jugadores
       };
+      // { jugadorId, maxJugadores, cantidadBots }
 
       // Envía la solicitud POST con el payload en formato JSON.
-      fetch('/crear-sala', {
+      fetch('/api/partidas', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
