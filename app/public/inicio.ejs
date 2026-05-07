@@ -5,13 +5,36 @@
     <div class="container-inicio">
       <img src="/images/uno-logo.png" alt="UNO" class="logo-inicio" />
       <div class="botones-inicio">
-        <button class="btn-inicio" onclick="window.location.href = '/public/jugar'">
-          JUGAR
-        </button>
+        <button class="btn-inicio" onclick="window.location.href = '/public/jugar'">JUGAR</button>
         <button class="btn-inicio" onclick="window.location.href = '/public/puntajes'">
           RANKING
         </button>
+        <button class="btn-inicio" onclick="salir()">SALIR</button>
       </div>
     </div>
+    <script>
+      (function () {
+        const jugadorId = sessionStorage.getItem('jugadorId');
+        if (!jugadorId) window.location.href = '/public/bienvenida';
+      })();
+
+      async function salir() {
+        const jugadorId = sessionStorage.getItem('jugadorId');
+
+        try {
+          await fetch('/api/salir', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ jugadorId }),
+          });
+        } catch (_) {
+          // Si falla la petición, igual se limpia sesión local y se redirige.
+        }
+
+        sessionStorage.removeItem('jugadorId');
+        sessionStorage.removeItem('nombreUsuario');
+        window.location.href = '/public/bienvenida';
+      }
+    </script>
   </body>
 </html>

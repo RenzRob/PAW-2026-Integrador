@@ -39,7 +39,10 @@
         const data = await response.json();
 
         if (!response.ok) {
-          error.textContent = data.error || 'Error al ingresar.';
+          error.textContent =
+            response.status === 409
+              ? 'Este usuario ya tiene una sesión activa.'
+              : data.error || 'Error al ingresar.';
           error.hidden = false;
           return;
         }

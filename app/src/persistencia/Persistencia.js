@@ -5,6 +5,7 @@ const repo = process.env.DB_HOST
 class Persistencia {
   constructor() {
     this.partidas = new Map();
+    this.jugadoresLogueados = new Set();
   }
 
   // ─── Jugadores (delegado al repositorio) ─────────────────────────────────
@@ -56,6 +57,18 @@ class Persistencia {
       }
     }
     return false;
+  }
+
+  marcarJugadorLogueado(jugadorId) {
+    this.jugadoresLogueados.add(jugadorId);
+  }
+
+  desmarcarJugadorLogueado(jugadorId) {
+    this.jugadoresLogueados.delete(jugadorId);
+  }
+
+  jugadorEstaLogueado(jugadorId) {
+    return this.jugadoresLogueados.has(jugadorId);
   }
 }
 

@@ -249,6 +249,7 @@ class PartidaController {
 
   async desconectar(partidaId, jugadorId) {
     logContext(logger, this, { partidaId, jugadorId });
+    this.persistencia.desmarcarJugadorLogueado(jugadorId);
 
     const sala = this.persistencia.obtenerPartida(partidaId);
 

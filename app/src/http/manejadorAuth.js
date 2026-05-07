@@ -29,6 +29,16 @@ class ManejadorAuth {
     res.json(result.data);
   }
 
+  async salir(req, res) {
+    const result = await this.controller.salir(req.body.jugadorId);
+
+    if (!result.ok) {
+      return res.status(result.status).json({ error: result.error });
+    }
+
+    res.status(204).send();
+  }
+
   #registrarRutas() {
     /**
      * @swagger
@@ -77,6 +87,30 @@ class ManejadorAuth {
      *         description: Error en los datos enviados
      */
     this.router.post('/ingresar', (req, res) => this.ingresar(req, res));
+
+    /**
+     * @swagger
+     * /api/salir:
+     *   post:
+     *     summary: Cierra sesión del jugador
+     *     tags:
+     *       - Jugadores
+     *     requestBody:
+     *       required: true
+     *       content:
+     *         application/json:
+     *           schema:
+     *             type: object
+     *             properties:
+     *               jugadorId:
+     *                 type: string
+     *     responses:
+     *       204:
+     *         description: Salida exitosa
+     *       400:
+     *         description: Error en los datos enviados
+     */
+    this.router.post('/salir', (req, res) => this.salir(req, res));
   }
 }
 
