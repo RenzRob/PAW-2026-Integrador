@@ -17,6 +17,7 @@ const AuthController = require('./controladores/AuthController');
 const PuntajesController = require('./controladores/PuntajesController');
 const ManejadorMensajes = require('./ws/manejadorMensajes');
 const ManejadorFront = require('./http/manejadorFront');
+const requireAuth = require('./http/middlewareAuth');
 const ManejadorAuth = require('./http/manejadorAuth');
 const ManejadorPartidas = require('./http/manejadorPartidas');
 const ManejadorPuntajes = require('./http/manejadorPuntajes');
@@ -148,8 +149,8 @@ class Servidor {
     const puntajes = new ManejadorPuntajes(new PuntajesController(db));
     this.app
       .use('/api', auth.router)
-      .use('/api/partidas', partidas.router)
-      .use('/api/puntajes', puntajes.router);
+      .use('/api/partidas', requireAuth, partidas.router)
+      .use('/api/puntajes', requireAuth, puntajes.router);
   }
 
   #configurarWebSocket() {
@@ -167,6 +168,12 @@ class Servidor {
       // jugador y la partida. Si no, responde con un error HTTP 400 y cierra la conexión.
       if (!jugadorId || !partidaId) {
         socket.write('HTTP/1.1 400 Bad Request\r\n\r\n');
+        socket.destroy();
+        return;
+      }
+
+      if (!db.jugadorEstaLogueado(jugadorId)) {
+        socket.write('HTTP/1.1 401 Unauthorized\r\n\r\n');
         socket.destroy();
         return;
       }

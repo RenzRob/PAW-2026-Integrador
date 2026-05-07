@@ -1,4 +1,5 @@
 const express = require('express');
+const requireAuth = require('./middlewareAuth');
 
 class ManejadorAuth {
   constructor(controller) {
@@ -110,7 +111,7 @@ class ManejadorAuth {
      *       400:
      *         description: Error en los datos enviados
      */
-    this.router.post('/salir', (req, res) => this.salir(req, res));
+    this.router.post('/salir', requireAuth, (req, res) => this.salir(req, res));
   }
 }
 

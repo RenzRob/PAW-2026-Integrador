@@ -2,6 +2,9 @@
 <html lang="es">
   <%- include('partials/head.ejs') %>
   <body>
+    <script>
+      if (!sessionStorage.getItem('jugadorId')) window.location.href = '/public/bienvenida';
+    </script>
     <nav class="navbar">
       <div class="navbar-logo">UNO Argentino</div>
       <div class="navbar-info" id="estado-partida">Conectando...</div>
@@ -29,11 +32,6 @@
     </div>
 
     <script>
-      (function () {
-        const jugadorId = sessionStorage.getItem('jugadorId');
-        if (!jugadorId) window.location.href = '/public/bienvenida';
-      })();
-
       const jugadorId = sessionStorage.getItem('jugadorId');
       const partidaId = new URLSearchParams(window.location.search).get('partidaId');
 
@@ -87,7 +85,9 @@
         }
 
         try {
-          const response = await fetch(`/api/partidas/${encodeURIComponent(partidaId)}`);
+          const response = await fetch(`/api/partidas/${encodeURIComponent(partidaId)}`, {
+            headers: { 'X-Jugador-Id': jugadorId || '' },
+          });
           if (!response.ok) {
             const data = await response.json().catch(() => ({}));
             mostrarMensaje(data.error || 'No se pudo cargar la partida.', 'error');

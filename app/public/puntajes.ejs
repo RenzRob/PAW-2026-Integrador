@@ -2,6 +2,9 @@
 <html lang="es">
   <%- include('partials/head.ejs') %>
   <body>
+    <script>
+      if (!sessionStorage.getItem('jugadorId')) window.location.href = '/public/bienvenida';
+    </script>
     <%- include('partials/navbar.ejs') %>
     <div class="container-puntajes">
       <div class="puntajes-box">
@@ -32,7 +35,9 @@
       async function cargarPuntajes() {
         const tbody = document.getElementById('lista-puntajes');
         try {
-          const response = await fetch('/api/puntajes');
+          const response = await fetch('/api/puntajes', {
+            headers: { 'X-Jugador-Id': sessionStorage.getItem('jugadorId') || '' },
+          });
           if (!response.ok) throw new Error('Error al cargar puntajes');
           const puntajes = await response.json();
 

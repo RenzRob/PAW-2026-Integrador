@@ -2,6 +2,9 @@
 <html lang="es">
   <%- include('partials/head.ejs') %>
   <body>
+    <script>
+      if (!sessionStorage.getItem('jugadorId')) window.location.href = '/public/bienvenida';
+    </script>
     <%- include('partials/navbar.ejs') %>
     <div class="container-crear-sala">
       <div class="form-crear-sala">
@@ -50,11 +53,6 @@
       </div>
     </div>
     <script>
-      (function () {
-        const jugadorId = sessionStorage.getItem('jugadorId');
-        if (!jugadorId) window.location.href = '/public/bienvenida';
-      })();
-
       // Mantiene el máximo de bots = maxJugadores - 1 (siempre te queda lugar a vos).
       // Si el valor actual de bots supera el nuevo máximo, lo recorta.
       const inputJugadores = document.getElementById('num-jugadores');

@@ -2,6 +2,9 @@
 <html lang="es">
   <%- include('partials/head.ejs') %>
   <body>
+    <script>
+      if (!sessionStorage.getItem('jugadorId')) window.location.href = '/public/bienvenida';
+    </script>
     <%- include('partials/navbar.ejs') %>
     <div class="container-salas">
       <div class="header-salas">
@@ -33,11 +36,6 @@
       </div>
     </div>
     <script>
-      (function () {
-        const jugadorId = sessionStorage.getItem('jugadorId');
-        if (!jugadorId) window.location.href = '/public/bienvenida';
-      })();
-
       let salas = [];
 
       function nombreSala(s) {
@@ -83,7 +81,9 @@
 
       async function cargarSalas() {
         try {
-          const response = await fetch('/api/partidas');
+          const response = await fetch('/api/partidas', {
+            headers: { 'X-Jugador-Id': sessionStorage.getItem('jugadorId') || '' },
+          });
           if (!response.ok) throw new Error('No se pudieron cargar las salas');
           salas = await response.json();
           pintar(document.getElementById('buscar').value);

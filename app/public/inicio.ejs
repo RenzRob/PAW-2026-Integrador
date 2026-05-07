@@ -2,6 +2,9 @@
 <html lang="es">
   <%- include('partials/head.ejs') %>
   <body>
+    <script>
+      if (!sessionStorage.getItem('jugadorId')) window.location.href = '/public/bienvenida';
+    </script>
     <%- include('partials/navbar.ejs') %>
     <div class="container-inicio">
       <img src="/images/uno-logo.png" alt="UNO" class="logo-inicio" />
@@ -14,11 +17,6 @@
       </div>
     </div>
     <script>
-      (function () {
-        const jugadorId = sessionStorage.getItem('jugadorId');
-        if (!jugadorId) window.location.href = '/public/bienvenida';
-      })();
-
       async function salir() {
         const jugadorId = sessionStorage.getItem('jugadorId');
 
