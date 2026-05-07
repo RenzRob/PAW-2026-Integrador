@@ -4,7 +4,7 @@ Repositorio del trabajo práctico integrador de la materia Programación en Ambi
 
 ## Integrantes
 
-Ver [authors.txt](https://raw.githubusercontent.com/facundolaffont/PAW-2026-Integrador/refs/heads/main/authors.txt).
+Ver [authors.txt](https://github.com/facundolaffont/PAW-2026-Integrador/raw/b7e8ee23b7183347c1303a8a93da85e0cfd3ee69/authors.txt).
 
 ## Entregas
 
