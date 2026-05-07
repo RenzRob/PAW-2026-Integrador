@@ -168,7 +168,10 @@
             break;
           }
           case 'jugador-abandono': {
-            mostrarMensaje(datos.mensaje || 'Un jugador abandonó.', 'error');
+            mostrarMensaje(
+              `${datos.nombreUsuario || 'Un jugador'} abandonó la partida. Se finaliza el juego.`,
+              'error'
+            );
             break;
           }
         }
