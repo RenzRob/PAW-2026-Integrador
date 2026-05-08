@@ -14,6 +14,23 @@ class PartidaController {
     this.conexiones = conexiones;
     this.persistencia = persistencia;
     this.botLLM = botLLM;
+    // Mapea `${partidaId}:${jugadorId}` → timeoutId del abandono diferido.
+    // Si el jugador se reconecta antes de que expire, se cancela.
+    this.desconexionesPendientes = new Map();
+    this.GRACE_PERIOD_MS = 30000;
+  }
+
+  _claveDesconexion(partidaId, jugadorId) {
+    return `${partidaId}:${jugadorId}`;
+  }
+
+  cancelarAbandonoPendiente(partidaId, jugadorId) {
+    const clave = this._claveDesconexion(partidaId, jugadorId);
+    const timeoutId = this.desconexionesPendientes.get(clave);
+    if (timeoutId == null) return false;
+    clearTimeout(timeoutId);
+    this.desconexionesPendientes.delete(clave);
+    return true;
   }
 
   listarPartidas() {
@@ -197,6 +214,15 @@ class PartidaController {
         nombreUsuario: jugador.nombreUsuario,
         totalJugadores: sala.jugadores.length,
       });
+    } else if (sala.estado === 'jugando') {
+      // Reconexión durante una partida en curso: cancelar el abandono diferido si existe.
+      const reconectado = this.cancelarAbandonoPendiente(partidaId, jugadorId);
+      if (reconectado) {
+        this._broadcast(sala, 'jugador-reconectado', {
+          jugadorId,
+          nombreUsuario: jugador.nombreUsuario,
+        });
+      }
     }
 
     this.conexiones.emitirA(jugadorId, 'estado-partida', {
@@ -281,6 +307,35 @@ class PartidaController {
       });
       return;
     }
+
+    // Partida en curso: NO marcamos abandono al instante. Damos un período de gracia
+    // para que el jugador pueda reconectarse tras un microcorte.
+    const jugador = sala.jugadores.find((j) => j.jugadorId === jugadorId);
+    if (!jugador) return;
+
+    // Si ya hay un abandono pendiente para este jugador, no programamos otro.
+    const clave = this._claveDesconexion(partidaId, jugadorId);
+    if (this.desconexionesPendientes.has(clave)) return;
+
+    this._broadcast(sala, 'jugador-desconectado', {
+      jugadorId,
+      nombreUsuario: jugador.nombreUsuario,
+      gracePeriodMs: this.GRACE_PERIOD_MS,
+    });
+
+    const timeoutId = setTimeout(() => {
+      this.desconexionesPendientes.delete(clave);
+      this._concretarAbandono(partidaId, jugadorId).catch((err) => {
+        registerLog(logger, 'error', 'Error al concretar abandono.', { error: err.message });
+      });
+    }, this.GRACE_PERIOD_MS);
+
+    this.desconexionesPendientes.set(clave, timeoutId);
+  }
+
+  async _concretarAbandono(partidaId, jugadorId) {
+    const sala = this.persistencia.obtenerPartida(partidaId);
+    if (!sala || sala.estado === 'terminada') return;
 
     const info = sala.jugadorAbandonó(jugadorId);
 

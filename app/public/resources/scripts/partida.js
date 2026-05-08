@@ -44,6 +44,10 @@ class Partida {
     this.esCreador = false;
     this.maxJugadores = null;
     this.webSocket = null;
+    this.intentosReconexion = 0;
+    this.cerrandoIntencionalmente = false;
+    this.timeoutReconexion = null;
+    this.MAX_INTENTOS_RECONEXION = 5;
   }
 
   init() {
@@ -57,7 +61,10 @@ class Partida {
   }
 
   salir() {
+    this.cerrandoIntencionalmente = true;
+    if (this.timeoutReconexion) clearTimeout(this.timeoutReconexion);
     if (this.webSocket) this.webSocket.close();
+    window.__navInterno = true;
     window.location.href = '/public/';
   }
 
@@ -275,7 +282,9 @@ class Partida {
     this.webSocket = new WebSocket(url);
 
     this.webSocket.addEventListener('open', () => {
-      this.estado.textContent = 'En sala';
+      const eraReconexion = this.intentosReconexion > 0;
+      this.intentosReconexion = 0;
+      this.estado.textContent = eraReconexion ? 'Reconectado' : 'En sala';
     });
 
     this.webSocket.addEventListener('message', (e) => {
@@ -289,7 +298,11 @@ class Partida {
     });
 
     this.webSocket.addEventListener('close', () => {
-      this.estado.textContent = 'Desconectado';
+      if (this.cerrandoIntencionalmente) {
+        this.estado.textContent = 'Desconectado';
+        return;
+      }
+      this.#intentarReconectar();
     });
 
     this.webSocket.addEventListener('error', (err) => {
@@ -298,8 +311,23 @@ class Partida {
         partidaId: this.partidaId,
         jugadorId: this.jugadorId,
       });
-      this.estado.textContent = 'Error de conexión';
     });
+  }
+
+  #intentarReconectar() {
+    if (this.intentosReconexion >= this.MAX_INTENTOS_RECONEXION) {
+      this.estado.textContent = 'No se pudo reconectar';
+      this.#mostrarMensaje('No se pudo reconectar al servidor.', 'error');
+      return;
+    }
+
+    this.intentosReconexion += 1;
+    const delay = Math.min(1000 * 2 ** (this.intentosReconexion - 1), 8000);
+    this.estado.textContent = `Reconectando... (${this.intentosReconexion}/${this.MAX_INTENTOS_RECONEXION})`;
+
+    this.timeoutReconexion = setTimeout(() => {
+      this.#conectarWS();
+    }, delay);
   }
 
   #manejarEvento(msg) {
@@ -341,6 +369,18 @@ class Partida {
           `${datos.nombreUsuario || 'Un jugador'} abandonó la partida. Se finaliza el juego.`,
           'error'
         );
+        break;
+      }
+      case 'jugador-desconectado': {
+        const segundos = Math.round((datos.gracePeriodMs || 30000) / 1000);
+        this.#mostrarMensaje(
+          `${datos.nombreUsuario || 'Un jugador'} se desconectó. Esperando reconexión (${segundos}s)...`,
+          'error'
+        );
+        break;
+      }
+      case 'jugador-reconectado': {
+        this.#mostrarMensaje(`${datos.nombreUsuario || 'Un jugador'} volvió a la partida.`);
         break;
       }
     }
