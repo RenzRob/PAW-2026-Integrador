@@ -8,6 +8,7 @@
     <nav class="navbar">
       <div class="navbar-logo">UNO Argentino</div>
       <div class="navbar-info" id="estado-partida">Conectando...</div>
+      <button class="btn-toggle-bitacora" id="btn-toggle-bitacora">Actividad</button>
       <div class="navbar-links">
         <span class="navbar-usuario" id="navbar-usuario"></span>
         <a href="#" id="salir" class="navbar-link">Salir</a>
@@ -78,6 +79,8 @@
         vistaLobby: document.getElementById('vista-lobby'),
         vistaMesa: document.getElementById('vista-mesa'),
         lobbyPrincipal: document.querySelector('.lobby-principal'),
+        btnToggleBitacora: document.getElementById('btn-toggle-bitacora'),
+        panelBitacora: document.querySelector('.lobby-bitacora'),
         onCambioVisibilidad: (visible) => {
           btnIniciar.hidden = !visible;
         },

@@ -12,6 +12,8 @@ class Partida {
     vistaLobby,
     vistaMesa,
     lobbyPrincipal,
+    btnToggleBitacora = null,
+    panelBitacora = null,
     onCambioVisibilidad = () => {},
   }) {
     this.jugadorId = jugadorId;
@@ -25,6 +27,8 @@ class Partida {
     this.vistaLobby = vistaLobby;
     this.vistaMesa = vistaMesa;
     this.lobbyPrincipal = lobbyPrincipal;
+    this.btnToggleBitacora = btnToggleBitacora;
+    this.panelBitacora = panelBitacora;
     this.onCambioVisibilidad = onCambioVisibilidad;
 
     logger.info('Cargando página de partida', {
@@ -38,6 +42,8 @@ class Partida {
       vistaLobby: this.vistaLobby,
       vistaMesa: this.vistaMesa,
       lobbyPrincipal: this.lobbyPrincipal,
+      btnToggleBitacora: this.btnToggleBitacora,
+      panelBitacora: this.panelBitacora,
       onCambioVisibilidad: this.onCambioVisibilidad,
     });
 
@@ -52,8 +58,32 @@ class Partida {
   }
 
   init() {
+    this.#configurarBitacoraMobile();
     this.#cargarResumen();
     this.#conectarWS();
+  }
+
+  #configurarBitacoraMobile() {
+    if (!this.btnToggleBitacora || !this.panelBitacora) return;
+
+    const aplicarEstadoPorAncho = () => {
+      if (window.innerWidth <= 768) {
+        this.panelBitacora.style.display = 'none';
+        this.btnToggleBitacora.textContent = 'Actividad';
+      } else {
+        this.panelBitacora.style.display = '';
+        this.btnToggleBitacora.textContent = 'Ocultar';
+      }
+    };
+
+    this.btnToggleBitacora.addEventListener('click', () => {
+      const oculto = this.panelBitacora.style.display === 'none';
+      this.panelBitacora.style.display = oculto ? '' : 'none';
+      this.btnToggleBitacora.textContent = oculto ? 'Ocultar' : 'Actividad';
+    });
+
+    aplicarEstadoPorAncho();
+    window.addEventListener('resize', aplicarEstadoPorAncho);
   }
 
   iniciarPartida() {
