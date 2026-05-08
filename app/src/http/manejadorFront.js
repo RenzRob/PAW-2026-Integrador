@@ -4,6 +4,8 @@ const logger = require('../logger');
 const EmptyException = require('../errores/EmptyException');
 
 class ManejadorFront {
+  #logLevel = process.env.LOG_LEVEL || 'debug';
+
   constructor(app) {
     logContext(logger, this);
     this.app = app;
@@ -21,6 +23,7 @@ class ManejadorFront {
 
     this.app.get('/public/bienvenida', (req, res) => {
       res.render('bienvenida', {
+        logLevel: this.#logLevel,
         title: 'UNO Argentino - Bienvenida',
         styles: ['/styles/auth.css'],
       });
@@ -28,6 +31,7 @@ class ManejadorFront {
 
     this.app.get('/public/', (req, res) => {
       res.render('inicio', {
+        logLevel: this.#logLevel,
         title: 'UNO Argentino - Inicio',
         styles: ['/styles/inicio.css'],
       });
@@ -35,6 +39,7 @@ class ManejadorFront {
 
     this.app.get('/public/ingresar', (req, res) => {
       res.render('login', {
+        logLevel: this.#logLevel,
         title: 'UNO Argentino - Ingresar',
         styles: ['/styles/auth.css'],
       });
@@ -42,6 +47,7 @@ class ManejadorFront {
 
     this.app.get('/public/registrarse', (req, res) => {
       res.render('registro', {
+        logLevel: this.#logLevel,
         title: 'UNO Argentino - Registrarse',
         styles: ['/styles/auth.css'],
       });
@@ -49,6 +55,7 @@ class ManejadorFront {
 
     this.app.get('/public/jugar', (req, res) => {
       res.render('jugar', {
+        logLevel: this.#logLevel,
         title: 'UNO Argentino - Jugar',
         styles: ['/styles/auth.css'],
       });
@@ -56,6 +63,7 @@ class ManejadorFront {
 
     this.app.get('/public/nombre-jugador', (req, res) => {
       res.render('nombre-jugador', {
+        logLevel: this.#logLevel,
         title: 'UNO Argentino - Nombre de Jugador',
         styles: ['/styles/nombre-jugador.css'],
       });
@@ -63,6 +71,7 @@ class ManejadorFront {
 
     this.app.get('/public/crear-sala', (req, res) => {
       res.render('crear-sala', {
+        logLevel: this.#logLevel,
         title: 'UNO Argentino - Crear Sala',
         styles: ['/styles/crear-sala.css'],
       });
@@ -98,6 +107,7 @@ class ManejadorFront {
 
     this.app.get('/public/partida', (req, res) => {
       res.render('partida', {
+        logLevel: this.#logLevel,
         title: 'UNO Argentino - Partida',
         styles: ['/styles/partida.css'],
       });
@@ -105,6 +115,7 @@ class ManejadorFront {
 
     this.app.get('/public/puntajes', (req, res) => {
       res.render('puntajes', {
+        logLevel: this.#logLevel,
         title: 'UNO Argentino - Puntajes',
         styles: ['/styles/puntajes.css'],
       });
@@ -112,6 +123,7 @@ class ManejadorFront {
 
     this.app.get('/public/salas', (req, res) => {
       res.render('salas', {
+        logLevel: this.#logLevel,
         title: 'UNO Argentino - Salas',
         styles: ['/styles/salas.css'],
       });

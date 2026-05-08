@@ -3,8 +3,10 @@
   <%- include('partials/head.ejs') %>
   <body>
     <script>
+      // Si el ID del usuario no está almacenado en la sesión, redirige a la página de bienvenida.
       if (!sessionStorage.getItem('jugadorId')) window.location.href = '/public/bienvenida';
     </script>
+
     <nav class="navbar">
       <div class="navbar-logo">UNO Argentino</div>
       <div class="navbar-info" id="estado-partida">Conectando...</div>
@@ -14,7 +16,9 @@
       </div>
     </nav>
 
+    <!-- Lobby -->
     <div class="lobby">
+      <!-- Lobby de juego -->
       <div class="lobby-principal">
         <div id="vista-lobby">
           <h1 id="lobby-titulo">Sala</h1>
@@ -29,313 +33,47 @@
         <div id="vista-mesa" class="mesa" hidden></div>
       </div>
 
+      <!-- Bitácora de actividades -->
       <div class="lobby-bitacora">
         <h2 class="lobby-subtitulo">Actividad</h2>
         <ul id="lista-mensajes" class="lista-mensajes"></ul>
       </div>
     </div>
 
-    <script>
-      const jugadorId = sessionStorage.getItem('jugadorId');
-      const partidaId = new URLSearchParams(window.location.search).get('partidaId');
+    <script type="module">
+      import Partida from '/scripts/partida.js';
 
+      // Establece el nombre del usuario en la barra de navegación utilizando el valor almacenado en sessionStorage.
       document.getElementById('navbar-usuario').textContent =
         sessionStorage.getItem('nombreUsuario') || '';
 
-      const elEstado = document.getElementById('estado-partida');
-      const elTitulo = document.getElementById('lobby-titulo');
-      const elInfo = document.getElementById('lobby-info');
-      const elLista = document.getElementById('lista-jugadores');
-      const elListaMensajes = document.getElementById('lista-mensajes');
       const btnIniciar = document.getElementById('btn-iniciar');
-      const elVistaLobby = document.getElementById('vista-lobby');
-      const elVistaMesa = document.getElementById('vista-mesa');
-      const elLobbyPrincipal = document.querySelector('.lobby-principal');
+      const partida = new Partida({
+        jugadorId: sessionStorage.getItem('jugadorId'),
+        partidaId: new URLSearchParams(window.location.search).get('partidaId'),
+        estado: document.getElementById('estado-partida'),
+        titulo: document.getElementById('lobby-titulo'),
+        info: document.getElementById('lobby-info'),
+        lista: document.getElementById('lista-jugadores'),
+        listaMensajes: document.getElementById('lista-mensajes'),
+        vistaLobby: document.getElementById('vista-lobby'),
+        vistaMesa: document.getElementById('vista-mesa'),
+        lobbyPrincipal: document.querySelector('.lobby-principal'),
+        onCambioVisibilidad: (visible) => {
+          btnIniciar.hidden = !visible;
+        },
+      });
 
-      let esCreador = false;
-      let maxJugadores = null;
-      let ws;
-
-      function mostrarMensaje(texto, tipo = 'info') {
-        const li = document.createElement('li');
-        li.className = 'mensaje-item';
-        li.dataset.tipo = tipo;
-
-        const ahora = new Date();
-        const hora = ahora.toLocaleString('es-AR', {
-          day: '2-digit',
-          month: '2-digit',
-          year: 'numeric',
-          hour: '2-digit',
-          minute: '2-digit',
-          second: '2-digit',
-        });
-        li.innerHTML = `<span class="mensaje-hora">${hora}</span> ${texto}`;
-
-        elListaMensajes.appendChild(li);
-        elListaMensajes.scrollTop = elListaMensajes.scrollHeight;
-      }
-
-      function pintarJugadores(jugadores) {
-        elLista.innerHTML = jugadores
-          .map((nombre) => `<li class="jugador-item">${nombre}</li>`)
-          .join('');
-        const cant = jugadores.length;
-        const total = maxJugadores != null ? `/${maxJugadores}` : '';
-        elInfo.textContent = `${cant}${total} jugadores en la sala`;
-      }
-
-      function normalizarTipoCarta(carta) {
-        if (!carta) return null;
-        if (carta.tipo === 'numero') return `${carta.color}-${carta.numero}.svg`;
-        if (carta.tipo === 'reversa') return `${carta.color}-cambio-sentido.svg`;
-        if (carta.tipo === 'salta') {
-          if (carta.color === 'azul') return 'azul-pierde.turno.svg';
-          return `${carta.color}-pierde-turno.svg`;
-        }
-        if (carta.tipo === 'roba-dos') return `${carta.color}-roba-dos.svg`;
-        if (carta.tipo === 'roba-cuatro') return 'comodín-roba-4.svg';
-        if (carta.esComodin || carta.color == null) return 'comodín.svg';
-        return null;
-      }
-
-      function urlCarta(carta, reverso = false) {
-        if (reverso) return '/vectors/reverso-cartas.svg';
-        const nombre = normalizarTipoCarta(carta);
-        return nombre ? `/vectors/${nombre}` : '/vectors/reverso-cartas.svg';
-      }
-
-      function crearCarta(carta, reverso = false) {
-        const img = document.createElement('img');
-        img.className = 'carta-svg';
-        img.src = urlCarta(carta, reverso);
-        img.alt = reverso ? 'Carta oculta' : 'Carta';
-        return img;
-      }
-
-      function crearManoHorizontal(cartas, reverso = false) {
-        const mano = document.createElement('div');
-        mano.className = 'mano-horizontal';
-        cartas.forEach((carta) => mano.appendChild(crearCarta(carta, reverso)));
-        return mano;
-      }
-
-      function crearManoLateral(cartas, reverso = false) {
-        const mano = document.createElement('div');
-        mano.className = 'mano-lateral';
-        cartas.forEach((carta) => mano.appendChild(crearCarta(carta, reverso)));
-        return mano;
-      }
-
-      function crearCartasPlaceholder(cantidad) {
-        return Array.from({ length: cantidad }, () => ({}));
-      }
-
-      function ordenarJugadoresDesdeActual(jugadores) {
-        const idxActual = jugadores.findIndex((j) => j.jugadorId === jugadorId);
-        if (idxActual < 0) return jugadores;
-        return jugadores.slice(idxActual).concat(jugadores.slice(0, idxActual));
-      }
-
-      function renderMesa(estado) {
-        const jugadoresOrdenados = ordenarJugadoresDesdeActual(estado.jugadores || []);
-        const jugadorActual = jugadoresOrdenados[0];
-        const rivales = jugadoresOrdenados.slice(1);
-
-        elVistaLobby.hidden = true;
-        elVistaMesa.hidden = false;
-        elLobbyPrincipal.classList.add('partida-activa');
-        elInfo.textContent = '';
-
-        elVistaMesa.innerHTML = '';
-
-        const areaArriba = document.createElement('div');
-        areaArriba.className = 'area-jugador-arriba';
-
-        if (rivales[0]) {
-          const nombre = document.createElement('div');
-          nombre.className = 'info-jugador';
-          nombre.textContent = rivales[0].nombreUsuario;
-          areaArriba.appendChild(nombre);
-          areaArriba.appendChild(
-            crearManoHorizontal(crearCartasPlaceholder(rivales[0].cantidadCartas), true)
-          );
-        }
-
-        const zonaCentral = document.createElement('div');
-        zonaCentral.className = 'zona-central';
-
-        const lateralIzq = document.createElement('div');
-        lateralIzq.className = 'area-jugador-lateral izquierda';
-        if (rivales[1]) {
-          const nombreIzq = document.createElement('div');
-          nombreIzq.className = 'nombre-lateral';
-          nombreIzq.textContent = rivales[1].nombreUsuario;
-          lateralIzq.appendChild(nombreIzq);
-          lateralIzq.appendChild(
-            crearManoLateral(crearCartasPlaceholder(rivales[1].cantidadCartas), true)
-          );
-        }
-
-        const tableroCentral = document.createElement('div');
-        tableroCentral.className = 'tablero-central';
-
-        const mazo = document.createElement('div');
-        mazo.className = 'mazo';
-        mazo.appendChild(crearCarta(null, true));
-
-        const descarte = document.createElement('div');
-        descarte.className = 'carta-descarte';
-        descarte.appendChild(crearCarta(estado.cartaEnMesa || null, false));
-
-        tableroCentral.appendChild(mazo);
-        tableroCentral.appendChild(descarte);
-
-        const lateralDer = document.createElement('div');
-        lateralDer.className = 'area-jugador-lateral derecha';
-        if (rivales[2]) {
-          const nombreDer = document.createElement('div');
-          nombreDer.className = 'nombre-lateral';
-          nombreDer.textContent = rivales[2].nombreUsuario;
-          lateralDer.appendChild(nombreDer);
-          lateralDer.appendChild(
-            crearManoLateral(crearCartasPlaceholder(rivales[2].cantidadCartas), true)
-          );
-        }
-
-        zonaCentral.appendChild(lateralIzq);
-        zonaCentral.appendChild(tableroCentral);
-        zonaCentral.appendChild(lateralDer);
-
-        const areaAbajo = document.createElement('div');
-        areaAbajo.className = 'area-jugador-abajo';
-
-        if (jugadorActual) {
-          const nombreActual = document.createElement('div');
-          nombreActual.className = 'info-jugador';
-          nombreActual.textContent = jugadorActual.nombreUsuario;
-          areaAbajo.appendChild(nombreActual);
-          areaAbajo.appendChild(crearManoHorizontal(jugadorActual.mano || [], false));
-        }
-
-        elVistaMesa.appendChild(areaArriba);
-        elVistaMesa.appendChild(zonaCentral);
-        elVistaMesa.appendChild(areaAbajo);
-      }
-
-      async function cargarResumen() {
-        if (!partidaId) {
-          mostrarMensaje('Falta el ID de partida.', 'error');
-          return;
-        }
-
-        try {
-          const response = await fetch(`/api/partidas/${encodeURIComponent(partidaId)}`, {
-            headers: { 'X-Jugador-Id': jugadorId || '' },
-          });
-          if (!response.ok) {
-            const data = await response.json().catch(() => ({}));
-            mostrarMensaje(data.error || 'No se pudo cargar la partida.', 'error');
-            return;
-          }
-          const sala = await response.json();
-          esCreador = sala.creadorId === jugadorId;
-          maxJugadores = sala.maxJugadores;
-          elTitulo.textContent = `Sala de ${sala.jugadores[0] || 'jugador'}`;
-          pintarJugadores(sala.jugadores);
-          if (esCreador) btnIniciar.hidden = false;
-        } catch (err) {
-          console.error(err);
-          mostrarMensaje('Error de red al cargar la partida.', 'error');
-        }
-      }
-
-      function conectarWS() {
-        const proto = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-        const url = `${proto}//${window.location.host}/ws?jugadorId=${encodeURIComponent(jugadorId)}&partidaId=${encodeURIComponent(partidaId)}`;
-        ws = new WebSocket(url);
-
-        ws.addEventListener('open', () => {
-          elEstado.textContent = 'En sala';
-        });
-
-        ws.addEventListener('message', (e) => {
-          let msg;
-          try {
-            msg = JSON.parse(e.data);
-          } catch {
-            return;
-          }
-          manejarEvento(msg);
-        });
-
-        ws.addEventListener('close', () => {
-          elEstado.textContent = 'Desconectado';
-        });
-
-        ws.addEventListener('error', (err) => {
-          console.error('WS error', err);
-          elEstado.textContent = 'Error de conexión';
-        });
-      }
-
-      function manejarEvento(msg) {
-        const { evento, ...datos } = msg;
-        switch (evento) {
-          case 'estado-partida': {
-            const estado = datos.estado;
-            if (estado.estado === 'jugando') {
-              elEstado.textContent = 'Partida en curso';
-              btnIniciar.hidden = true;
-              mostrarMensaje('La partida ya empezó.');
-              renderMesa(estado);
-            }
-            const nombres = (estado.jugadores || []).map((j) => j.nombreUsuario);
-            pintarJugadores(nombres);
-            break;
-          }
-          case 'jugador-unido': {
-            mostrarMensaje(`${datos.nombreUsuario || 'Un jugador'} ingresó a la sala.`);
-            cargarResumen();
-            break;
-          }
-          case 'jugador-salio': {
-            mostrarMensaje(`${datos.nombreUsuario || 'Un jugador'} salió de la sala.`);
-            cargarResumen();
-            break;
-          }
-          case 'turno-cambiado': {
-            elEstado.textContent = 'Partida en curso';
-            btnIniciar.hidden = true;
-            break;
-          }
-          case 'error': {
-            mostrarMensaje(datos.mensaje || 'Error', 'error');
-            break;
-          }
-          case 'jugador-abandono': {
-            mostrarMensaje(
-              `${datos.nombreUsuario || 'Un jugador'} abandonó la partida. Se finaliza el juego.`,
-              'error'
-            );
-            break;
-          }
-        }
-      }
-
-      btnIniciar.addEventListener('click', () => {
-        if (!ws || ws.readyState !== WebSocket.OPEN) return;
-        ws.send(JSON.stringify({ accion: 'iniciar-partida' }));
+      document.getElementById('btn-iniciar').addEventListener('click', () => {
+        partida.iniciarPartida();
       });
 
       document.getElementById('salir').addEventListener('click', (e) => {
         e.preventDefault();
-        if (ws) ws.close();
-        window.location.href = '/public/';
+        partida.salir();
       });
 
-      cargarResumen();
-      conectarWS();
+      partida.init();
     </script>
   </body>
 </html>

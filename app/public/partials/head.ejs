@@ -2,6 +2,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title><%= title %></title>
+  <script>window.__APP_LOG_LEVEL__ = '<%= logLevel %>';</script>
+
   <% if (typeof styles !== 'undefined' && styles.length) { %>
     <% styles.forEach(function(style) { %>
       <link rel="stylesheet" href="<%= style %>" />
