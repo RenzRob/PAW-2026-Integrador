@@ -41,6 +41,18 @@
     </div>
 
     <script>
+      // Re-login silencioso al cargar (cubre F5 y reinicio del server)
+      (function () {
+        const nombre = sessionStorage.getItem('nombreUsuario');
+        if (nombre) {
+          fetch('/api/ingresar', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ nombreUsuario: nombre }),
+          }).catch(() => {});
+        }
+      })();
+
       // Detección de cierre de navegador (mismo patrón que partials/navbar.ejs)
       document.addEventListener('click', (e) => {
         if (e.target.closest('a[href], button')) window.__navInterno = true;

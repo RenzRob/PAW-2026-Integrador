@@ -30,6 +30,17 @@
     const nombre = sessionStorage.getItem('nombreUsuario');
     if (nombre) document.getElementById('topbar-usuario').textContent = nombre;
 
+    // Re-login silencioso al cargar la página: cubre el caso de F5/recarga
+    // (donde el pagehide previo nos deslogueó) y reinicio del server.
+    // Si ya estás logueado, /api/ingresar devuelve 409 y no pasa nada.
+    if (nombre) {
+      fetch('/api/ingresar', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nombreUsuario: nombre }),
+      }).catch(() => {});
+    }
+
     // Detección de cierre de navegador/pestaña: si el usuario navega dentro de
     // la app (click en link/botón), se setea __navInterno y NO se desloguea.
     // Si el usuario cierra la pestaña/navegador, se dispara sendBeacon a /api/salir
