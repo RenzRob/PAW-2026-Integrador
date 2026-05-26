@@ -124,7 +124,7 @@ class Servidor {
     logContext(logger, this);
 
     /* Rutas del frontend. */
-    const manejadorFront = new ManejadorFront(this.app);
+    const manejadorFront = new ManejadorFront(this.app, new PuntajesController(db));
 
     /* Rutas del backend. */
 

@@ -193,6 +193,53 @@ body {
   color: #222;
 }
 
+/* ── Sección de contenido SEO en bienvenida ─────────────────────────────── */
+.bienvenida-info {
+  max-width: 560px;
+  width: 100%;
+  margin-top: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.4rem;
+}
+
+.bienvenida-info article {
+  background: rgba(255, 255, 255, 0.75);
+  border-radius: 10px;
+  padding: 1.2rem 1.5rem;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.08);
+}
+
+.bienvenida-info h2 {
+  margin: 0 0 0.6rem 0;
+  font-size: 1rem;
+  color: #1a4971;
+}
+
+.bienvenida-info p {
+  margin: 0;
+  font-size: 0.92rem;
+  color: #444;
+  line-height: 1.5;
+}
+
+.bienvenida-pasos {
+  margin: 0;
+  padding-left: 1.3rem;
+  font-size: 0.92rem;
+  color: #444;
+  line-height: 1.8;
+}
+
+.bienvenida-info a {
+  color: #007bff;
+  text-decoration: none;
+}
+
+.bienvenida-info a:hover {
+  text-decoration: underline;
+}
+
 @media (max-width: 420px) {
   .auth-form,
   .bienvenida-box {
