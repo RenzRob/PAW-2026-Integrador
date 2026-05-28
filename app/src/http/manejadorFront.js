@@ -2,6 +2,7 @@ const { isEmptyObject, logContext, registerLog, handleGenericErrorByEnv } = requ
 const axios = require('axios');
 const logger = require('../logger');
 const EmptyException = require('../errores/EmptyException');
+const { buildReglasLocals } = require('./seo/reglas');
 
 class ManejadorFront {
   #logLevel = process.env.LOG_LEVEL || 'debug';
@@ -127,6 +128,10 @@ class ManejadorFront {
         title: 'UNO Argentino - Salas',
         styles: ['/styles/salas.css'],
       });
+    });
+
+    this.app.get('/public/reglas', (req, res) => {
+      res.render('reglas', { logLevel: this.#logLevel, ...buildReglasLocals(req) });
     });
   }
 }

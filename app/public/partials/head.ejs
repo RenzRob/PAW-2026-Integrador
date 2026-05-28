@@ -2,11 +2,48 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title><%= title %></title>
+
+  <% if (typeof description !== 'undefined') { %>
+    <meta name="description" content="<%= description %>" />
+  <% } %>
+  <% if (typeof keywords !== 'undefined') { %>
+    <meta name="keywords" content="<%= keywords %>" />
+  <% } %>
+  <% if (typeof canonical !== 'undefined') { %>
+    <link rel="canonical" href="<%= canonical %>" />
+  <% } %>
+
+  <meta property="og:title" content="<%= title %>" />
+  <% if (typeof description !== 'undefined') { %>
+    <meta property="og:description" content="<%= description %>" />
+  <% } %>
+  <meta property="og:type" content="<%= typeof ogType !== 'undefined' ? ogType : 'website' %>" />
+  <meta property="og:locale" content="es_AR" />
+  <% if (typeof canonical !== 'undefined') { %>
+    <meta property="og:url" content="<%= canonical %>" />
+  <% } %>
+  <% if (typeof ogImage !== 'undefined') { %>
+    <meta property="og:image" content="<%= ogImage %>" />
+  <% } %>
+
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="<%= title %>" />
+  <% if (typeof description !== 'undefined') { %>
+    <meta name="twitter:description" content="<%= description %>" />
+  <% } %>
+  <% if (typeof ogImage !== 'undefined') { %>
+    <meta name="twitter:image" content="<%= ogImage %>" />
+  <% } %>
+
   <script>window.__APP_LOG_LEVEL__ = '<%= logLevel %>';</script>
 
   <% if (typeof styles !== 'undefined' && styles.length) { %>
     <% styles.forEach(function(style) { %>
       <link rel="stylesheet" href="<%= style %>" />
     <% }); %>
+  <% } %>
+
+  <% if (typeof jsonLd !== 'undefined') { %>
+    <script type="application/ld+json"><%- jsonLd %></script>
   <% } %>
 </head>
