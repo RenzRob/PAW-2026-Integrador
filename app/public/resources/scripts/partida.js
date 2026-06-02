@@ -155,8 +155,7 @@ class Partida {
   }
 
   /**
-   * Renderiza un mensaje del chat en la lista. Usa textContent/createElement
-   * para todo lo proveniente del server y así prevenir XSS.
+   * Renderiza un mensaje del chat en la lista.
    */
   #mostrarMensajeChat({ jugadorId, nombreUsuario, texto, timestamp }) {
     if (!this.listaMensajes) return;

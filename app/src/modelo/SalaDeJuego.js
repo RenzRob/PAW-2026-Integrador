@@ -21,7 +21,7 @@ class SalaDeJuego {
     this.tipoPenalidad = null;
     this.puntajesRonda = {};
 
-    // Chat de la sala (en memoria, no se persiste).
+    // Chat de la sala
     this.mensajesChat = [];
     this.MAX_MENSAJES_CHAT = 100;
     this.MAX_LARGO_MENSAJE = 200;
