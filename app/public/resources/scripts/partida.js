@@ -319,7 +319,11 @@ class Partida {
    */
   #pintarJugadores(jugadores) {
     this.lista.innerHTML = jugadores
-      .map((nombre) => `<li class="jugador-item">${nombre}</li>`)
+      .map((j) => {
+        const nombre = typeof j === 'string' ? j : j.nombreUsuario;
+        const esPropio = typeof j === 'object' && String(j.jugadorId) === String(this.jugadorId);
+        return `<li class="jugador-item${esPropio ? ' jugador-propio' : ''}">${nombre}</li>`;
+      })
       .join('');
     const cant = jugadores.length;
     const total = this.maxJugadores != null ? `/${this.maxJugadores}` : '';
@@ -588,6 +592,10 @@ class Partida {
     const rivales = jugadoresOrdenados.slice(1);
     const esMiTurno = estado.turno === this.jugadorId;
     const turnoActualId = estado.turno;
+    const claseNombreTurno = (jugador, claseBase) =>
+      String(jugador?.jugadorId) === String(turnoActualId)
+        ? `${claseBase} jugador-en-turno-nombre`
+        : claseBase;
 
     const textoTurnoJugador = (jugador) => {
       if (!jugador) return '';
@@ -616,13 +624,36 @@ class Partida {
 
     if (rivalArriba) {
       const nombre = document.createElement('div');
-      nombre.className = 'info-jugador';
+      nombre.className = claseNombreTurno(rivalArriba, 'info-jugador');
       nombre.textContent = textoTurnoJugador(rivalArriba);
       areaArriba.appendChild(nombre);
       areaArriba.appendChild(
         this.#crearManoHorizontal(this.#crearCartasPlaceholder(rivalArriba.cantidadCartas), true)
       );
     }
+
+    const areaRivalesMobile = document.createElement('div');
+    areaRivalesMobile.className = 'area-rivales-mobile';
+    [rivalIzquierda, rivalArriba, rivalDerecha].forEach((rival) => {
+      if (!rival) return;
+
+      const filaRival = document.createElement('div');
+      filaRival.className = 'rival-mobile-row';
+
+      const nombreRival = document.createElement('div');
+      nombreRival.className = claseNombreTurno(rival, 'info-jugador');
+      nombreRival.textContent = textoTurnoJugador(rival);
+
+      const manoRival = this.#crearManoHorizontal(
+        this.#crearCartasPlaceholder(rival.cantidadCartas),
+        true
+      );
+      manoRival.classList.add('mano-rival-mobile');
+
+      filaRival.appendChild(nombreRival);
+      filaRival.appendChild(manoRival);
+      areaRivalesMobile.appendChild(filaRival);
+    });
 
     const zonaCentral = document.createElement('div');
     zonaCentral.className = 'zona-central';
@@ -631,7 +662,7 @@ class Partida {
     lateralIzq.className = 'area-jugador-lateral izquierda';
     if (rivalIzquierda) {
       const nombreIzq = document.createElement('div');
-      nombreIzq.className = 'nombre-lateral';
+      nombreIzq.className = claseNombreTurno(rivalIzquierda, 'nombre-lateral');
       nombreIzq.textContent = textoTurnoJugador(rivalIzquierda);
       lateralIzq.appendChild(nombreIzq);
       lateralIzq.appendChild(
@@ -664,15 +695,39 @@ class Partida {
     indicadorColor.className = `indicador-color${colorActual ? ` color-${colorActual}` : ''}`;
     indicadorColor.textContent = `Color actual: ${this.#nombreColor(colorActual)}`;
 
-    tableroCentral.appendChild(mazo);
-    tableroCentral.appendChild(descarte);
-    tableroCentral.appendChild(indicadorColor);
+    const indicadorSentido = document.createElement('div');
+    indicadorSentido.className = 'indicador-sentido';
+    const esVistaMobile = window.matchMedia('(max-width: 768px)').matches;
+    indicadorSentido.textContent = esVistaMobile
+      ? estado.sentido === -1
+        ? 'Hacia arriba'
+        : 'Hacia abajo'
+      : estado.sentido === -1
+        ? '↺ Antihorario'
+        : '↻ Horario';
+
+    const cartasRow = document.createElement('div');
+    cartasRow.className = 'cartas-row';
+    cartasRow.appendChild(mazo);
+    cartasRow.appendChild(descarte);
+
+    const indicadoresRow = document.createElement('div');
+    indicadoresRow.className = 'indicadores-row';
+    indicadoresRow.appendChild(indicadorColor);
+    indicadoresRow.appendChild(indicadorSentido);
+
+    const mazoWrapper = document.createElement('div');
+    mazoWrapper.className = 'mazo-wrapper';
+    mazoWrapper.appendChild(cartasRow);
+    mazoWrapper.appendChild(indicadoresRow);
+
+    tableroCentral.appendChild(mazoWrapper);
 
     const lateralDer = document.createElement('div');
     lateralDer.className = 'area-jugador-lateral derecha';
     if (rivalDerecha) {
       const nombreDer = document.createElement('div');
-      nombreDer.className = 'nombre-lateral';
+      nombreDer.className = claseNombreTurno(rivalDerecha, 'nombre-lateral');
       nombreDer.textContent = textoTurnoJugador(rivalDerecha);
       lateralDer.appendChild(nombreDer);
       lateralDer.appendChild(
@@ -689,7 +744,7 @@ class Partida {
 
     if (jugadorActual) {
       const nombreActual = document.createElement('div');
-      nombreActual.className = 'info-jugador';
+      nombreActual.className = claseNombreTurno(jugadorActual, 'info-jugador');
       nombreActual.textContent = textoTurnoJugador(jugadorActual);
       areaAbajo.appendChild(nombreActual);
       areaAbajo.appendChild(
@@ -714,6 +769,7 @@ class Partida {
     }
 
     this.vistaMesa.appendChild(areaArriba);
+    this.vistaMesa.appendChild(areaRivalesMobile);
     this.vistaMesa.appendChild(zonaCentral);
     this.vistaMesa.appendChild(areaAbajo);
   }
@@ -841,8 +897,7 @@ class Partida {
           }
           this.#renderMesa(estado);
         }
-        const nombres = (estado.jugadores || []).map((j) => j.nombreUsuario);
-        this.#pintarJugadores(nombres);
+        this.#pintarJugadores(estado.jugadores || []);
         // Hidratar el historial de chat la primera vez que llega estado-partida
         // (sirve para reconexiones después de un microcorte o F5)
         if (!this.chatHidratado && Array.isArray(estado.mensajesChat)) {
@@ -887,6 +942,16 @@ class Partida {
       case 'ronda-terminada': {
         this.#mostrarMensaje('Ronda terminada.');
         this.#mostrarTablaPuntajesRonda(datos.puntajesRonda || {}, datos.ganadorRonda);
+        break;
+      }
+      case 'partida-terminada': {
+        const ganador = (datos.ranking || [])[0];
+        this.#mostrarMensaje(`¡${ganador?.nombre || 'Un jugador'} ganó la partida!`);
+        const puntajesFinales = {};
+        for (const r of datos.ranking || []) {
+          puntajesFinales[r.jugadorId] = r.puntaje;
+        }
+        this.#mostrarTablaPuntajesRonda(puntajesFinales, ganador?.jugadorId);
         break;
       }
       case 'error': {

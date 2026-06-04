@@ -5,6 +5,7 @@
 ## HTTP
 
 ### Registrar jugador
+
 ```bash
 curl -X POST http://localhost:3000/api/registrarse \
   -H "Content-Type: application/json" \
@@ -12,6 +13,7 @@ curl -X POST http://localhost:3000/api/registrarse \
 ```
 
 ### Ingresar
+
 ```bash
 curl -X POST http://localhost:3000/api/ingresar \
   -H "Content-Type: application/json" \
@@ -19,6 +21,7 @@ curl -X POST http://localhost:3000/api/ingresar \
 ```
 
 ### Crear partida
+
 ```bash
 curl -X POST http://localhost:3000/api/partidas \
   -H "Content-Type: application/json" \
@@ -26,16 +29,19 @@ curl -X POST http://localhost:3000/api/partidas \
 ```
 
 ### Listar partidas disponibles
+
 ```bash
 curl http://localhost:3000/api/partidas
 ```
 
 ### Obtener partida
+
 ```bash
 curl http://localhost:3000/api/partidas/UUID_PARTIDA
 ```
 
 ### Ranking global
+
 ```bash
 curl http://localhost:3000/api/puntajes
 ```
@@ -45,38 +51,33 @@ curl http://localhost:3000/api/puntajes
 ## WebSocket
 
 ### Conectarse
+
 ```bash
 wscat -c "ws://localhost:3000?jugadorId=UUID_JUGADOR&partidaId=UUID_PARTIDA"
 ```
 
 ### Iniciar partida
+
 ```json
-{"accion":"iniciar-partida"}
+{ "accion": "iniciar-partida" }
 ```
 
 ### Jugar carta
+
 ```json
-{"accion":"jugar-carta","cartaId":"UUID_CARTA"}
+{ "accion": "jugar-carta", "cartaId": "UUID_CARTA" }
 ```
 
 ### Jugar comodín (con color elegido)
+
 ```json
-{"accion":"jugar-carta","cartaId":"UUID_CARTA","colorElegido":"rojo"}
+{ "accion": "jugar-carta", "cartaId": "UUID_CARTA", "colorElegido": "rojo" }
 ```
 
 ### Robar carta
-```json
-{"accion":"robar-carta"}
-```
 
-### Cantar UNO
 ```json
-{"accion":"cantar-uno"}
-```
-
-### Denunciar UNO no cantado
-```json
-{"accion":"denunciar-uno","acusadoId":"UUID_JUGADOR"}
+{ "accion": "robar-carta" }
 ```
 
 ---
@@ -84,7 +85,9 @@ wscat -c "ws://localhost:3000?jugadorId=UUID_JUGADOR&partidaId=UUID_PARTIDA"
 ## Eventos servidor → cliente
 
 ### `estado-partida`
+
 Se recibe al unirse a la sala, al iniciar la partida y al terminar cada ronda.
+
 ```json
 {
   "estado": {
@@ -99,17 +102,20 @@ Se recibe al unirse a la sala, al iniciar la partida y al terminar cada ronda.
         "jugadorId": "UUID",
         "nombreUsuario": "renzo",
         "cantidadCartas": 7,
-        "mano": [ { "id": "UUID", "color": "rojo", "tipo": "numero", "valor": 5 } ]
+        "mano": [{ "id": "UUID", "color": "rojo", "tipo": "numero", "valor": 5 }]
       }
     ],
     "puntajesRonda": { "UUID_JUGADOR": 120 }
   }
 }
 ```
+
 > `mano` solo está presente para el jugador que recibe el evento. Los demás ven `undefined`.
 
 ### `jugador-unido`
+
 Se recibe cuando un jugador se une a la sala.
+
 ```json
 {
   "jugadorId": "UUID",
@@ -119,7 +125,9 @@ Se recibe cuando un jugador se une a la sala.
 ```
 
 ### `carta-jugada`
+
 Se recibe cuando un jugador (o bot) juega una carta.
+
 ```json
 {
   "jugadorId": "UUID",
@@ -128,7 +136,9 @@ Se recibe cuando un jugador (o bot) juega una carta.
 ```
 
 ### `turno-cambiado`
+
 Se recibe después de cada jugada o robo.
+
 ```json
 {
   "turno": "UUID_JUGADOR",
@@ -137,10 +147,13 @@ Se recibe después de cada jugada o robo.
   "robó": { "jugadorId": "UUID", "cantidad": 2 }
 }
 ```
+
 > `penalidad` y `robó` son opcionales.
 
 ### `ronda-terminada`
+
 Se recibe cuando un jugador se queda sin cartas y aún no hay ganador de la partida.
+
 ```json
 {
   "ganadorRonda": "UUID_JUGADOR",
@@ -150,36 +163,22 @@ Se recibe cuando un jugador se queda sin cartas y aún no hay ganador de la part
 ```
 
 ### `partida-terminada`
-Se recibe cuando un jugador acumula 500 puntos o más.
+
+Se recibe cuando un jugador acumula 200 puntos o más.
+
 ```json
 {
   "ranking": [
-    { "jugadorId": "UUID", "nombre": "renzo", "puntaje": 520, "puesto": 1, "deltaGlobal": 50 },
+    { "jugadorId": "UUID", "nombre": "renzo", "puntaje": 220, "puesto": 1, "deltaGlobal": 50 },
     { "jugadorId": "UUID", "nombre": "Bot-A", "puntaje": 130, "puesto": 2, "deltaGlobal": 0 }
   ]
 }
 ```
 
-### `uno-cantado`
-Se recibe cuando un jugador (o bot) canta UNO.
-```json
-{
-  "jugadorId": "UUID",
-  "nombreUsuario": "renzo"
-}
-```
-
-### `uno-denunciado`
-Se recibe cuando se denuncia con éxito a un jugador que no cantó UNO.
-```json
-{
-  "denuncianteId": "UUID",
-  "acusado": "renzo"
-}
-```
-
 ### `jugador-abandono`
+
 Se recibe cuando un jugador se desconecta durante la partida. La partida se cancela.
+
 ```json
 {
   "jugadorId": "UUID",
@@ -189,7 +188,9 @@ Se recibe cuando un jugador se desconecta durante la partida. La partida se canc
 ```
 
 ### `error`
+
 Se recibe ante cualquier acción inválida. Solo lo recibe el jugador que la generó.
+
 ```json
 {
   "mensaje": "No es tu turno"

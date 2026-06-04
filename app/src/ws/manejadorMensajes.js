@@ -99,12 +99,6 @@ class ManejadorMensajes {
             case 'robar-carta':
               this.#partidaController.robarCarta(partidaId, jugadorId);
               break;
-            case 'cantar-uno':
-              this.#partidaController.cantarUno(partidaId, jugadorId);
-              break;
-            case 'denunciar-uno':
-              this.#partidaController.denunciarUno(partidaId, jugadorId, payload.acusadoId);
-              break;
             case 'abandonar-partida':
               abandonoExplicito = true;
               await this.#partidaController.abandonarPartida(partidaId, jugadorId);

@@ -40,13 +40,11 @@ classDiagram
         +String jugadorId
         +String nombreUsuario
         +Carta[] mano
-        +bool cantóUno
         +bool esBot
         +recibirCartas(cartas) void
         +quitarCarta(cartaId) Carta
         +reiniciarMano() void
         +get cantidadCartas() int
-        +get tieneUna() bool
         +get gano() bool
     }
 
@@ -74,8 +72,6 @@ classDiagram
         +estadoParaBot() Object
         +jugarCarta(jugadorId, cartaId, colorElegido) Object
         +robarCarta(jugadorId) Object
-        +cantarUno(jugadorId) Object
-        +denunciarUno(denuncianteId, acusadoId) Object
         +jugadorAbandonó(jugadorId) Object
         +estadoParaJugador(jugadorId) Object
     }
@@ -119,8 +115,6 @@ classDiagram
         +iniciarPartida(partidaId, jugadorId) void
         +jugarCarta(partidaId, jugadorId, cartaId, colorElegido) void
         +robarCarta(partidaId, jugadorId) void
-        +cantarUno(partidaId, jugadorId) void
-        +denunciarUno(partidaId, jugadorId, acusadoId) void
         +desconectar(partidaId, jugadorId) void
     }
 

@@ -102,33 +102,6 @@ class PartidaController {
     }
   }
 
-  cantarUno(partidaId, jugadorId) {
-    logContext(logger, this);
-    const sala = this.persistencia.obtenerPartida(partidaId);
-    const jugador = sala.jugadores.find((j) => j.jugadorId === jugadorId);
-    const res = sala.cantarUno(jugadorId);
-
-    if (res.error) {
-      this.manejadorConexiones.emitirA(jugadorId, 'error', { mensaje: res.error });
-      return;
-    }
-
-    this.#broadcast(sala, 'uno-cantado', { jugadorId, nombreUsuario: jugador.nombreUsuario });
-  }
-
-  denunciarUno(partidaId, jugadorId, acusadoId) {
-    logContext(logger, this);
-    const sala = this.persistencia.obtenerPartida(partidaId);
-    const res = sala.denunciarUno(jugadorId, acusadoId);
-
-    if (res.error) {
-      this.manejadorConexiones.emitirA(jugadorId, 'error', { mensaje: res.error });
-      return;
-    }
-
-    this.#broadcast(sala, 'uno-denunciado', { denuncianteId: jugadorId, acusado: res.acusado });
-  }
-
   enviarMensajeChat(partidaId, jugadorId, texto) {
     logContext(logger, this, { partidaId, jugadorId });
     const sala = this.persistencia.obtenerPartida(partidaId);
@@ -312,6 +285,10 @@ class PartidaController {
       return;
     }
 
+    if (res.carta) {
+      this.#broadcast(sala, 'carta-jugada', { jugadorId, carta: res.carta });
+    }
+
     if (res.partidaTerminada) {
       await this.persistencia.guardarResultadoPartida(partidaId, res.ranking);
 
@@ -332,8 +309,6 @@ class PartidaController {
 
       return;
     }
-
-    this.#broadcast(sala, 'carta-jugada', { jugadorId, carta: res.carta });
 
     this.#broadcast(sala, 'turno-cambiado', {
       turno: sala.jugadorEnTurno().jugadorId,
@@ -521,11 +496,23 @@ class PartidaController {
           });
           this.#emitirEstadoPartida(salaActual);
         } else if (res.partidaTerminada) {
+          if (res.carta) {
+            this.#broadcast(salaActual, 'carta-jugada', {
+              jugadorId: bot.jugadorId,
+              carta: res.carta,
+            });
+          }
           await this.persistencia.guardarResultadoPartida(partidaId, res.ranking);
           this.#broadcast(salaActual, 'partida-terminada', { ranking: res.ranking });
           this.persistencia.eliminarPartida(partidaId);
           return;
         } else if (res.rondaTerminada) {
+          if (res.carta) {
+            this.#broadcast(salaActual, 'carta-jugada', {
+              jugadorId: bot.jugadorId,
+              carta: res.carta,
+            });
+          }
           this.#broadcast(salaActual, 'ronda-terminada', {
             ganadorRonda: res.ganadorRonda,
             puntosGanados: res.puntosGanados,
@@ -534,13 +521,6 @@ class PartidaController {
           this.#emitirEstadoPartida(salaActual);
           return;
         } else {
-          if (bot.mano.length === 1) {
-            salaActual.cantarUno(bot.jugadorId);
-            this.#broadcast(salaActual, 'uno-cantado', {
-              jugadorId: bot.jugadorId,
-              nombreUsuario: bot.nombreUsuario,
-            });
-          }
           this.#broadcast(salaActual, 'carta-jugada', {
             jugadorId: bot.jugadorId,
             carta: res.carta,

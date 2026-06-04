@@ -15,7 +15,7 @@ REGLAS DEL UNO ARGENTINO:
 - Reversa: invierte el sentido del juego. Con 2 jugadores, actúa como Salta.
 - Fin de ronda: el primero en quedarse sin cartas gana la ronda y suma los puntos de las cartas restantes de los rivales.
 - Valores: números = valor nominal, especiales (salta/reversa/roba-dos) = 20 pts, comodines = 50 pts.
-- Fin de partida: el primero en llegar a 500 puntos gana.
+- Fin de partida: el primero en llegar a 200 puntos gana.
 
 ESTRATEGIA RECOMENDADA:
 - Priorizá jugar cartas de alto valor (comodines y especiales) para no quedarte con muchos puntos si otro gana.

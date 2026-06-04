@@ -36,12 +36,6 @@ const HOW_TO_STEPS = [
       'o cualquier comodín. Si no podés, robá una carta del mazo.',
   },
   {
-    name: 'Cantar UNO',
-    text:
-      'Decí "UNO" antes de jugar tu penúltima carta. Si no lo decís y otro jugador te ' +
-      'denuncia, robás 2 cartas.',
-  },
-  {
     name: 'Cerrar la ronda',
     text:
       'Al jugar tu última carta finaliza la ronda. Sumás los puntos de las cartas que les ' +
@@ -49,7 +43,7 @@ const HOW_TO_STEPS = [
   },
   {
     name: 'Ganar la partida',
-    text: 'El primer jugador en llegar a 500 puntos acumulados gana la partida.',
+    text: 'El primer jugador en llegar a 200 puntos acumulados gana la partida.',
   },
 ];
 
