@@ -1,32 +1,31 @@
-const db = require('../../persistencia/Persistencia');
-const logger = require('../../logger');
+const jwt = require('jsonwebtoken');
 
-/**
- * Middleware que verifica que el jugador tiene una sesión activa.
- * Lee el jugadorId desde la cookie HttpOnly.
- * Si la sesión es válida, expone req.jugadorId para los handlers.
- * Responde con 401 si no hay sesión válida.
- */
+function verifyToken(token) {
+  return jwt.verify(token, process.env.JWT_SECRET);
+}
+
 function requireAuth(req, res, next) {
-  const jugadorId = req.cookies?.jugadorId;
-
-  if (!jugadorId || !db.jugadorEstaLogueado(jugadorId)) {
-    return res.status(401).json({ error: 'No autorizado' });
+  try {
+    const payload = verifyToken(req.cookies?.token);
+    req.jugadorId = payload.jugadorId;
+    req.nombreUsuario = payload.nombreUsuario;
+    next();
+  } catch {
+    res.status(401).json({ error: 'No autorizado' });
   }
-
-  req.jugadorId = jugadorId;
-  next();
 }
 
 function requireAuthWeb(req, res, next) {
-  const jugadorId = req.cookies?.jugadorId;
-
-  if (!jugadorId || !db.jugadorEstaLogueado(jugadorId)) {
-    return res.redirect('/public/bienvenida');
+  try {
+    const payload = verifyToken(req.cookies?.token);
+    req.jugadorId = payload.jugadorId;
+    req.nombreUsuario = payload.nombreUsuario;
+    next();
+  } catch {
+    res.clearCookie('token');
+    res.clearCookie('nombreUsuario');
+    res.redirect('/public/bienvenida');
   }
-
-  req.jugadorId = jugadorId;
-  next();
 }
 
 module.exports = { requireAuth, requireAuthWeb };

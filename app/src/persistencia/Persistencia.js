@@ -16,7 +16,6 @@ class Persistencia {
       ? require('./mysql/JugadorRepositorioMySQL')
       : require('./memoria/JugadorRepositorioMemoria');
     this.partidas = new Map();
-    this.jugadoresLogueados = new Set();
   }
 
   // ─── Jugadores (delegado al repositorio) ─────────────────────────────────
@@ -108,20 +107,6 @@ class Persistencia {
     return false;
   }
 
-  marcarJugadorLogueado(jugadorId) {
-    logContext(logger, this);
-    this.jugadoresLogueados.add(jugadorId);
-  }
-
-  desmarcarJugadorLogueado(jugadorId) {
-    logContext(logger, this);
-    this.jugadoresLogueados.delete(jugadorId);
-  }
-
-  jugadorEstaLogueado(jugadorId) {
-    logContext(logger, this);
-    return this.jugadoresLogueados.has(jugadorId);
-  }
 }
 
 module.exports = new Persistencia();

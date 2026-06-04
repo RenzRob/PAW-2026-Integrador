@@ -5,6 +5,7 @@ const http = require('http');
 const path = require('path');
 const express = require('express');
 const cookieParser = require('cookie-parser');
+const jwt = require('jsonwebtoken');
 const { WebSocketServer } = require('ws');
 const { URL } = require('url');
 const axios = require('axios');
@@ -149,17 +150,23 @@ class Servidor {
     this.server.on('upgrade', (req, socket, head) => {
       const url = new URL(req.url, `http://${req.headers.host}`);
       const partidaId = url.searchParams.get('partidaId');
-      const cookieStr = req.headers.cookie || '';
-      const jugadorId = cookieStr.split(';').map(c => c.trim()).find(c => c.startsWith('jugadorId='))?.split('=')[1];
 
-      if (!jugadorId || !partidaId) {
-        socket.write('HTTP/1.1 400 Bad Request\r\n\r\n');
+      const cookieStr = req.headers.cookie || '';
+      const tokenCookie = cookieStr.split(';').map(c => c.trim()).find(c => c.startsWith('token='));
+      const rawToken = tokenCookie?.split('=')[1];
+
+      let jugadorId;
+      try {
+        const payload = jwt.verify(rawToken, process.env.JWT_SECRET);
+        jugadorId = payload.jugadorId;
+      } catch {
+        socket.write('HTTP/1.1 401 Unauthorized\r\n\r\n');
         socket.destroy();
         return;
       }
 
-      if (!db.jugadorEstaLogueado(jugadorId)) {
-        socket.write('HTTP/1.1 401 Unauthorized\r\n\r\n');
+      if (!partidaId) {
+        socket.write('HTTP/1.1 400 Bad Request\r\n\r\n');
         socket.destroy();
         return;
       }

@@ -49,7 +49,6 @@ class AuthController {
     const jugadorId = uuidv4();
     const passwordHash = await bcrypt.hash(clave, BCRYPT_ROUNDS);
     await this.persistencia.registrarJugador(jugadorId, nombre, passwordHash);
-    this.persistencia.marcarJugadorLogueado(jugadorId);
 
     return { ok: true, data: { jugadorId, nombreUsuario: nombre } };
   }
@@ -78,27 +77,12 @@ class AuthController {
     const passwordOk = await bcrypt.compare(clave, jugador.passwordHash);
     if (!passwordOk) return credencialesInvalidas;
 
-    this.persistencia.marcarJugadorLogueado(jugador.jugadorId);
-
     return {
       ok: true,
       data: { jugadorId: jugador.jugadorId, nombreUsuario: jugador.nombreUsuario },
     };
   }
 
-  async obtenerSesion(jugadorId) {
-    if (!jugadorId || !this.persistencia.jugadorEstaLogueado(jugadorId)) return null;
-    const jugador = await this.persistencia.obtenerJugador(jugadorId);
-    return jugador ? { jugadorId, nombreUsuario: jugador.nombreUsuario } : null;
-  }
-
-  async salir(jugadorId) {
-    logContext(logger, this);
-    if (!jugadorId?.trim()) return { ok: false, status: 400, error: 'jugadorId requerido' };
-
-    this.persistencia.desmarcarJugadorLogueado(jugadorId.trim());
-    return { ok: true };
-  }
 }
 
 module.exports = AuthController;

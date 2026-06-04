@@ -16,7 +16,7 @@ jobs:
           host: ${{ secrets.VM_IP }}
           username: ${{ secrets.VM_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          envs: DB_USER,DB_PASSWORD,GEMINI_API_KEY
+          envs: DB_USER,DB_PASSWORD,GEMINI_API_KEY,JWT_SECRET
           script: |
             cd /home/rrobles/PAW-2026-Integrador
             git pull origin main
@@ -31,6 +31,7 @@ jobs:
               echo "DB_USER=$DB_USER"
               echo "DB_PASSWORD=$DB_PASSWORD"
               echo "GEMINI_API_KEY=$GEMINI_API_KEY"
+              echo "JWT_SECRET=$JWT_SECRET"
             } > .env
             docker compose up -d
             docker compose restart app
@@ -38,3 +39,4 @@ jobs:
           DB_USER: ${{ secrets.DB_USER }}
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}

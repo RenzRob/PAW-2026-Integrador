@@ -1,83 +1,57 @@
 const express = require('express');
-const { requireAuth } = require('../middleware/middlewareAuth');
+const jwt = require('jsonwebtoken');
 const logger = require('../../logger');
 const { logContext } = require('../../utils');
 
-/**
- * ManejadorAuth es responsable de manejar las rutas relacionadas con la autenticación
- * de usuarios, como el registro, ingreso y salida. Utiliza un controlador de
- * autenticación para realizar las operaciones necesarias y devuelve las correspondientes
- * respuestas HTTP.
- *
- * Las rutas que maneja son:
- * - POST /registrarse: para registrar un nuevo usuario.
- * - POST /ingresar: para que un usuario existente pueda ingresar.
- * - POST /salir: para que un usuario logueado pueda cerrar su sesión.
- *
- * Cada método del manejador llama al controlador correspondiente y maneja la respuesta HTTP
- * según el resultado obtenido del controlador, devolviendo errores con códigos
- * de estado apropiados cuando sea necesario.
- *
- * @param {AuthController} controller - El controlador de autenticación que se utilizará.
- */
 class ManejadorAuth {
   constructor(controller) {
     logContext(logger, this);
-
     this.controller = controller;
     this.router = express.Router();
     this.#registrarRutas();
   }
 
-  #setAuthCookies(res, jugadorId, nombreUsuario) {
-    res.cookie('jugadorId', jugadorId, { httpOnly: true, sameSite: 'strict' });
+  #emitirToken(res, jugadorId, nombreUsuario) {
+    const token = jwt.sign(
+      { jugadorId, nombreUsuario },
+      process.env.JWT_SECRET,
+      { expiresIn: '1d' }
+    );
+    res.cookie('token', token, { httpOnly: true, sameSite: 'strict' });
     res.cookie('nombreUsuario', nombreUsuario, { sameSite: 'strict' });
   }
 
   async registrar(req, res) {
     logContext(logger, this);
-
     const result = await this.controller.registrar(req.body.nombreUsuario, req.body.password);
-
-    if (!result.ok) {
-      return res.status(result.status).json({ error: result.error });
-    }
-
-    this.#setAuthCookies(res, result.data.jugadorId, result.data.nombreUsuario);
+    if (!result.ok) return res.status(result.status).json({ error: result.error });
+    this.#emitirToken(res, result.data.jugadorId, result.data.nombreUsuario);
     res.status(201).json(result.data);
   }
 
   async ingresar(req, res) {
     logContext(logger, this);
     const result = await this.controller.ingresar(req.body.nombreUsuario, req.body.password);
-
-    if (!result.ok) {
-      return res.status(result.status).json({ error: result.error });
-    }
-
-    this.#setAuthCookies(res, result.data.jugadorId, result.data.nombreUsuario);
+    if (!result.ok) return res.status(result.status).json({ error: result.error });
+    this.#emitirToken(res, result.data.jugadorId, result.data.nombreUsuario);
     res.json(result.data);
   }
 
-  async salir(req, res) {
+  salir(req, res) {
     logContext(logger, this);
-
-    const result = await this.controller.salir(req.jugadorId);
-
-    if (!result.ok) {
-      return res.status(result.status).json({ error: result.error });
-    }
-
-    res.clearCookie('jugadorId');
+    res.clearCookie('token');
     res.clearCookie('nombreUsuario');
     res.status(204).send();
   }
 
-  async me(req, res) {
+  me(req, res) {
     logContext(logger, this);
-    const sesion = await this.controller.obtenerSesion(req.cookies?.jugadorId);
-    if (!sesion) return res.status(401).json({ error: 'No autorizado' });
-    res.json(sesion);
+    try {
+      const payload = jwt.verify(req.cookies?.token, process.env.JWT_SECRET);
+      res.json({ jugadorId: payload.jugadorId, nombreUsuario: payload.nombreUsuario });
+    } catch {
+      res.status(401).json({ error: 'No autorizado' });
+    }
   }
 
   #registrarRutas() {
@@ -85,7 +59,7 @@ class ManejadorAuth {
     this.router.get('/me', (req, res) => this.me(req, res));
     this.router.post('/registrarse', (req, res) => this.registrar(req, res));
     this.router.post('/ingresar', (req, res) => this.ingresar(req, res));
-    this.router.post('/salir', requireAuth, (req, res) => this.salir(req, res));
+    this.router.post('/salir', (req, res) => this.salir(req, res));
   }
 }
 
