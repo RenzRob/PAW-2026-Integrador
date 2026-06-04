@@ -32,7 +32,8 @@ jobs:
               echo "DB_PASSWORD=$DB_PASSWORD"
               echo "GEMINI_API_KEY=$GEMINI_API_KEY"
             } > .env
-            docker compose up --build -d
+            docker compose up -d
+            docker compose restart app
         env:
           DB_USER: ${{ secrets.DB_USER }}
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
