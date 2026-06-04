@@ -177,9 +177,10 @@ body {
 }
 
 .bienvenida-acciones .btn-auth {
-  text-align: center;
   text-decoration: none;
-  display: block;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .btn-auth-secundario {

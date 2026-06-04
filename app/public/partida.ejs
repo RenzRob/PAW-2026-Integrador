@@ -31,7 +31,11 @@
       </div>
 
       <div class="lobby-bitacora">
-        <h2 class="lobby-subtitulo">Actividad</h2>
+        <div class="tab-bar">
+          <button class="tab tab--active" data-tab="actividad">Actividad</button>
+          <button class="tab" data-tab="chat">Chat</button>
+          <button class="btn-cerrar-bitacora" id="btn-cerrar-bitacora">&times;</button>
+        </div>
         <ul id="lista-mensajes" class="lista-mensajes"></ul>
         <form id="form-chat" class="form-chat">
           <input

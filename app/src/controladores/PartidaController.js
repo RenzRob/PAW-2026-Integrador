@@ -113,7 +113,7 @@ class PartidaController {
       return;
     }
 
-    this._broadcast(sala, 'mensaje-chat', res.mensaje);
+    this.#broadcast(sala, 'mensaje-chat', res.mensaje);
   }
 
   #broadcast(sala, evento, datos) {

@@ -584,6 +584,50 @@ body {
   justify-content: stretch;
 }
 
+/* ─── TABS ───── */
+.tab-bar {
+  display: flex;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  align-items: center;
+}
+
+.tab {
+  flex: 1;
+  padding: 8px 12px;
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s;
+}
+
+.tab:hover {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.tab--active {
+  color: white;
+  border-bottom-color: #5e9bff;
+}
+
+.btn-cerrar-bitacora {
+  display: none;
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 24px;
+  cursor: pointer;
+  padding: 4px 8px;
+  line-height: 1;
+}
+
+.btn-cerrar-bitacora:hover {
+  color: white;
+}
+
 .lobby-bitacora {
   display: flex;
   flex-direction: column;
@@ -711,6 +755,18 @@ body {
 
 .mensaje-chat-item .mensaje-texto {
   color: rgba(255, 255, 255, 0.95);
+}
+
+.lobby-bitacora.tab-chat .mensaje-item {
+  display: none;
+}
+
+.lobby-bitacora:not(.tab-chat) .mensaje-chat-item {
+  display: none;
+}
+
+.lobby-bitacora:not(.tab-chat) .form-chat {
+  display: none;
 }
 
 .form-chat {
@@ -856,7 +912,7 @@ body {
   }
 
   .lobby-bitacora {
-    position: absolute;
+    position: fixed;
     top: 0;
     left: 0;
     right: 0;
@@ -869,6 +925,10 @@ body {
     border-top: none;
     z-index: 20;
     backdrop-filter: blur(4px);
+  }
+
+  .btn-cerrar-bitacora {
+    display: block;
   }
 
   .lobby h1 {
@@ -1035,7 +1095,8 @@ body {
   }
 
   .lobby-bitacora {
-    max-height: 150px;
+    min-height: 60vh;
+    max-height: 80vh;
     padding: 12px;
   }
 

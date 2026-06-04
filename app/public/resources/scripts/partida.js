@@ -52,8 +52,10 @@ class Partida {
     this.inputChat = inputChat;
     this.formChat = formChat;
     this.onCambioVisibilidad = onCambioVisibilidad;
+    this.tabActivo = 'actividad';
     this.chatHidratado = false;
     this.idsMensajesChatVistos = new Set();
+    this.idsMensajesEnviados = new Set();
 
     logger.info('Cargando página de partida', {
       partidaId: this.partidaId,
@@ -92,6 +94,7 @@ class Partida {
    */
   init() {
     this.#configurarBitacoraMobile();
+    this.#configurarTabs();
     this.#configurarChat();
     this.#cargarResumen();
     this.#conectarWS();
@@ -106,10 +109,49 @@ class Partida {
     });
   }
 
+  #configurarTabs() {
+    const tabs = document.querySelectorAll('.tab');
+    tabs.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        this.#cambiarTab(btn.dataset.tab);
+      });
+    });
+  }
+
+  #cambiarTab(tab) {
+    if (tab === this.tabActivo) return;
+    this.tabActivo = tab;
+
+    document.querySelectorAll('.tab').forEach((btn) => {
+      btn.classList.toggle('tab--active', btn.dataset.tab === tab);
+    });
+
+    if (this.panelBitacora) {
+      this.panelBitacora.classList.toggle('tab-chat', tab === 'chat');
+    }
+
+    if (this.btnToggleBitacora) {
+      this.btnToggleBitacora.textContent = tab === 'chat' ? 'Chat' : 'Actividad';
+    }
+  }
+
   enviarChat(texto) {
     if (!texto || !texto.trim()) return;
     if (!this.webSocket || this.webSocket.readyState !== WebSocket.OPEN) return;
-    this.webSocket.send(JSON.stringify({ accion: 'chat', texto: texto.trim() }));
+
+    const limpio = texto.trim();
+    const mensaje = {
+      jugadorId: this.jugadorId,
+      nombreUsuario: sessionStorage.getItem('nombreUsuario') || 'Yo',
+      texto: limpio,
+      timestamp: Date.now(),
+    };
+
+    this.#mostrarMensajeChat(mensaje);
+
+    const claveEnviado = `${this.jugadorId}|${limpio}`;
+    this.idsMensajesEnviados.add(claveEnviado);
+    this.webSocket.send(JSON.stringify({ accion: 'chat', texto: limpio }));
   }
 
   /**
@@ -121,10 +163,12 @@ class Partida {
   #configurarBitacoraMobile() {
     if (!this.btnToggleBitacora || !this.panelBitacora) return;
 
+    const textoActivo = () => (this.tabActivo === 'chat' ? 'Chat' : 'Actividad');
+
     const aplicarEstadoPorAncho = () => {
       if (window.innerWidth <= 768) {
         this.panelBitacora.style.display = 'none';
-        this.btnToggleBitacora.textContent = 'Actividad';
+        this.btnToggleBitacora.textContent = textoActivo();
       } else {
         this.panelBitacora.style.display = '';
         this.btnToggleBitacora.textContent = 'Ocultar';
@@ -134,8 +178,16 @@ class Partida {
     this.btnToggleBitacora.addEventListener('click', () => {
       const oculto = this.panelBitacora.style.display === 'none';
       this.panelBitacora.style.display = oculto ? '' : 'none';
-      this.btnToggleBitacora.textContent = oculto ? 'Ocultar' : 'Actividad';
+      this.btnToggleBitacora.textContent = oculto ? 'Ocultar' : textoActivo();
     });
+
+    const btnCerrar = document.getElementById('btn-cerrar-bitacora');
+    if (btnCerrar) {
+      btnCerrar.addEventListener('click', () => {
+        this.panelBitacora.style.display = 'none';
+        this.btnToggleBitacora.textContent = textoActivo();
+      });
+    }
 
     aplicarEstadoPorAncho();
     window.addEventListener('resize', aplicarEstadoPorAncho);
@@ -302,6 +354,10 @@ class Partida {
    */
   #mostrarMensajeChat({ jugadorId, nombreUsuario, texto, timestamp }) {
     if (!this.listaMensajes) return;
+
+    // Deduplica si ya lo renderizamos localmente (optimista)
+    const claveEnviado = `${jugadorId}|${texto}`;
+    if (this.idsMensajesEnviados.has(claveEnviado)) return;
 
     // Deduplica si recibimos el mismo mensaje vía broadcast e hidratación
     const claveMsg = `${jugadorId}|${timestamp}|${texto}`;
