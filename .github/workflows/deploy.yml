@@ -16,8 +16,24 @@ jobs:
           host: ${{ secrets.VM_IP }}
           username: ${{ secrets.VM_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
+          envs: DB_USER,DB_PASSWORD,GEMINI_API_KEY
           script: |
             cd /home/rrobles/PAW-2026-Integrador
             git pull origin main
             cd app
+            {
+              echo "NODE_ENV=production"
+              echo "LOG_LEVEL=info"
+              echo "PORT=3000"
+              echo "DB_HOST=mysql"
+              echo "DB_PORT=3306"
+              echo "DB_NAME=uno_argentino"
+              echo "DB_USER=$DB_USER"
+              echo "DB_PASSWORD=$DB_PASSWORD"
+              echo "GEMINI_API_KEY=$GEMINI_API_KEY"
+            } > .env
             docker compose up --build -d
+        env:
+          DB_USER: ${{ secrets.DB_USER }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
