@@ -89,6 +89,10 @@ body {
   padding-bottom: 16px;
 }
 
+.area-rivales-mobile {
+  display: none;
+}
+
 .info-jugador {
   display: flex;
   align-items: center;
@@ -96,6 +100,14 @@ body {
   font-size: 13px;
   letter-spacing: 1px;
   color: #cdd8e3;
+  padding: 5px;
+  border-radius: 5px;
+}
+
+.jugador-en-turno-nombre {
+  color: white;
+  font-weight: bolder;
+  background-color: black;
 }
 
 .puntaje {
@@ -136,6 +148,8 @@ body {
   font-size: 13px;
   letter-spacing: 2px;
   color: #cdd8e3;
+  padding: 5px;
+  border-radius: 5px;
 }
 
 .izquierda .nombre-lateral {
@@ -204,6 +218,18 @@ body {
 
 .indicador-color.color-amarillo {
   color: #ffe28a;
+}
+
+.indicador-sentido {
+  width: clamp(100px, 24vw, 156px);
+  text-align: center;
+  font-size: 13px;
+  letter-spacing: 1px;
+  color: #e9f2fb;
+  background: rgba(0, 0, 0, 0.22);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 8px;
+  padding: 6px 10px;
 }
 
 .selector-color-overlay {
@@ -293,6 +319,25 @@ body {
 .carta-descarte {
   display: flex;
   align-items: center;
+}
+
+.mazo-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.cartas-row {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.indicadores-row {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 /* ─── MANOS HORIZONTALES (arriba y abajo) ─── */
@@ -588,6 +633,11 @@ body {
   font-size: 16px;
 }
 
+.jugador-item.jugador-propio {
+  background: rgba(0, 0, 0, 0.18);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
 .btn-iniciar {
   background: #ffe14b;
   color: #444;
@@ -700,36 +750,36 @@ body {
     overflow-y: auto;
   }
 
+  .area-jugador-arriba,
   .area-jugador-lateral {
-    flex-direction: row !important;
-    padding: 4px 0;
-    align-self: center;
-    gap: 6px;
+    display: none;
   }
 
-  .area-jugador-lateral .nombre-lateral {
-    writing-mode: horizontal-tb;
-    transform: none !important;
-    font-size: 12px;
-    letter-spacing: 1px;
+  .area-rivales-mobile {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 6px;
+  }
+
+  .rival-mobile-row {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 6px;
+    width: fit-content;
+    max-width: 100%;
+  }
+
+  .rival-mobile-row .info-jugador {
     white-space: nowrap;
   }
 
-  .mano-lateral {
-    flex-direction: row;
-    overflow-x: auto;
+  .mano-rival-mobile {
     max-width: 50vw;
-  }
-
-  .mano-lateral .carta,
-  .mano-lateral .carta-svg {
-    margin-top: 0;
-    margin-left: -24px;
-  }
-
-  .mano-lateral .carta:first-child,
-  .mano-lateral .carta-svg:first-child {
-    margin-left: 0;
+    overflow-x: auto;
   }
 
   .tablero-central {

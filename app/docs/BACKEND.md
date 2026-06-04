@@ -34,7 +34,7 @@ app/
     └── modelo/
         ├── Carta.js                   # Modelo de carta (valor, validación de jugada)
         ├── Jugador.js                 # Jugador registrado (id, nombre)
-        ├── JugadorEnSala.js           # Jugador dentro de una partida (mano, UNO)
+        ├── JugadorEnSala.js           # Jugador dentro de una partida (mano)
         ├── Mazo.js                    # Mazo de cartas (crear, mezclar, robar)
         ├── SalaDeJuego.js             # Lógica de la partida (turnos, rondas)
         └── BotLLM.js                  # Bot con IA (Gemini 1.5 Flash)
@@ -95,8 +95,6 @@ Todos los mensajes son JSON con el campo `accion`.
 | `iniciar-partida` | —                            | El creador inicia la partida (mínimo 2 jugadores)                   |
 | `jugar-carta`     | `{ cartaId, colorElegido? }` | Jugar una carta de la mano. `colorElegido` requerido para comodines |
 | `robar-carta`     | —                            | Robar del mazo (o absorber la penalidad acumulada)                  |
-| `cantar-uno`      | —                            | Declarar UNO (debe hacerse cuando quedan 2 cartas en mano)          |
-| `denunciar-uno`   | `{ acusadoId }`              | Denunciar que un jugador no cantó UNO                               |
 
 Ejemplo:
 
@@ -113,10 +111,8 @@ Ejemplo:
 | `turno-cambiado`    | `{ turno, sentido, penalidad?, robó? }`          | Cambió el turno                                                                           |
 | `carta-jugada`      | `{ jugadorId, carta }`                           | Alguien jugó una carta                                                                    |
 | `cartas-robadas`    | `{ cartasRobadas }`                              | Las cartas que robaste vos (solo te llega a vos)                                          |
-| `uno-cantado`       | `{ jugadorId, nombreUsuario }`                   | Un jugador cantó UNO                                                                      |
-| `uno-denunciado`    | `{ denuncianteId, acusado }`                     | Se denunció un UNO no cantado                                                             |
 | `ronda-terminada`   | `{ ganadorRonda, puntosGanados, puntajesRonda }` | Terminó una ronda                                                                         |
-| `partida-terminada` | `{ ranking }`                                    | Alguien llegó a 500 pts. Ranking con deltas de puntaje global                             |
+| `partida-terminada` | `{ ranking }`                                    | Alguien llegó a 200 pts. Ranking con deltas de puntaje global                             |
 | `jugador-abandono`  | `{ jugadorId, nombreUsuario, mensaje }`          | Un jugador se desconectó, partida cancelada                                               |
 | `error`             | `{ mensaje }`                                    | Jugada inválida u otro error                                                              |
 
@@ -143,10 +139,9 @@ Ejemplo:
 - **Jugada válida**: misma carta, mismo color, o comodín
 - **Comodines**: se juegan sobre cualquier carta; el jugador elige el color nuevo
 - **Acumulación de penalidad**: +2, +3 y +4 se apilan si el siguiente jugador tiene una del mismo tipo. Si no tiene, roba todo el acumulado
-- **UNO**: debe cantarse después de jugar la anteúltima carta, cuando queda **1 carta** en mano. Si otro jugador lo denuncia antes de que lo cante, el infractor roba 2
 - **Reversa con 2 jugadores**: actúa como Salta
 - **Fin de ronda**: el primero en quedarse sin cartas suma los puntos de las cartas restantes de los rivales
-- **Fin de partida**: el primero en llegar a **500 puntos** gana
+- **Fin de partida**: el primero en llegar a **200 puntos** gana
 - **Abandono**: la partida se cancela; no se persiste resultado en base de datos
 
 ## Sistema de puntaje
@@ -163,7 +158,7 @@ Cuando un jugador se queda sin cartas, gana la ronda y suma al acumulado (`punta
 
 Ejemplo: si los rivales tienen `7 + Reversa + Comodín` en mano → el ganador suma `7 + 20 + 50 = 77` puntos.
 
-La partida continúa ronda a ronda hasta que un jugador acumula **500 puntos** en `puntajesRonda`.
+La partida continúa ronda a ronda hasta que un jugador acumula **200 puntos** en `puntajesRonda`.
 
 ### Puntaje global al terminar la partida
 
@@ -209,7 +204,7 @@ Obtené tu API key gratis en [aistudio.google.com](https://aistudio.google.com).
 2. Gemini elige qué carta jugar (o si robar) y devuelve un JSON `{ cartaId, colorElegido }`
 3. El servidor valida que la jugada sea legal antes de ejecutarla
 4. Si la API falla o la respuesta es inválida → **fallback**: se juega una carta de acción aleatoria válida (o número si no hay acciones)
-5. El bot canta UNO automáticamente cuando le quedan 2 cartas
+5. El bot respeta las mismas reglas de juego que los jugadores humanos
 6. Hay un delay de **1.2 segundos** entre turnos de bot para que se sienta natural
 
 ### Nombres de los bots
@@ -225,7 +220,6 @@ Obtené tu API key gratis en [aistudio.google.com](https://aistudio.google.com).
 ## Pendientes / Mejoras posibles
 
 - [ ] **Contraseña en login**: ahora cualquiera puede ingresar con cualquier nombre existente
-- [ ] **Timer para cantar UNO**: actualmente el servidor no aplica penalidad automática si el jugador no canta en X segundos; depende de que otro jugador lo denuncie
 - [x] **Persistencia**: jugadores e historial de partidas en MySQL; partidas activas en memoria
 - [ ] **Espectadores**: permitir conectarse a una sala sin jugar
 - [ ] **Chat en partida**: evento `mensaje` cliente→servidor, broadcast a la sala

@@ -237,7 +237,7 @@ class SalaDeJuego {
     this.descarte.push(carta);
 
     if (jugador.gano) {
-      return this._cerrarRonda(jugadorId);
+      return this._cerrarRonda(jugadorId, carta);
     }
 
     const { turnoIdx, sentido } = this._aplicarEfecto(carta);
@@ -313,31 +313,11 @@ class SalaDeJuego {
     return robadas;
   }
 
-  cantarUno(jugadorId) {
-    logContext(logger, this);
-    const jugador = this.jugadores.find((j) => j.jugadorId === jugadorId);
-    if (!jugador) return { error: 'Jugador no encontrado' };
-    if (!jugador.tieneUna) return { error: 'Solo podés cantar UNO cuando te queda 1 carta' };
-
-    jugador.cantóUno = true;
-    return { ok: true };
-  }
-
-  denunciarUno(denuncianteId, acusadoId) {
-    logContext(logger, this);
-    const acusado = this.jugadores.find((j) => j.jugadorId === acusadoId);
-    if (!acusado) return { error: 'Jugador no encontrado' };
-    if (!acusado.tieneUna || acusado.cantóUno) return { error: 'Denuncia inválida' };
-
-    this._robarDelMazo(acusado, 2);
-    return { ok: true, acusado: acusado.nombreUsuario };
-  }
-
   // ─── Ronda / Partida ─────────────────────────────────────────────────────
 
-  _cerrarRonda(ganadorId) {
+  _cerrarRonda(ganadorId, cartaFinal = null) {
     logContext(logger, this);
-    let PUNTAJE_PARA_GANAR = 500;
+    let PUNTAJE_PARA_GANAR = 200;
 
     let puntosGanados = 0;
 
@@ -349,13 +329,14 @@ class SalaDeJuego {
     this.puntajesRonda[ganadorId] = (this.puntajesRonda[ganadorId] || 0) + puntosGanados;
 
     if (this.puntajesRonda[ganadorId] >= PUNTAJE_PARA_GANAR) {
-      return this._cerrarPartida(ganadorId);
+      return this._cerrarPartida(ganadorId, cartaFinal);
     }
 
     this._iniciarRonda();
 
     return {
       ok: true,
+      carta: cartaFinal,
       rondaTerminada: true,
       ganadorRonda: ganadorId,
       puntosGanados,
@@ -363,7 +344,7 @@ class SalaDeJuego {
     };
   }
 
-  _cerrarPartida(ganadorId) {
+  _cerrarPartida(ganadorId, cartaFinal = null) {
     logContext(logger, this);
     this.estado = 'terminada';
 
@@ -382,7 +363,7 @@ class SalaDeJuego {
       r.deltaGlobal = deltas[i] || -50;
     });
 
-    return { ok: true, partidaTerminada: true, ranking };
+    return { ok: true, carta: cartaFinal, partidaTerminada: true, ranking };
   }
 
   jugadorAbandonó(jugadorId) {
@@ -455,6 +436,7 @@ class SalaDeJuego {
       cartaEnMesa: enMesa,
       descarte: descarteVisible,
       penalidad: this.penalidad,
+      tipoPenalidad: this.tipoPenalidad,
       jugadores: this.jugadores.map((j) => ({
         jugadorId: j.jugadorId,
         nombreUsuario: j.nombreUsuario,

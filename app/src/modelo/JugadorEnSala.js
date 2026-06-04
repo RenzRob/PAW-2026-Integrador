@@ -7,7 +7,6 @@ class JugadorEnSala {
     this.jugadorId = jugadorId;
     this.nombreUsuario = nombreUsuario;
     this.mano = [];
-    this.cantóUno = false;
     this.esBot = esBot;
   }
 
@@ -26,17 +25,11 @@ class JugadorEnSala {
   reiniciarMano() {
     logContext(logger, this);
     this.mano = [];
-    this.cantóUno = false;
   }
 
   get cantidadCartas() {
     logContext(logger, this);
     return this.mano.length;
-  }
-
-  get tieneUna() {
-    logContext(logger, this);
-    return this.mano.length === 1;
   }
 
   get gano() {
