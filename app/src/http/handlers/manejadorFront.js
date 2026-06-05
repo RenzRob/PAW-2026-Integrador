@@ -154,7 +154,11 @@ class ManejadorFront {
     });
 
     this.app.get('/public/reglas', (req, res) => {
-      res.render('reglas', { logLevel: this.#logLevel, ...buildReglasLocals(req) });
+      res.render('reglas', {
+        logLevel: this.#logLevel,
+        embed: req.query.embed === '1',
+        ...buildReglasLocals(req),
+      });
     });
   }
 }

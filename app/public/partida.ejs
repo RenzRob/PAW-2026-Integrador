@@ -11,7 +11,9 @@
       <button class="btn-toggle-bitacora" id="btn-toggle-bitacora">Actividad</button>
       <div class="navbar-links">
         <span class="navbar-usuario" id="navbar-usuario"></span>
-        <a href="/public/reglas" target="_blank" rel="noopener" class="navbar-link">Reglas</a>
+        <button type="button" id="btn-reglas" class="navbar-link navbar-link-button">
+          Reglas
+        </button>
         <a href="#" id="salir" class="navbar-link">Salir</a>
       </div>
     </nav>
@@ -47,6 +49,34 @@
       </div>
     </div>
 
+    <div id="modal-reglas" class="modal-reglas" hidden aria-hidden="true">
+      <div class="modal-reglas-backdrop" data-cerrar-reglas="true"></div>
+      <section
+        class="modal-reglas-panel"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="modal-reglas-titulo"
+      >
+        <button
+          type="button"
+          id="btn-cerrar-reglas"
+          class="modal-reglas-cerrar"
+          aria-label="Cerrar reglas"
+        >
+          ×
+        </button>
+        <div class="modal-reglas-header">
+          <h2 id="modal-reglas-titulo">Reglas del juego</h2>
+        </div>
+        <iframe
+          id="iframe-reglas"
+          class="modal-reglas-frame"
+          title="Reglas de UNO Argentino"
+          loading="lazy"
+        ></iframe>
+      </section>
+    </div>
+
     <script>
       // Re-login silencioso al cargar (cubre F5 y reinicio del server)
       (function () {
@@ -62,7 +92,7 @@
 
       // Detección de cierre de navegador (mismo patrón que partials/navbar.ejs)
       document.addEventListener('click', (e) => {
-        if (e.target.closest('a[href], button')) window.__navInterno = true;
+        if (e.target.closest('a[href], [data-nav-interno="true"]')) window.__navInterno = true;
       });
       window.addEventListener('pagehide', () => {
         if (window.__navInterno) return;
@@ -101,6 +131,33 @@
 
       document.getElementById('btn-iniciar').addEventListener('click', () => {
         partida.iniciarPartida();
+      });
+
+      const btnReglas = document.getElementById('btn-reglas');
+      const modalReglas = document.getElementById('modal-reglas');
+      const btnCerrarReglas = document.getElementById('btn-cerrar-reglas');
+      const iframeReglas = document.getElementById('iframe-reglas');
+
+      const abrirReglas = () => {
+        if (!iframeReglas.src) iframeReglas.src = '/public/reglas?embed=1';
+        modalReglas.hidden = false;
+        modalReglas.setAttribute('aria-hidden', 'false');
+        document.body.classList.add('modal-reglas-abierto');
+      };
+
+      const cerrarReglas = () => {
+        modalReglas.hidden = true;
+        modalReglas.setAttribute('aria-hidden', 'true');
+        document.body.classList.remove('modal-reglas-abierto');
+      };
+
+      btnReglas.addEventListener('click', abrirReglas);
+      btnCerrarReglas.addEventListener('click', cerrarReglas);
+      modalReglas.addEventListener('click', (e) => {
+        if (e.target.closest('[data-cerrar-reglas="true"]')) cerrarReglas();
+      });
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && !modalReglas.hidden) cerrarReglas();
       });
 
       document.getElementById('salir').addEventListener('click', (e) => {
