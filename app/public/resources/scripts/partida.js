@@ -344,6 +344,173 @@ class Partida {
   }
 
   /**
+   * Renderiza una tabla de puntajes dentro de un contenedor del modal.
+   *
+   * @param {HTMLElement} contenedor - Elemento donde se renderiza la tabla.
+   * @param {Object.<string, number>} puntajes - Mapa de puntajes por jugador.
+   * @param {?string} ganadorId - Identificador del jugador ganador.
+   * @returns {void}
+   */
+  #renderTablaPuntajesEnModal(contenedor, puntajes, ganadorId) {
+    const jugadores = this.jugadoresActuales || [];
+
+    const filas = jugadores
+      .map((j) => ({
+        jugadorId: j.jugadorId,
+        nombre: j.nombreUsuario,
+        puntaje: Number(puntajes[j.jugadorId]) || 0,
+      }))
+      .sort((a, b) => b.puntaje - a.puntaje || a.nombre.localeCompare(b.nombre, 'es'));
+
+    const tabla = document.createElement('table');
+    const thead = document.createElement('thead');
+    thead.innerHTML = '<tr><th>Jugador</th><th>Puntos</th></tr>';
+    tabla.appendChild(thead);
+
+    const tbody = document.createElement('tbody');
+    filas.forEach((fila) => {
+      const tr = document.createElement('tr');
+      if (String(fila.jugadorId) === String(ganadorId)) {
+        tr.classList.add('ganador');
+      }
+      tr.innerHTML = `<td>${fila.nombre}</td><td>${fila.puntaje}</td>`;
+      tbody.appendChild(tr);
+    });
+    tabla.appendChild(tbody);
+
+    contenedor.innerHTML = '';
+    contenedor.appendChild(tabla);
+  }
+
+  /**
+   * Cierra el modal de fin de ronda y limpia el temporizador.
+   *
+   * @param {HTMLElement} modal - Elemento del modal.
+   * @param {number} intervalo - ID del intervalo del temporizador.
+   * @returns {void}
+   */
+  #cerrarModalFinRonda(modal, intervalo) {
+    clearInterval(intervalo);
+    modal.hidden = true;
+    modal.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('modal-fin-abierto');
+  }
+
+  /**
+   * Muestra el modal de fin de ronda con el ganador y los puntajes.
+   * Inicia un temporizador de 30 segundos tras el cual continúa automáticamente.
+   *
+   * @param {string} ganadorRonda - ID del jugador ganador.
+   * @param {Object.<string, number>} puntajesRonda - Mapa de puntajes acumulados.
+   * @returns {void}
+   */
+  #mostrarModalFinRonda(ganadorRonda, puntajesRonda) {
+    const modal = document.getElementById('modal-fin-ronda');
+    if (!modal) return;
+
+    const ganadorEl = document.getElementById('ronda-ganador-texto');
+    const tablaEl = document.getElementById('ronda-tabla-puntajes');
+    const timerEl = document.getElementById('ronda-timer');
+
+    const ganadorNombre = this.#nombreJugador(ganadorRonda);
+    ganadorEl.innerHTML = `¡${ganadorNombre} ganó la ronda!`;
+
+    this.#renderTablaPuntajesEnModal(tablaEl, puntajesRonda, ganadorRonda);
+
+    let segundosRestantes = 30;
+    timerEl.textContent = `Continuando en ${segundosRestantes}...`;
+    const intervalo = setInterval(() => {
+      segundosRestantes -= 1;
+      timerEl.textContent = `Continuando en ${segundosRestantes}...`;
+      if (segundosRestantes <= 0) {
+        this.#cerrarModalFinRonda(modal, intervalo);
+      }
+    }, 1000);
+
+    const btnContinuar = document.getElementById('btn-ronda-continuar');
+    btnContinuar.addEventListener(
+      'click',
+      () => {
+        this.#cerrarModalFinRonda(modal, intervalo);
+      },
+      { once: true }
+    );
+
+    const btnSalir = document.getElementById('btn-ronda-salir');
+    btnSalir.addEventListener(
+      'click',
+      () => {
+        clearInterval(intervalo);
+        modal.hidden = true;
+        modal.setAttribute('aria-hidden', 'true');
+        document.body.classList.remove('modal-fin-abierto');
+        this.salir();
+      },
+      { once: true }
+    );
+
+    modal.hidden = false;
+    modal.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('modal-fin-abierto');
+  }
+
+  /**
+   * Muestra el modal de fin de partida con el ganador y la clasificación final.
+   * Solo dispone de botón Salir, que no penaliza el ranking.
+   *
+   * @param {Object[]} ranking - Lista ordenada de jugadores con puntajes.
+   * @returns {void}
+   */
+  #mostrarModalFinPartida(ranking) {
+    const modal = document.getElementById('modal-fin-partida');
+    if (!modal) return;
+
+    const ganadorEl = document.getElementById('partida-ganador-texto');
+    const tablaEl = document.getElementById('partida-tabla-puntajes');
+
+    const ganador = ranking[0];
+    ganadorEl.textContent = `¡${ganador?.nombre || 'Un jugador'} ganó la partida!`;
+
+    const puntajesFinales = {};
+    for (const r of ranking || []) {
+      puntajesFinales[r.jugadorId] = r.puntaje;
+    }
+    this.#renderTablaPuntajesEnModal(tablaEl, puntajesFinales, ganador?.jugadorId);
+
+    const btnSalir = document.getElementById('btn-partida-salir');
+    btnSalir.addEventListener(
+      'click',
+      () => {
+        modal.hidden = true;
+        modal.setAttribute('aria-hidden', 'true');
+        document.body.classList.remove('modal-fin-abierto');
+        this.#salirSinPenalizar();
+      },
+      { once: true }
+    );
+
+    modal.hidden = false;
+    modal.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('modal-fin-abierto');
+  }
+
+  /**
+   * Sale de la partida sin enviar abandono ni penalizar el ranking.
+   * Usado desde el modal de fin de partida.
+   *
+   * @returns {void}
+   */
+  #salirSinPenalizar() {
+    this.cerrandoIntencionalmente = true;
+    if (this.timeoutReconexion) clearTimeout(this.timeoutReconexion);
+    if (this.webSocket) {
+      this.webSocket.close();
+    }
+    window.__navInterno = true;
+    window.location.href = '/public/';
+  }
+
+  /**
    * Renderiza un mensaje del chat en la lista.
    *
    * @param {Object} mensaje - Objeto con la información del mensaje.
@@ -1086,6 +1253,7 @@ class Partida {
       case 'ronda-terminada': {
         this.#mostrarMensaje('Ronda terminada.');
         this.#mostrarTablaPuntajesRonda(datos.puntajesRonda || {}, datos.ganadorRonda);
+        this.#mostrarModalFinRonda(datos.ganadorRonda, datos.puntajesRonda);
         break;
       }
       case 'partida-terminada': {
@@ -1096,6 +1264,7 @@ class Partida {
           puntajesFinales[r.jugadorId] = r.puntaje;
         }
         this.#mostrarTablaPuntajesRonda(puntajesFinales, ganador?.jugadorId);
+        this.#mostrarModalFinPartida(datos.ranking || []);
         break;
       }
       case 'error': {

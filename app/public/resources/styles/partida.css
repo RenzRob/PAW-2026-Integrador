@@ -197,6 +197,167 @@ body {
   background: white;
 }
 
+/* ─── FIN DE RONDA / FIN DE PARTIDA MODAL ─── */
+.modal-fin-abierto {
+  overflow: hidden;
+}
+
+.modal-fin {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.modal-fin[hidden] {
+  display: none;
+}
+
+.modal-fin-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(4, 15, 28, 0.62);
+  backdrop-filter: blur(3px);
+}
+
+.modal-fin-panel {
+  position: relative;
+  z-index: 1;
+  width: min(480px, calc(100vw - 48px));
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  background: rgba(17, 43, 67, 0.96);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 18px;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.35);
+  overflow: hidden;
+}
+
+.modal-fin-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 60px;
+  padding: 16px 22px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.modal-fin-header h2 {
+  font-size: 20px;
+  color: #f2f7fb;
+  letter-spacing: 0.4px;
+}
+
+.modal-fin-body {
+  padding: 20px 22px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.modal-fin-ganador {
+  text-align: center;
+  font-size: 22px;
+  font-weight: bold;
+  color: #ffe28a;
+  margin-bottom: 20px;
+}
+
+.modal-fin-ganador small {
+  display: block;
+  font-size: 14px;
+  font-weight: normal;
+  color: #b8d4f0;
+  margin-top: 4px;
+}
+
+.modal-fin-tabla table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 15px;
+}
+
+.modal-fin-tabla th,
+.modal-fin-tabla td {
+  text-align: left;
+  padding: 8px 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.modal-fin-tabla th {
+  color: #a8c8e8;
+  font-weight: 600;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.modal-fin-tabla th:last-child,
+.modal-fin-tabla td:last-child {
+  text-align: right;
+}
+
+.modal-fin-tabla tbody tr.ganador td {
+  color: #ffe28a;
+  font-weight: 700;
+}
+
+.modal-fin-footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 16px 22px;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.btn-modal-primario,
+.btn-modal-secundario {
+  border: none;
+  border-radius: 10px;
+  padding: 12px 28px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  min-height: 44px;
+  min-width: 120px;
+  transition:
+    transform 0.15s,
+    box-shadow 0.15s;
+}
+
+.btn-modal-primario {
+  background: #5e9bff;
+  color: white;
+}
+
+.btn-modal-primario:hover {
+  background: #4a85e8;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(94, 155, 255, 0.3);
+}
+
+.btn-modal-secundario {
+  background: rgba(255, 255, 255, 0.12);
+  color: #e8eff7;
+}
+
+.btn-modal-secundario:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-1px);
+}
+
+.modal-fin-timer {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.5);
+  margin-right: auto;
+}
+
 /* ─── LAYOUT PRINCIPAL ─── */
 .mesa {
   display: flex;

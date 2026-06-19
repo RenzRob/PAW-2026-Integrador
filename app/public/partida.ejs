@@ -106,6 +106,40 @@
       </section>
     </div>
 
+    <div id="modal-fin-ronda" class="modal-fin" hidden aria-hidden="true">
+      <div class="modal-fin-backdrop"></div>
+      <section class="modal-fin-panel" role="dialog" aria-modal="true" aria-labelledby="modal-fin-ronda-titulo">
+        <div class="modal-fin-header">
+          <h2 id="modal-fin-ronda-titulo">Fin de ronda</h2>
+        </div>
+        <div class="modal-fin-body">
+          <div id="ronda-ganador-texto" class="modal-fin-ganador"></div>
+          <div id="ronda-tabla-puntajes" class="modal-fin-tabla"></div>
+        </div>
+        <div class="modal-fin-footer">
+          <span id="ronda-timer" class="modal-fin-timer"></span>
+          <button type="button" id="btn-ronda-continuar" class="btn-modal-primario">Continuar</button>
+          <button type="button" id="btn-ronda-salir" class="btn-modal-secundario">Salir</button>
+        </div>
+      </section>
+    </div>
+
+    <div id="modal-fin-partida" class="modal-fin" hidden aria-hidden="true">
+      <div class="modal-fin-backdrop"></div>
+      <section class="modal-fin-panel" role="dialog" aria-modal="true" aria-labelledby="modal-fin-partida-titulo">
+        <div class="modal-fin-header">
+          <h2 id="modal-fin-partida-titulo">¡Partida terminada!</h2>
+        </div>
+        <div class="modal-fin-body">
+          <div id="partida-ganador-texto" class="modal-fin-ganador"></div>
+          <div id="partida-tabla-puntajes" class="modal-fin-tabla"></div>
+        </div>
+        <div class="modal-fin-footer">
+          <button type="button" id="btn-partida-salir" class="btn-modal-primario">Salir</button>
+        </div>
+      </section>
+    </div>
+
     <script>
       document.addEventListener('click', (e) => {
         if (e.target.closest('a[href], [data-nav-interno="true"]')) window.__navInterno = true;
