@@ -161,6 +161,7 @@
       document.getElementById('navbar-usuario').textContent = getCookie('nombreUsuario') || '';
 
       const btnIniciar = document.getElementById('btn-iniciar');
+      const btnCompartir = document.getElementById('btn-compartir-float');
       const partida = new Partida({
         jugadorId,
         partidaId: new URLSearchParams(window.location.search).get('partidaId'),
@@ -176,6 +177,7 @@
         panelBitacora: document.querySelector('.lobby-bitacora'),
         inputChat: document.getElementById('input-chat'),
         formChat: document.getElementById('form-chat'),
+        btnCompartir,
         onCambioVisibilidad: (visible) => {
           btnIniciar.hidden = !visible;
         },
@@ -185,7 +187,6 @@
         partida.iniciarPartida();
       });
 
-      const btnCompartir = document.getElementById('btn-compartir-float');
       const btnReglas = document.getElementById('btn-reglas');
       const modalReglas = document.getElementById('modal-reglas');
       const btnCerrarReglas = document.getElementById('btn-cerrar-reglas');

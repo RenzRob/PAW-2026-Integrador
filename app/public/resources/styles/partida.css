@@ -104,6 +104,10 @@ body {
   background: rgba(255, 255, 255, 0.24);
 }
 
+.btn-compartir-float[hidden] {
+  display: none !important;
+}
+
 .btn-compartir-icono {
   width: 22px;
   height: 22px;

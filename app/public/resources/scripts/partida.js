@@ -17,6 +17,7 @@ class Partida {
    * @param {HTMLElement} opciones.lobbyPrincipal - Contenedor principal del layout.
    * @param {?HTMLElement} [opciones.btnToggleBitacora=null] - Botón para alternar la bitácora en mobile.
    * @param {?HTMLElement} [opciones.panelBitacora=null] - Panel visual de la bitácora.
+   * @param {?HTMLElement} [opciones.btnCompartir=null] - Botón flotante para copiar el link de la partida.
    * @param {Function} [opciones.onCambioVisibilidad=() => {}] - Callback para mostrar u ocultar acciones del lobby.
    */
   constructor({
@@ -34,6 +35,7 @@ class Partida {
     panelBitacora = null,
     inputChat = null,
     formChat = null,
+    btnCompartir = null,
     onCambioVisibilidad = () => {},
   }) {
     this.jugadorId = jugadorId;
@@ -51,6 +53,7 @@ class Partida {
     this.panelBitacora = panelBitacora;
     this.inputChat = inputChat;
     this.formChat = formChat;
+    this.btnCompartir = btnCompartir;
     this.onCambioVisibilidad = onCambioVisibilidad;
     this.tabActivo = 'actividad';
     this.chatHidratado = false;
@@ -96,6 +99,7 @@ class Partida {
     this.#configurarBitacoraMobile();
     this.#configurarTabs();
     this.#configurarChat();
+    this.#actualizarControlesLobby(undefined);
     this.#cargarResumen();
     this.#conectarWS();
   }
@@ -332,13 +336,22 @@ class Partida {
   }
 
   /**
-   * Muestra u oculta el botón de iniciar partida según rol y estado de la sala.
+   * Actualiza los controles del lobby según el estado de la partida.
    *
-   * @param {string} [estadoPartida='esperando'] - Estado actual de la partida.
+   * @param {string} [estadoPartida] - Estado actual de la partida.
    * @returns {void}
    */
-  #actualizarBotonIniciar(estadoPartida = 'esperando') {
-    this.onCambioVisibilidad(this.esCreador && estadoPartida === 'esperando');
+  #actualizarControlesLobby(estadoPartida) {
+    const enEspera = estadoPartida === 'esperando';
+    this.onCambioVisibilidad(this.esCreador && enEspera);
+
+    if (!this.btnCompartir) return;
+
+    this.btnCompartir.hidden = !enEspera;
+    if (enEspera) {
+      this.btnCompartir.title = 'Copiar link de la partida';
+      this.btnCompartir.setAttribute('aria-label', 'Copiar link de la partida');
+    }
   }
 
   /**
@@ -1182,7 +1195,7 @@ class Partida {
       this.maxJugadores = sala.maxJugadores;
       this.titulo.textContent = `Sala de ${sala.jugadores[0] || 'jugador'}`;
       this.#pintarJugadores(sala.jugadores);
-      this.#actualizarBotonIniciar(sala.estado);
+      this.#actualizarControlesLobby(sala.estado);
     } catch (err) {
       logger.error('Error al cargar resumen de partida', {
         error: err,
@@ -1273,10 +1286,8 @@ class Partida {
         }
         this.jugadoresActuales = estado.jugadores || [];
         this.#actualizarEstadoPartida(estado);
-        if (estado.estado === 'esperando') {
-          this.#actualizarBotonIniciar('esperando');
-        } else if (estado.estado === 'jugando') {
-          this.#actualizarBotonIniciar('jugando');
+        this.#actualizarControlesLobby(estado.estado);
+        if (estado.estado === 'jugando') {
           if (!this.partidaIniciadaNotificada) {
             this.#mostrarMensaje('La partida ya empezó.');
             this.partidaIniciadaNotificada = true;
@@ -1293,7 +1304,6 @@ class Partida {
           }
           this.#renderMesa(estado);
         } else if (estado.estado === 'entre-rondas') {
-          this.#actualizarBotonIniciar('entre-rondas');
           this.estadoMesaActual = estado;
           this.#renderMesa(estado);
         }
@@ -1326,7 +1336,7 @@ class Partida {
         break;
       }
       case 'turno-cambiado': {
-        this.#actualizarBotonIniciar('jugando');
+        this.#actualizarControlesLobby('jugando');
         this.#actualizarEstadoPartida(this.estadoMesaActual);
 
         const robo = datos['robó'] || datos.robo;
