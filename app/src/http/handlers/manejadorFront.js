@@ -8,6 +8,7 @@ const { requireAuthWeb } = require('../middleware/middlewareAuth');
 class ManejadorFront {
   #logLevel = process.env.LOG_LEVEL || 'debug';
   #puntajesController;
+  #partidaController;
 
   #buildSeoLocals(req, path) {
     const baseUrl = `${req.protocol}://${req.get('host')}`;
@@ -23,10 +24,11 @@ class ManejadorFront {
     };
   }
 
-  constructor(app, puntajesController) {
+  constructor(app, puntajesController, partidaController) {
     logContext(logger, this);
     this.app = app;
     this.#puntajesController = puntajesController;
+    this.#partidaController = partidaController;
 
     this.#registrarRutas();
   }
@@ -128,6 +130,16 @@ class ManejadorFront {
     this.app.get('/public/partida', requireAuthWeb, (req, res) => {
       const baseUrl = `${req.protocol}://${req.get('host')}`;
       const partidaId = req.query.partidaId;
+
+      if (partidaId) {
+        const acceso = this.#partidaController.obtenerPartida(partidaId, req.jugadorId);
+        if (!acceso.ok) {
+          return res.redirect(
+            `/public/salas?error=${encodeURIComponent(acceso.error || 'No podés ingresar a esta partida.')}`
+          );
+        }
+      }
+
       const sharePath = partidaId
         ? `/public/partida?partidaId=${encodeURIComponent(partidaId)}`
         : '/public/partida';

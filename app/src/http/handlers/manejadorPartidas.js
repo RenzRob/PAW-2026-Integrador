@@ -56,7 +56,7 @@ class ManejadorPartidas {
 
   obtener(req, res) {
     logContext(logger, this);
-    const result = this.controller.obtenerPartida(req.params.id);
+    const result = this.controller.obtenerPartida(req.params.id, req.jugadorId);
 
     if (!result.ok) {
       return res.status(result.status).json({ error: result.error });

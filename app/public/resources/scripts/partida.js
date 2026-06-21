@@ -95,13 +95,13 @@ class Partida {
    *
    * @returns {void}
    */
-  init() {
+  async init() {
     this.#configurarBitacoraMobile();
     this.#configurarTabs();
     this.#configurarChat();
     this.#actualizarControlesLobby(undefined);
-    this.#cargarResumen();
-    this.#conectarWS();
+    const accesoOk = await this.#cargarResumen();
+    if (accesoOk) this.#conectarWS();
   }
 
   #configurarChat() {
@@ -1176,18 +1176,24 @@ class Partida {
   async #cargarResumen() {
     if (!this.partidaId) {
       this.#mostrarMensaje('Falta el ID de partida.', 'error');
-      return;
+      return false;
     }
 
     try {
       const response = await fetch(`/api/partidas/${encodeURIComponent(this.partidaId)}`);
 
-      // Si la respuesta no es exitosa, intenta obtener el mensaje de error del cuerpo de la respuesta y mostrarlo.
-      // Si no se puede obtener un mensaje específico, muestra un mensaje genérico.
       if (!response.ok) {
         const data = await response.json().catch(() => ({}));
-        this.#mostrarMensaje(data.error || 'No se pudo cargar la partida.', 'error');
-        return;
+        const mensaje = data.error || 'No se pudo cargar la partida.';
+
+        if (response.status === 403 || response.status === 404) {
+          window.__navInterno = true;
+          window.location.href = `/public/salas?error=${encodeURIComponent(mensaje)}`;
+          return false;
+        }
+
+        this.#mostrarMensaje(mensaje, 'error');
+        return false;
       }
 
       const sala = await response.json();
@@ -1196,6 +1202,7 @@ class Partida {
       this.titulo.textContent = `Sala de ${sala.jugadores[0] || 'jugador'}`;
       this.#pintarJugadores(sala.jugadores);
       this.#actualizarControlesLobby(sala.estado);
+      return true;
     } catch (err) {
       logger.error('Error al cargar resumen de partida', {
         error: err,
@@ -1203,6 +1210,7 @@ class Partida {
         jugadorId: this.jugadorId,
       });
       this.#mostrarMensaje('Error de red al cargar la partida.', 'error');
+      return false;
     }
   }
 

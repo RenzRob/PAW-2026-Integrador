@@ -46,10 +46,16 @@ class PartidaController {
     return this.persistencia.listarPartidasDisponibles();
   }
 
-  obtenerPartida(id) {
+  obtenerPartida(id, jugadorId = null) {
     logContext(logger, this);
     const sala = this.persistencia.obtenerPartida(id);
     if (!sala) return { ok: false, status: 404, error: 'Partida no encontrada' };
+
+    if (jugadorId != null) {
+      const ingreso = sala.validarIngreso(jugadorId);
+      if (ingreso.error) return { ok: false, status: 403, error: ingreso.error };
+    }
+
     return { ok: true, data: sala.resumenPublico() };
   }
 
@@ -240,6 +246,12 @@ class PartidaController {
     // se notifica y se retorna un error. Si tuvo éxito, se notifica a todos los jugadores de la
     // sala sobre el nuevo jugador unido.
     if (!yaEstaEnEstaSala) {
+      const ingreso = sala.validarIngreso(jugadorId);
+      if (ingreso.error) {
+        this.manejadorConexiones.emitirA(jugadorId, 'error', { mensaje: ingreso.error });
+        return { error: ingreso.error };
+      }
+
       const resultado = sala.agregarJugador(jugadorId, jugador.nombreUsuario);
 
       // Si no se logró agregar al jugador (ej. sala llena), se notifica y se retorna un error.

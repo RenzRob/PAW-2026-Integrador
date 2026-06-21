@@ -9,6 +9,7 @@
         <h2>Salas disponibles</h2>
       </div>
       <input type="text" id="buscar" class="input-buscar" placeholder="Buscar sala" />
+      <p id="mensaje-error-salas" class="mensaje-error-salas" hidden></p>
       <div class="tabla-salas">
         <table>
           <thead>
@@ -34,6 +35,15 @@
     </div>
     <script>
       let salas = [];
+
+      const params = new URLSearchParams(window.location.search);
+      const errorIngreso = params.get('error');
+      if (errorIngreso) {
+        const mensajeEl = document.getElementById('mensaje-error-salas');
+        mensajeEl.textContent = errorIngreso;
+        mensajeEl.hidden = false;
+        window.history.replaceState({}, '', '/public/salas');
+      }
 
       function nombreSala(s) {
         const creador = (s.jugadores && s.jugadores[0]) || 'Sala';

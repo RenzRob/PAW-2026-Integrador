@@ -115,6 +115,29 @@ class SalaDeJuego {
     return { ok: true };
   }
 
+  /**
+   * Indica si el jugador ya forma parte de la sala.
+   *
+   * @param {string} jugadorId - Identificador del jugador.
+   * @returns {boolean}
+   */
+  tieneJugador(jugadorId) {
+    return this.jugadores.some((j) => j.jugadorId === jugadorId);
+  }
+
+  /**
+   * Valida si un jugador puede ingresar a la sala (nuevo ingreso o reconexión).
+   *
+   * @param {string} jugadorId - Identificador del jugador.
+   * @returns {{ ok: true } | { error: string }}
+   */
+  validarIngreso(jugadorId) {
+    if (this.tieneJugador(jugadorId)) return { ok: true };
+    if (this.estado === 'esperando') return { ok: true };
+    if (this.estado === 'terminada') return { error: 'La partida ya finalizó.' };
+    return { error: 'La partida ya comenzó. No podés unirte ahora.' };
+  }
+
   resumenPublico() {
     logContext(logger, this);
     return {

@@ -129,7 +129,7 @@ class Servidor {
     logContext(logger, this);
 
     /* Rutas del frontend. */
-    const manejadorFront = new ManejadorFront(this.app, new PuntajesController(db));
+    const manejadorFront = new ManejadorFront(this.app, new PuntajesController(db), this.partidaController);
 
     /* Rutas del backend. */
     const auth = new ManejadorAuth(new AuthController(db));
