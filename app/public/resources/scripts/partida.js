@@ -108,18 +108,33 @@ class Partida {
   }
 
   #configurarBotonUno() {
-    this.btnCantarUno = document.getElementById('btn-cantar-uno');
-    if (!this.btnCantarUno) return;
-    this.btnCantarUno.addEventListener('click', () => {
+    const boton = document.createElement('button');
+    boton.type = 'button';
+    boton.id = 'btn-cantar-uno';
+    boton.className = 'btn-cantar-uno';
+    boton.setAttribute('aria-label', 'Cantar UNO');
+    boton.title = 'Cantar UNO';
+    boton.textContent = 'UNO';
+
+    const progreso = document.createElement('span');
+    progreso.className = 'btn-cantar-uno-progreso';
+    progreso.setAttribute('aria-hidden', 'true');
+    boton.appendChild(progreso);
+
+    boton.addEventListener('click', () => {
       if (!this.webSocket || this.webSocket.readyState !== WebSocket.OPEN) return;
       this.webSocket.send(JSON.stringify({ accion: 'cantar-uno' }));
     });
+
+    this.btnCantarUno = boton;
   }
 
   #mostrarBotonUno(visible) {
     if (!this.btnCantarUno) return;
-    this.btnCantarUno.hidden = !visible;
-    if (!visible) this.#detenerAnimacionUno();
+    if (!visible) {
+      this.#detenerAnimacionUno();
+      if (this.btnCantarUno.parentNode) this.btnCantarUno.parentNode.removeChild(this.btnCantarUno);
+    }
   }
 
   #iniciarAnimacionUno(timeoutMs) {
@@ -1183,10 +1198,17 @@ class Partida {
     areaAbajo.className = 'area-jugador-abajo';
 
     if (jugadorActual) {
+      const headerActual = document.createElement('div');
+      headerActual.className = 'jugador-actual-header';
+
       const nombreActual = document.createElement('div');
       nombreActual.className = claseNombreTurno(jugadorActual, 'info-jugador');
       nombreActual.textContent = textoTurnoJugador(jugadorActual);
-      areaAbajo.appendChild(nombreActual);
+      headerActual.appendChild(nombreActual);
+
+      if (juegoActivo && this.btnCantarUno) headerActual.appendChild(this.btnCantarUno);
+
+      areaAbajo.appendChild(headerActual);
       areaAbajo.appendChild(
         this.#crearManoHorizontal(manoActual, false, async (carta) => {
           if (!juegoActivo || !esMiTurno) return;
