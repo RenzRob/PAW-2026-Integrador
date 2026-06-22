@@ -88,6 +88,8 @@ class Partida {
     this.estadoMesaActual = null;
     this.selectorColorActivo = null;
     this.numeroRondaActual = 0;
+    this.btnCantarUno = null;
+    this.unoProgresoIntervalo = null;
   }
 
   /**
@@ -99,9 +101,54 @@ class Partida {
     this.#configurarBitacoraMobile();
     this.#configurarTabs();
     this.#configurarChat();
+    this.#configurarBotonUno();
     this.#actualizarControlesLobby(undefined);
     const accesoOk = await this.#cargarResumen();
     if (accesoOk) this.#conectarWS();
+  }
+
+  #configurarBotonUno() {
+    this.btnCantarUno = document.getElementById('btn-cantar-uno');
+    if (!this.btnCantarUno) return;
+    this.btnCantarUno.addEventListener('click', () => {
+      if (!this.webSocket || this.webSocket.readyState !== WebSocket.OPEN) return;
+      this.webSocket.send(JSON.stringify({ accion: 'cantar-uno' }));
+    });
+  }
+
+  #mostrarBotonUno(visible) {
+    if (!this.btnCantarUno) return;
+    this.btnCantarUno.hidden = !visible;
+    if (!visible) this.#detenerAnimacionUno();
+  }
+
+  #iniciarAnimacionUno(timeoutMs) {
+    if (!this.btnCantarUno) return;
+    this.btnCantarUno.classList.add('activo');
+    this.#detenerAnimacionUno(false);
+
+    const inicio = Date.now();
+    const total = Math.max(1, Number(timeoutMs) || 2000);
+    const actualizar = () => {
+      const transcurrido = Date.now() - inicio;
+      const porcentaje = Math.min(100, (transcurrido / total) * 100);
+      this.btnCantarUno.style.setProperty('--uno-progreso', `${porcentaje}%`);
+      if (porcentaje >= 100) this.#detenerAnimacionUno();
+    };
+    actualizar();
+    this.unoProgresoIntervalo = setInterval(actualizar, 60);
+  }
+
+  #detenerAnimacionUno(quitarClase = true) {
+    if (this.unoProgresoIntervalo) {
+      clearInterval(this.unoProgresoIntervalo);
+      this.unoProgresoIntervalo = null;
+    }
+    if (!this.btnCantarUno) return;
+    if (quitarClase) {
+      this.btnCantarUno.classList.remove('activo');
+      this.btnCantarUno.style.setProperty('--uno-progreso', '0%');
+    }
   }
 
   #configurarChat() {
@@ -303,8 +350,11 @@ class Partida {
     if (estadoPartida.estado === 'jugando') {
       const numeroRonda = Number(estadoPartida.numeroRonda) || 1;
       this.estado.textContent = `Partida en curso · Ronda ${numeroRonda}`;
+      this.#mostrarBotonUno(true);
       return;
     }
+
+    this.#mostrarBotonUno(false);
 
     if (estadoPartida.estado === 'entre-rondas') {
       const numeroRonda = Number(estadoPartida.numeroRonda) || 1;
@@ -1399,6 +1449,44 @@ class Partida {
       }
       case 'mensaje-chat': {
         this.#mostrarMensajeChat(datos);
+        break;
+      }
+      case 'uno-pendiente': {
+        const nombre = this.#nombreJugador(datos.jugadorEnUno);
+        this.#mostrarMensaje(`${nombre} tiene una sola carta. ¡Cantá UNO!`);
+        this.#iniciarAnimacionUno(datos.timeoutMs || 2000);
+        break;
+      }
+      case 'uno-cantado': {
+        const nombreEnUno = this.#nombreJugador(datos.jugadorEnUno);
+        if (datos.auto) {
+          this.#mostrarMensaje(`${nombreEnUno} cantó UNO.`);
+        } else if (String(datos.cantadoPor) === String(datos.jugadorEnUno)) {
+          this.#mostrarMensaje(`${nombreEnUno} cantó UNO a tiempo.`);
+        } else {
+          const cantador = this.#nombreJugador(datos.cantadoPor);
+          this.#mostrarMensaje(`${cantador} cantó UNO por ${nombreEnUno}.`);
+        }
+        this.#detenerAnimacionUno();
+        break;
+      }
+      case 'uno-penalizado': {
+        const nombreEnUno = this.#nombreJugador(datos.jugadorEnUno);
+        const cantidad = Number(datos.cantidad) || 2;
+        const cartas = cantidad === 1 ? 'carta' : 'cartas';
+        const por =
+          datos.atrapadoPor === 'bot'
+            ? 'un bot'
+            : this.#nombreJugador(datos.atrapadoPor);
+        this.#mostrarMensaje(
+          `${nombreEnUno} no cantó UNO. ${por} lo atrapó: +${cantidad} ${cartas}.`,
+          'error'
+        );
+        this.#detenerAnimacionUno();
+        break;
+      }
+      case 'uno-vencido': {
+        this.#detenerAnimacionUno();
         break;
       }
     }

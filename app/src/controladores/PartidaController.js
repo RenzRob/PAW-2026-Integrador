@@ -26,6 +26,16 @@ class PartidaController {
     // Si el jugador se reconecta antes de que expire, se cancela.
     this.desconexionesPendientes = new Map();
     this.GRACE_PERIOD_MS = 30000;
+    this.unoTimers = new Map();
+    this.UNO_TIMEOUT_MS = 2000;
+  }
+
+  #cancelarUnoTimer(partidaId) {
+    const timeoutId = this.unoTimers.get(partidaId);
+    if (timeoutId == null) return false;
+    clearTimeout(timeoutId);
+    this.unoTimers.delete(partidaId);
+    return true;
   }
 
   #claveDesconexion(partidaId, jugadorId) {
@@ -302,6 +312,7 @@ class PartidaController {
     }
 
     if (res.partidaTerminada) {
+      this.#cancelarUnoTimer(partidaId);
       await this.persistencia.guardarResultadoPartida(partidaId, res.ranking);
 
       this.#broadcast(sala, 'partida-terminada', { ranking: res.ranking });
@@ -311,6 +322,7 @@ class PartidaController {
     }
 
     if (res.rondaTerminada) {
+      this.#cancelarUnoTimer(partidaId);
       this.#broadcast(sala, 'ronda-terminada', {
         ganadorRonda: res.ganadorRonda,
         puntosGanados: res.puntosGanados,
@@ -319,6 +331,8 @@ class PartidaController {
 
       return;
     }
+
+    this.#manejarUnoTrasJugada(partidaId, res);
 
     this.#broadcast(sala, 'turno-cambiado', {
       turno: sala.jugadorEnTurno().jugadorId,
@@ -330,6 +344,96 @@ class PartidaController {
 
     if (sala.turnoEsBot()) {
       this.#ejecutarTurnoBot(partidaId);
+    }
+  }
+
+  #manejarUnoTrasJugada(partidaId, res) {
+    const sala = this.persistencia.obtenerPartida(partidaId);
+    if (!sala) return;
+
+    if (res.unoAutoCantadoBot) {
+      this.#broadcast(sala, 'uno-cantado', {
+        jugadorEnUno: res.unoAutoCantadoBot.jugadorEnUno,
+        cantadoPor: res.unoAutoCantadoBot.jugadorEnUno,
+        auto: true,
+      });
+      return;
+    }
+
+    if (res.unoPendiente) {
+      this.#cancelarUnoTimer(partidaId);
+      this.#broadcast(sala, 'uno-pendiente', {
+        jugadorEnUno: res.unoPendiente.jugadorEnUno,
+        timeoutMs: res.unoPendiente.timeoutMs,
+      });
+      const timeoutId = setTimeout(() => {
+        this.#resolverUnoTimeout(partidaId);
+      }, res.unoPendiente.timeoutMs);
+      this.unoTimers.set(partidaId, timeoutId);
+    }
+  }
+
+  cantarUno(partidaId, jugadorId) {
+    logContext(logger, this, { partidaId, jugadorId });
+    const sala = this.persistencia.obtenerPartida(partidaId);
+    if (!sala) return;
+
+    const res = sala.cantarUno(jugadorId);
+    if (res.error) {
+      if (res.error !== 'No hay UNO pendiente') {
+        this.manejadorConexiones.emitirA(jugadorId, 'error', { mensaje: res.error });
+      }
+      return;
+    }
+
+    this.#cancelarUnoTimer(partidaId);
+
+    if (res.salvado) {
+      this.#broadcast(sala, 'uno-cantado', {
+        jugadorEnUno: res.jugadorEnUno,
+        cantadoPor: jugadorId,
+        auto: false,
+      });
+      return;
+    }
+
+    if (res.atrapado) {
+      this.#broadcast(sala, 'uno-penalizado', {
+        jugadorEnUno: res.jugadorEnUno,
+        atrapadoPor: res.atrapadoPor,
+        cantidad: res.cartasRobadas.length,
+      });
+      this.manejadorConexiones.emitirA(res.jugadorEnUno, 'cartas-robadas', {
+        cartasRobadas: res.cartasRobadas,
+      });
+      this.#emitirEstadoPartida(sala);
+    }
+  }
+
+  #resolverUnoTimeout(partidaId) {
+    this.unoTimers.delete(partidaId);
+
+    const sala = this.persistencia.obtenerPartida(partidaId);
+    if (!sala) return;
+
+    const res = sala.resolverUnoPorTimeout();
+    if (res.noop) return;
+
+    if (res.vencido) {
+      this.#broadcast(sala, 'uno-vencido', { jugadorEnUno: res.jugadorEnUno });
+      return;
+    }
+
+    if (res.atrapadoPorBot) {
+      this.#broadcast(sala, 'uno-penalizado', {
+        jugadorEnUno: res.jugadorEnUno,
+        atrapadoPor: 'bot',
+        cantidad: res.cartasRobadas.length,
+      });
+      this.manejadorConexiones.emitirA(res.jugadorEnUno, 'cartas-robadas', {
+        cartasRobadas: res.cartasRobadas,
+      });
+      this.#emitirEstadoPartida(sala);
     }
   }
 
@@ -531,6 +635,7 @@ class PartidaController {
           });
           this.#emitirEstadoPartida(salaActual);
         } else if (res.partidaTerminada) {
+          this.#cancelarUnoTimer(partidaId);
           if (res.carta) {
             this.#broadcast(salaActual, 'carta-jugada', {
               jugadorId: bot.jugadorId,
@@ -542,6 +647,7 @@ class PartidaController {
           this.persistencia.eliminarPartida(partidaId);
           return;
         } else if (res.rondaTerminada) {
+          this.#cancelarUnoTimer(partidaId);
           if (res.carta) {
             this.#broadcast(salaActual, 'carta-jugada', {
               jugadorId: bot.jugadorId,
@@ -559,6 +665,7 @@ class PartidaController {
             jugadorId: bot.jugadorId,
             carta: res.carta,
           });
+          this.#manejarUnoTrasJugada(partidaId, res);
           this.#broadcast(salaActual, 'turno-cambiado', {
             turno: salaActual.jugadorEnTurno().jugadorId,
             sentido: salaActual.sentido,
