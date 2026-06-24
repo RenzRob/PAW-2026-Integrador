@@ -44,6 +44,10 @@ class Servidor {
     this.puerto = puerto;
     this.app = express();
 
+    // Necesario para que req.secure y req.ip sean correctos cuando Express
+    // está detrás de nginx como reverse proxy.
+    this.app.set('trust proxy', 1);
+
     // Crea un servidor HTTP utilizando el módulo `http` de Node.js,
     // pasando la aplicación Express como manejador de solicitudes.
     // Esto permite que el mismo servidor HTTP maneje tanto las solicitudes

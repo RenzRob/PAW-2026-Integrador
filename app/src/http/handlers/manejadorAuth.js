@@ -17,8 +17,9 @@ class ManejadorAuth {
       process.env.JWT_SECRET,
       { expiresIn: '1d' }
     );
-    res.cookie('token', token, { httpOnly: true, sameSite: 'strict' });
-    res.cookie('nombreUsuario', nombreUsuario, { sameSite: 'strict' });
+    const secure = process.env.NODE_ENV === 'production';
+    res.cookie('token', token, { httpOnly: true, sameSite: 'strict', secure });
+    res.cookie('nombreUsuario', nombreUsuario, { sameSite: 'strict', secure });
   }
 
   async registrar(req, res) {

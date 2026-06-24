@@ -17,7 +17,7 @@ jobs:
           username: ${{ secrets.VM_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           command_timeout: 30m
-          envs: DB_USER,DB_PASSWORD,GEMINI_API_KEY,JWT_SECRET
+          envs: DB_USER,DB_PASSWORD,GEMINI_API_KEY,JWT_SECRET,DOMAIN,CERTBOT_EMAIL
           script: |
             cd /home/rrobles/PAW-2026-Integrador
             git pull origin main
@@ -34,10 +34,14 @@ jobs:
               echo "DB_PASSWORD=$DB_PASSWORD"
               echo "GEMINI_API_KEY=$GEMINI_API_KEY"
               echo "JWT_SECRET=$JWT_SECRET"
+              echo "DOMAIN=$DOMAIN"
+              echo "CERTBOT_EMAIL=$CERTBOT_EMAIL"
             } > .env
-            DOCKER_BUILDKIT=0 docker compose up -d --build app
+            DOCKER_BUILDKIT=0 docker compose --profile https up -d --build app nginx
         env:
           DB_USER: ${{ secrets.DB_USER }}
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          DOMAIN: ${{ secrets.DOMAIN }}
+          CERTBOT_EMAIL: ${{ secrets.CERTBOT_EMAIL }}
