@@ -30,7 +30,7 @@ sleep 3
 
 # 3. Obtener el certificado real de Let's Encrypt via webroot challenge.
 echo "--- Solicitando certificado real a Let's Encrypt..."
-docker compose --profile https run --rm certbot certonly \
+docker compose --profile https run --rm --entrypoint certbot certbot certonly \
   --webroot -w /var/www/certbot \
   --email "$EMAIL" \
   -d "$DOMAIN" \
