@@ -50,7 +50,7 @@ services:
     volumes:
       - ./nginx/nginx.conf.template:/etc/nginx/nginx.conf.template:ro
       - ./nginx/entrypoint.sh:/entrypoint.sh:ro
-      - certbot_certs:/etc/letsencrypt:ro
+      - certbot_certs:/etc/letsencrypt
       - certbot_www:/var/www/certbot
     environment:
       DOMAIN: ${DOMAIN}

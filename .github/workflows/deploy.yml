@@ -38,6 +38,16 @@ jobs:
               echo "CERTBOT_EMAIL=$CERTBOT_EMAIL"
             } > .env
             DOCKER_BUILDKIT=0 docker compose --profile https up -d --build app nginx
+            sleep 3
+            docker compose --profile https run --rm certbot certonly \
+              --webroot -w /var/www/certbot \
+              --email "$CERTBOT_EMAIL" \
+              -d "$DOMAIN" \
+              --rsa-key-size 4096 \
+              --agree-tos \
+              --non-interactive \
+              --keep-until-expiring
+            docker compose --profile https exec nginx nginx -s reload
         env:
           DB_USER: ${{ secrets.DB_USER }}
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
