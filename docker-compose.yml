@@ -1,0 +1,74 @@
+services:
+  mysql:
+    image: mysql:8
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./src/infraestructura/persistencia/mysql/sql/init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ['CMD-SHELL', 'mysqladmin ping -h localhost -u$$MYSQL_USER -p$$MYSQL_PASSWORD --silent']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  app:
+    build:
+      context: .
+      dockerfile: ${DOCKERFILE_PATH:-Dockerfile}
+    ports:
+      - '${HOST_PORT:-8080}:${PORT:-3000}'
+    environment:
+      PORT: ${PORT:-3000}
+      NODE_ENV: ${NODE_ENV:-development}
+      LOG_LEVEL: ${LOG_LEVEL:-debug}
+      GEMINI_API_KEY: ${GEMINI_API_KEY}
+      JWT_SECRET: ${JWT_SECRET}
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT:-3306}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
+    depends_on:
+      mysql:
+        condition: service_healthy
+    restart: unless-stopped
+    volumes:
+      - ./src:/app/src
+      - ./logs:/app/logs
+
+  nginx:
+    profiles: ["https"]
+    image: nginx:alpine
+    ports:
+      - '80:80'
+      - '443:443'
+    volumes:
+      - ./nginx/nginx.conf.template:/etc/nginx/nginx.conf.template:ro
+      - ./nginx/entrypoint.sh:/entrypoint.sh:ro
+      - certbot_certs:/etc/letsencrypt
+      - certbot_www:/var/www/certbot
+    environment:
+      DOMAIN: ${DOMAIN}
+      APP_PORT: ${PORT:-3000}
+    entrypoint: ['/bin/sh', '/entrypoint.sh']
+    depends_on:
+      - app
+    restart: unless-stopped
+
+  certbot:
+    profiles: ["https"]
+    image: certbot/certbot
+    volumes:
+      - certbot_certs:/etc/letsencrypt
+      - certbot_www:/var/www/certbot
+    entrypoint: /bin/sh -c 'trap exit TERM; while :; do certbot renew --quiet; sleep 12h & wait $${!}; done'
+    restart: unless-stopped
+
+volumes:
+  mysql_data:
+  certbot_certs:
+  certbot_www:

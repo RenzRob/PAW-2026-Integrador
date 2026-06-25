@@ -21,7 +21,6 @@ jobs:
           script: |
             cd /home/rrobles/PAW-2026-Integrador
             git pull origin main
-            cd app
             {
               echo "NODE_ENV=production"
               echo "LOG_LEVEL=info"

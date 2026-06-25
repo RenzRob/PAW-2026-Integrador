@@ -14,7 +14,7 @@ Para ejecutar la aplicación, primero clonar el repositorio:
 git clone https://github.com/facundolaffont/PAW-2026-Integrador.git
 ```
 
-Luego, ingresar en la carpeta `app/`, crear el archivo `.env`, tal como indica el archivo `.env.example`, completarlo y luego ejecutar:
+Luego, en la raíz del repositorio, crear el archivo `.env` tal como indica `.env.example`, completarlo y ejecutar:
 
 ```sh
 ./run.sh
