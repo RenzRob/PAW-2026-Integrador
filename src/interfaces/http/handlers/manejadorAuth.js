@@ -30,8 +30,8 @@ class ManejadorAuth {
       { expiresIn: '1d' }
     );
     const secure = process.env.NODE_ENV === 'production';
-    res.cookie('token', token, { httpOnly: true, sameSite: 'strict', secure });
-    res.cookie('nombreUsuario', nombreUsuario, { sameSite: 'strict', secure });
+    res.cookie('token', token, { httpOnly: true, sameSite: 'lax', secure });
+    res.cookie('nombreUsuario', nombreUsuario, { sameSite: 'lax', secure });
   }
 
   async registrar(req, res) {
