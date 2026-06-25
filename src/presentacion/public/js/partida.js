@@ -182,7 +182,7 @@ class Partida {
     this.vistaMesa.addEventListener(
       'wheel',
       (e) => {
-        const mano = e.target.closest('.area-jugador-abajo .mano-horizontal');
+        const mano = e.target.closest('.mano-horizontal, .mano-rival-mobile');
         if (!mano) return;
         if (e.deltaY === 0) return;
         e.preventDefault();
