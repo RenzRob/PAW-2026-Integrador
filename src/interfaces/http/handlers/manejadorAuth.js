@@ -3,6 +3,20 @@ const jwt = require('jsonwebtoken');
 const logger = require('#infraestructura/shared/logger');
 const { logContext } = require('#infraestructura/shared/utils');
 
+/**
+ * Manejador HTTP de autenticación. Expone las rutas de registro, ingreso,
+ * cierre de sesión y consulta del jugador autenticado (`/me`).
+ * Traduce peticiones REST en llamadas al controlador, emite tokens JWT en
+ * cookies HTTP-only y devuelve respuestas JSON o códigos de estado apropiados.
+ *
+ * Endpoints (montado en `/api`):
+ * - `GET /api/me` — devuelve el jugador autenticado según la cookie JWT.
+ * - `POST /api/registrarse` — registra un nuevo jugador y emite sesión.
+ * - `POST /api/ingresar` — inicia sesión y emite cookie JWT.
+ * - `POST /api/salir` — cierra sesión y elimina las cookies.
+ *
+ * @param {import('#controladores/AuthController')} controller - Controlador con la lógica de registro e ingreso.
+ */
 class ManejadorAuth {
   constructor(controller) {
     logContext(logger, this);

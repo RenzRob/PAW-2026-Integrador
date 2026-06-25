@@ -2,6 +2,19 @@ const express = require('express');
 const logger = require('#infraestructura/shared/logger');
 const { registerLog, logContext } = require('#infraestructura/shared/utils');
 
+/**
+ * Manejador HTTP de la API REST de partidas. Expone endpoints para listar,
+ * crear y obtener partidas por ID. Extrae datos del request (jugador autenticado,
+ * parámetros y cuerpo), delega en PartidaController y traduce el resultado
+ * en respuestas JSON con el código HTTP correspondiente.
+ *
+ * Endpoints (montado en `/api/partidas`, requiere autenticación):
+ * - `GET /api/partidas` — lista las partidas activas.
+ * - `POST /api/partidas` — crea una nueva partida.
+ * - `GET /api/partidas/:id` — obtiene el estado de una partida.
+ *
+ * @param {import('#controladores/PartidaController')} controller - Controlador de lógica de partidas.
+ */
 class ManejadorPartidas {
   constructor(controller) {
     logContext(logger, this);

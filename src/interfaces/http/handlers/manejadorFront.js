@@ -5,6 +5,31 @@ const EmptyException = require('#errores/EmptyException');
 const { buildReglasLocals } = require('#interfaces/http/seo/reglas');
 const { requireAuthWeb } = require('#interfaces/http/middleware/middlewareAuth');
 
+/**
+ * Manejador HTTP del frontend web. Registra las rutas que renderizan vistas EJS
+ * (bienvenida, login, registro, juego, salas, partida, puntajes y reglas).
+ * Protege con middleware las páginas que requieren sesión, arma metadatos SEO
+ * y delega en los controladores de partidas y puntajes cuando la vista necesita datos del dominio.
+ *
+ * Endpoints:
+ * - `GET /` — redirige a `/public/bienvenida`.
+ * - `GET /public/bienvenida` — vista de bienvenida.
+ * - `GET /public/` — inicio (requiere sesión).
+ * - `GET /public/ingresar` — formulario de ingreso.
+ * - `GET /public/registrarse` — formulario de registro.
+ * - `GET /public/jugar` — pantalla de juego (requiere sesión).
+ * - `GET /public/nombre-jugador` — ingreso de nombre de jugador.
+ * - `GET /public/crear-sala` — formulario de creación de sala (requiere sesión).
+ * - `POST /public/crear-sala` — envía el formulario y crea la sala vía API.
+ * - `GET /public/partida` — vista de partida (requiere sesión).
+ * - `GET /public/puntajes` — tabla de puntajes.
+ * - `GET /public/salas` — listado de salas (requiere sesión).
+ * - `GET /public/reglas` — reglas del juego.
+ *
+ * @param {import('express').Application} app - Aplicación Express donde se montan las rutas.
+ * @param {import('#controladores/PuntajesController')} puntajesController - Controlador para obtener la tabla de puntajes.
+ * @param {import('#controladores/PartidaController')} partidaController - Controlador para validar acceso a partidas.
+ */
 class ManejadorFront {
   #logLevel = process.env.LOG_LEVEL || 'debug';
   #puntajesController;
