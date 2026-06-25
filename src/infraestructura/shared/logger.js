@@ -1,12 +1,15 @@
 const { createLogger, format, transports } = require('winston');
 
 class Logger {
+  static #instance;
+  #logger;
+
   constructor() {
-    if (Logger._instance) {
-      return Logger._instance;
+    if (Logger.#instance) {
+      return Logger.#instance;
     }
 
-    this._logger = createLogger({
+    this.#logger = createLogger({
       level: process.env.NODE_ENV === 'production' ? 'info' : 'debug',
       format: format.combine(
         format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
@@ -37,7 +40,7 @@ class Logger {
       ],
     });
 
-    Logger._instance = this;
+    Logger.#instance = this;
   }
 
   /**
@@ -46,9 +49,10 @@ class Logger {
    * @param {{ file: string, method: string }} executionContext - Contexto de ejecución.
    * @param {string|null} [message=null] - Mensaje opcional.
    * @param {object|null} [meta=null] - Metadatos opcionales del mensaje.
+   * @private
    */
-  logEntry(level, executionContext, message = null, meta = null) {
-    this._logger[level]('', {
+  #logEntry(level, executionContext, message = null, meta = null) {
+    this.#logger[level]('', {
       _exec: executionContext,
       _msg: message,
       _meta: meta,
@@ -56,33 +60,33 @@ class Logger {
   }
 
   info(message, meta = {}) {
-    this.logEntry(
+    this.#logEntry(
       'info',
-      this._captureExecutionContext(4),
+      this.#captureExecutionContext(4),
       message || null,
       Object.keys(meta).length ? meta : null
     );
   }
   warn(message, meta = {}) {
-    this.logEntry(
+    this.#logEntry(
       'warn',
-      this._captureExecutionContext(4),
+      this.#captureExecutionContext(4),
       message || null,
       Object.keys(meta).length ? meta : null
     );
   }
   error(message, meta = {}) {
-    this.logEntry(
+    this.#logEntry(
       'error',
-      this._captureExecutionContext(4),
+      this.#captureExecutionContext(4),
       message || null,
       Object.keys(meta).length ? meta : null
     );
   }
   debug(message, meta = {}) {
-    this.logEntry(
+    this.#logEntry(
       'debug',
-      this._captureExecutionContext(4),
+      this.#captureExecutionContext(4),
       message || null,
       Object.keys(meta).length ? meta : null
     );
@@ -95,7 +99,7 @@ class Logger {
    */
   logContext(context, params) {
     const meta = params && Object.keys(params).length > 0 ? params : null;
-    this.logEntry('debug', this._captureExecutionContext(3), null, meta);
+    this.#logEntry('debug', this.#captureExecutionContext(3), null, meta);
   }
 
   /**
@@ -105,15 +109,23 @@ class Logger {
    * @param {object} [meta={}] - Metadatos adicionales.
    */
   registerLog(level, message, meta = {}) {
-    this.logEntry(
+    this.#logEntry(
       level,
-      this._captureExecutionContext(3),
+      this.#captureExecutionContext(3),
       message || null,
       Object.keys(meta).length > 0 ? meta : null
     );
   }
 
-  _captureExecutionContext(frameIndex) {
+  /**
+   * Extrae del stack trace el archivo y método del frame indicado.
+   * @param {number} frameIndex - Índice de línea en `Error().stack` del caller a capturar.
+   *   Usar `3` cuando el caller invoca directamente al método público de Logger
+   *   (`logContext`, `registerLog`); usar `4` cuando pasa por `info`/`warn`/`error`/`debug`.
+   * @returns {{ file: string, method: string }} Contexto de ejecución con ruta:linea y nombre del método.
+   * @private
+   */
+  #captureExecutionContext(frameIndex) {
     const stack = new Error().stack;
     const callerLine = stack.split('\n')[frameIndex] || '';
     const methodMatch = callerLine.match(/at (\S+)/);

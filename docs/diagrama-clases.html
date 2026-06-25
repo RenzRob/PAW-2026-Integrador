@@ -1010,8 +1010,10 @@ classDiagram
     }
 
     class Logger {
-        -Logger _instance$
-        -Winston _logger
+        -Logger #instance$
+        -Winston #logger
+        -#logEntry(level, exec, msg, meta) void
+        -#captureExecutionContext(frameIndex) object
         +debug(exec, msg, meta) void
         +info(exec, msg, meta) void
         +error(exec, msg, meta) void
