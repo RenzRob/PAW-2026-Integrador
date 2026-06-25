@@ -3,7 +3,7 @@ const Carta = require('#dominio/Carta');
 const logger = require('#infraestructura/shared/logger');
 
 /**
- * Bot que decide jugadas usando Gemini 1.5 Flash. Construye un prompt con las reglas del juego
+ * Bot que decide jugadas usando Gemini. Construye un prompt con las reglas del juego
  * y el estado del turno, parsea la respuesta JSON del modelo y valida la carta elegida.
  * Si la API falla o devuelve una jugada inválida, aplica una estrategia heurística de fallback.
  */
