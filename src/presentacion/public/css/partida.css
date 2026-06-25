@@ -599,12 +599,12 @@ body {
 }
 
 .mano-lateral .carta {
-  margin-top: -52px;
+  margin-top: calc(-1 * var(--sep-carta, 52px));
   flex-shrink: 0;
 }
 
 .mano-lateral .carta-svg {
-  margin-top: -52px;
+  margin-top: calc(-1 * var(--sep-carta, 52px));
   flex-shrink: 0;
 }
 
@@ -824,12 +824,12 @@ body {
 }
 
 .mano-horizontal .carta {
-  margin-left: -18px;
+  margin-left: calc(-1 * var(--sep-carta, 18px));
   flex-shrink: 0;
 }
 
 .mano-horizontal .carta-svg {
-  margin-left: -18px;
+  margin-left: calc(-1 * var(--sep-carta, 18px));
   flex-shrink: 0;
 }
 
@@ -1380,7 +1380,7 @@ body {
 
   .mano-horizontal .carta,
   .mano-horizontal .carta-svg {
-    margin-left: -16px;
+    margin-left: calc(-1 * var(--sep-carta, 16px));
   }
 
   .mano-horizontal .carta:first-child,
@@ -1815,7 +1815,7 @@ body {
   .lobby-principal.partida-activa .mano-horizontal .carta-svg {
     width: clamp(26px, min(6.5vw, 4.2vh), 38px);
     height: clamp(38px, min(9.5vw, 6vh), 52px);
-    margin-left: -12px;
+    margin-left: calc(-1 * var(--sep-carta, 12px));
   }
 
   .lobby-principal.partida-activa .mano-horizontal .carta:first-child,

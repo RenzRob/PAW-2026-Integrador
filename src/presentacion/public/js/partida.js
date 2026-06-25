@@ -172,9 +172,31 @@ class Partida {
     this.#configurarChat();
     this.#configurarBotonUno();
     this.#configurarTurnoTimer();
+    this.#configurarSolapamientoAdaptativo();
     this.#actualizarControlesLobby(undefined);
     const accesoOk = await this.#cargarResumen();
     if (accesoOk) this.#conectarWS();
+  }
+
+  /**
+   * Recalcula el solapamiento de las manos cuando cambia el tamaño de la mesa
+   * (resize, rotación, apertura del panel lateral, etc.).
+   *
+   * @returns {void}
+   */
+  #configurarSolapamientoAdaptativo() {
+    if (!this.vistaMesa || typeof ResizeObserver === 'undefined') return;
+    let pendiente = false;
+    const observador = new ResizeObserver(() => {
+      if (pendiente) return;
+      pendiente = true;
+      requestAnimationFrame(() => {
+        pendiente = false;
+        this.#ajustarSolapamientoManos();
+      });
+    });
+    observador.observe(this.vistaMesa);
+    this.observadorSolapamiento = observador;
   }
 
   #configurarTurnoTimer() {
@@ -1062,6 +1084,61 @@ class Partida {
     return mano;
   }
 
+  /**
+   * Recalcula el solapamiento de todas las manos visibles para que, sin importar
+   * la cantidad de cartas, la mano completa entre siempre en el espacio disponible.
+   *
+   * @returns {void}
+   */
+  #ajustarSolapamientoManos() {
+    if (!this.vistaMesa || this.vistaMesa.hidden) return;
+    const manos = this.vistaMesa.querySelectorAll('.mano-horizontal, .mano-lateral');
+    manos.forEach((mano) => this.#ajustarSolapamientoMano(mano));
+  }
+
+  /**
+   * Ajusta el solapamiento (`--sep-carta`) de una mano puntual.
+   *
+   * Patrón de "abanico adaptativo": el solapamiento por defecto (definido en CSS)
+   * solo se sobreescribe cuando las cartas desbordan el contenedor; en ese caso se
+   * calcula el solapamiento mínimo que hace que las N cartas entren en el espacio
+   * disponible, dejando siempre una porción visible de cada carta.
+   *
+   * @param {HTMLElement} mano - Contenedor de la mano (`.mano-horizontal` o `.mano-lateral`).
+   * @returns {void}
+   */
+  #ajustarSolapamientoMano(mano) {
+    if (!mano) return;
+
+    // Partimos del solapamiento de diseño para medir el desborde real.
+    mano.style.removeProperty('--sep-carta');
+
+    const cartas = mano.children;
+    const cantidad = cartas.length;
+    if (cantidad <= 1) return;
+
+    const primera = cartas[0];
+    const esLateral = mano.classList.contains('mano-lateral');
+    const tamCarta = esLateral ? primera.offsetHeight : primera.offsetWidth;
+    const disponible = esLateral ? mano.clientHeight : mano.clientWidth;
+    const contenido = esLateral ? mano.scrollHeight : mano.scrollWidth;
+
+    if (!tamCarta || !disponible) return;
+
+    // Si con el solapamiento por defecto ya entran, no tocamos nada.
+    if (contenido <= disponible + 1) return;
+
+    // Avance máximo por carta para que las N entren: tamCarta + (n-1)*avance <= disponible.
+    const avanceMax = (disponible - tamCarta) / (cantidad - 1);
+    const solapamientoNecesario = tamCarta - avanceMax;
+
+    // Nunca tapamos la carta por completo: dejamos al menos una porción visible.
+    const solapamientoMaximo = tamCarta - Math.max(10, tamCarta * 0.16);
+    const solapamiento = Math.min(solapamientoMaximo, Math.max(0, solapamientoNecesario));
+
+    mano.style.setProperty('--sep-carta', `${solapamiento}px`);
+  }
+
   #obtenerSlotTimerTurnoVisible() {
     const nombresEnTurno = this.vistaMesa?.querySelectorAll('.jugador-en-turno-nombre');
     if (!nombresEnTurno?.length) return null;
@@ -1765,6 +1842,10 @@ class Partida {
     }
     this.#aplicarTimerTurnoPendiente();
     this.cartasAnimadasRecientemente.clear();
+
+    // El solapamiento adaptativo se calcula tras el layout para que la mano
+    // entre completa en pantalla por más cartas que tenga.
+    requestAnimationFrame(() => this.#ajustarSolapamientoManos());
   }
 
   /**
