@@ -17,6 +17,7 @@
     --facundo:    #3b82f6;
     --renzo:      #10b981;
     --gonzalo:    #f59e0b;
+    --axel:       #8b5cf6;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   html, body { width: 100%; height: 100%; overflow: hidden; font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg-dark); color: var(--text); }
@@ -43,6 +44,7 @@
   .badge.facundo { background: var(--facundo); }
   .badge.renzo   { background: var(--renzo);   color: #111; }
   .badge.gonzalo { background: var(--gonzalo);  color: #111; }
+  .badge.axel    { background: var(--axel);    }
 
   /* ── progress bar ── */
   #progress {
@@ -160,6 +162,7 @@
   .plan-row:nth-child(1) { background: rgba(59,130,246,.15); border: 1px solid rgba(59,130,246,.3); }
   .plan-row:nth-child(2) { background: rgba(16,185,129,.15); border: 1px solid rgba(16,185,129,.3); }
   .plan-row:nth-child(3) { background: rgba(245,158,11,.15); border: 1px solid rgba(245,158,11,.3); }
+  .plan-row:nth-child(4) { background: rgba(139,92,246,.15); border: 1px solid rgba(139,92,246,.3); }
   .plan-name { font-weight: 700; font-size: 1rem; }
   .plan-topics { font-size: .85rem; color: var(--muted); }
   .plan-time { font-weight: 700; font-size: 1rem; text-align: right; }
@@ -234,7 +237,7 @@
     <div class="divider" style="background: linear-gradient(90deg,var(--uno-red),var(--uno-yellow),var(--uno-green),var(--uno-blue))"></div>
     <h3>Programación en Ambiente Web — PAW 2026<br>Universidad de Luján · Entrega Final</h3>
     <div style="display:flex; gap: 12px; margin-top: 20px;">
-      <span class="chip" style="background:rgba(59,130,246,.2); color: #93c5fd;">Axel Hoffmann</span>
+      <span class="chip" style="background:rgba(139,92,246,.2); color: #c4b5fd;">Axel Hoffmann</span>
       <span class="chip" style="background:rgba(59,130,246,.3); color: var(--facundo);">Facundo Laffont</span>
       <span class="chip" style="background:rgba(16,185,129,.2); color: var(--renzo);">Renzo Robles</span>
       <span class="chip" style="background:rgba(245,158,11,.2); color: var(--gonzalo);">Gonzalo Echeverría</span>
@@ -254,16 +257,21 @@
       </div>
       <div class="plan-row">
         <div class="plan-name" style="color:var(--renzo)">Renzo</div>
-        <div class="plan-topics">Frontend EJS &nbsp;·&nbsp; WebSocket tiempo real &nbsp;·&nbsp; Bots IA Gemini &nbsp;·&nbsp; Demo</div>
-        <div class="plan-time" style="color:var(--renzo)">~7 min</div>
+        <div class="plan-topics">Frontend EJS &nbsp;·&nbsp; WebSocket tiempo real &nbsp;·&nbsp; Bots IA Gemini</div>
+        <div class="plan-time" style="color:var(--renzo)">~6 min</div>
       </div>
       <div class="plan-row">
         <div class="plan-name" style="color:var(--gonzalo)">Gonzalo</div>
         <div class="plan-topics">Railway &nbsp;·&nbsp; Infraestructura GCP &nbsp;·&nbsp; Docker Compose &nbsp;·&nbsp; HTTPS / TLS &nbsp;·&nbsp; CI/CD</div>
         <div class="plan-time" style="color:var(--gonzalo)">~6 min</div>
       </div>
+      <div class="plan-row">
+        <div class="plan-name" style="color:var(--axel)">Axel</div>
+        <div class="plan-topics">Demo en vivo &nbsp;·&nbsp; Demostración de la aplicación en producción</div>
+        <div class="plan-time" style="color:var(--axel)">~5 min</div>
+      </div>
     </div>
-    <p style="margin-top: 28px;">Duración total: <strong style="color:var(--text)">20 minutos</strong> &nbsp;+&nbsp; preguntas</p>
+    <p style="margin-top: 28px;">Duración total: <strong style="color:var(--text)">~24 minutos</strong> &nbsp;+&nbsp; preguntas</p>
   </div>
 
   <!-- ─────────────────── SLIDE 2: ¿QUÉ ES? ─────────────────── -->
@@ -590,47 +598,7 @@
     </div>
   </div>
 
-  <!-- ─────────────────── SLIDE 10: DEMO ─────────────────── -->
-  <div class="slide" id="s10">
-    <span class="badge renzo">Renzo</span>
-    <h2 style="font-size: 3rem;">🎮 Demo</h2>
-    <div class="divider" style="background: var(--renzo)"></div>
-    <h3>Demostración en vivo de la aplicación</h3>
-    <div style="display:flex; gap:24px; margin-top: 16px; flex-wrap:wrap; justify-content:center;">
-      <div class="card" style="padding:14px 20px; text-align:center; min-width:160px;">
-        <div style="font-size:2rem; margin-bottom:6px;">🔐</div>
-        <div style="font-size:.85rem;">Registro / Login</div>
-      </div>
-      <div class="card" style="padding:14px 20px; text-align:center; min-width:160px;">
-        <div style="font-size:2rem; margin-bottom:6px;">🏠</div>
-        <div style="font-size:.85rem;">Crear sala con bots</div>
-      </div>
-      <div class="card" style="padding:14px 20px; text-align:center; min-width:160px;">
-        <div style="font-size:2rem; margin-bottom:6px;">🃏</div>
-        <div style="font-size:.85rem;">Jugar partida</div>
-      </div>
-      <div class="card" style="padding:14px 20px; text-align:center; min-width:160px;">
-        <div style="font-size:2rem; margin-bottom:6px;">🏆</div>
-        <div style="font-size:.85rem;">Ver ranking</div>
-      </div>
-    </div>
-    <p style="margin-top: 24px; font-size: 1rem;">La app está <strong style="color: var(--renzo)">desplegada en producción</strong> con HTTPS activo.</p>
-    <a href="https://www.juegouno.app" target="_blank" style="
-      margin-top: 16px;
-      display: inline-block;
-      padding: 12px 32px;
-      background: linear-gradient(135deg, var(--uno-red), var(--uno-blue));
-      color: #fff;
-      font-size: 1.2rem;
-      font-weight: 700;
-      border-radius: 10px;
-      text-decoration: none;
-      letter-spacing: .5px;
-      box-shadow: 0 4px 20px rgba(0,0,0,.4);
-    ">🌐 www.juegouno.app</a>
-  </div>
-
-  <!-- ─────────────────── SLIDE 11: DEPLOY PLATFORMS ─────────────────── -->
+  <!-- ─────────────────── SLIDE 10: DEPLOY PLATFORMS ─────────────────── -->
   <div class="slide" id="s11">
     <span class="badge gonzalo">Gonzalo</span>
     <span class="section-label" style="background:rgba(245,158,11,.15); color:var(--gonzalo)">Infraestructura</span>
@@ -792,6 +760,46 @@
     </p>
   </div>
 
+  <!-- ─────────────────── SLIDE 14: DEMO ─────────────────── -->
+  <div class="slide" id="s14b">
+    <span class="badge axel">Axel</span>
+    <h2 style="font-size: 3rem;">🎮 Demo</h2>
+    <div class="divider" style="background: var(--axel)"></div>
+    <h3>Demostración en vivo de la aplicación</h3>
+    <div style="display:flex; gap:24px; margin-top: 16px; flex-wrap:wrap; justify-content:center;">
+      <div class="card" style="padding:14px 20px; text-align:center; min-width:160px;">
+        <div style="font-size:2rem; margin-bottom:6px;">🔐</div>
+        <div style="font-size:.85rem;">Registro / Login</div>
+      </div>
+      <div class="card" style="padding:14px 20px; text-align:center; min-width:160px;">
+        <div style="font-size:2rem; margin-bottom:6px;">🏠</div>
+        <div style="font-size:.85rem;">Crear sala con bots</div>
+      </div>
+      <div class="card" style="padding:14px 20px; text-align:center; min-width:160px;">
+        <div style="font-size:2rem; margin-bottom:6px;">🃏</div>
+        <div style="font-size:.85rem;">Jugar partida</div>
+      </div>
+      <div class="card" style="padding:14px 20px; text-align:center; min-width:160px;">
+        <div style="font-size:2rem; margin-bottom:6px;">🏆</div>
+        <div style="font-size:.85rem;">Ver ranking</div>
+      </div>
+    </div>
+    <p style="margin-top: 24px; font-size: 1rem;">La app está <strong style="color: var(--axel)">desplegada en producción</strong> con HTTPS activo.</p>
+    <a href="https://www.juegouno.app" target="_blank" style="
+      margin-top: 16px;
+      display: inline-block;
+      padding: 12px 32px;
+      background: linear-gradient(135deg, var(--axel), var(--uno-blue));
+      color: #fff;
+      font-size: 1.2rem;
+      font-weight: 700;
+      border-radius: 10px;
+      text-decoration: none;
+      letter-spacing: .5px;
+      box-shadow: 0 4px 20px rgba(0,0,0,.4);
+    ">🌐 www.juegouno.app</a>
+  </div>
+
   <!-- ─────────────────── SLIDE 15: CIERRE ─────────────────── -->
   <div class="slide" id="s15">
     <div class="uno-cards">
@@ -803,7 +811,7 @@
     <h1 style="margin-top:16px;">¡Gracias!</h1>
     <div class="divider" style="background: linear-gradient(90deg,var(--uno-red),var(--uno-yellow),var(--uno-green),var(--uno-blue))"></div>
     <h3 style="margin-bottom:20px;">Preguntas y comentarios</h3>
-    <div class="grid-3" style="max-width:720px;">
+    <div class="grid-4" style="max-width:920px;">
       <div class="card" style="text-align:center; padding:12px;">
         <div style="font-size:1.5rem; margin-bottom:4px;">🏗️</div>
         <div style="font-size:.82rem; color:var(--facundo); font-weight:600;">Facundo</div>
@@ -818,6 +826,11 @@
         <div style="font-size:1.5rem; margin-bottom:4px;">☁️</div>
         <div style="font-size:.82rem; color:var(--gonzalo); font-weight:600;">Gonzalo</div>
         <div style="font-size:.75rem; color:var(--muted);">Railway · GCP · Docker · HTTPS · CI/CD</div>
+      </div>
+      <div class="card" style="text-align:center; padding:12px;">
+        <div style="font-size:1.5rem; margin-bottom:4px;">🕹️</div>
+        <div style="font-size:.82rem; color:var(--axel); font-weight:600;">Axel</div>
+        <div style="font-size:.75rem; color:var(--muted);">Demo en vivo</div>
       </div>
     </div>
     <p style="margin-top:20px; font-size:.8rem;">
