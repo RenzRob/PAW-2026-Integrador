@@ -8,28 +8,28 @@ PAW-2026-Integrador/
 ├── nginx/
 └── src/
     ├── controladores/
-    │   ├── AuthController.js          # Registro e ingreso
-    │   ├── PartidaController.js       # Orquestación de partidas (juego, bots, timers)
-    │   └── PuntajesController.js      # Ranking global
-    ├── dominio/                       # Reglas de juego y entidades
-    ├── errores/
-    ├── infraestructura/               # Persistencia, integraciones y utilidades
+    │   ├── AuthController.js          # Registro e ingreso.
+    │   ├── PartidaController.js       # Orquestación de partidas (juego, bots, timers).
+    │   └── PuntajesController.js      # Ranking global.
+    ├── dominio/                       # Reglas de juego y entidades.
+    ├── errores/                       # Excepciones para representar errores de la aplicación.
+    ├── infraestructura/
     │   ├── integraciones/
     │   │   └── ia/
-    │   │       └── BotLLM.js          # Bot con Gemini
+    │   │       └── BotLLM.js          # Bot con Gemini.
     │   ├── persistencia/
-    │   │   ├── memoria/               # Fallback sin DB_HOST
-    │   │   ├── mysql/                 # MySQL (pool, repositorio, init.sql)
-    │   │   └── Persistencia.js        # Facade: partidas en memoria + repos
+    │   │   ├── memoria/               # Fallback sin DB_HOST.
+    │   │   ├── mysql/                 # MySQL (pool, repositorio, init.sql).
+    │   │   └── Persistencia.js        # Facade: partidas en memoria + repos.
     │   └── shared/                    # Archivos compartidos por toda la app.
     ├── interfaces/
     │   ├── http/
-    │   │   ├── handlers/              # Rutas REST y páginas (manejadorFront = generador de vistas)
-    │   │   ├── middleware/            # JWT (API y web)
-    │   │   └── seo/                   # Metadatos SEO
-    │   └── ws/                        # WebSocket: conexiones y mensajes
+    │   │   ├── handlers/              # Rutas REST y páginas.
+    │   │   ├── middleware/            # JWT (API y web).
+    │   │   └── seo/                   # Metadatos SEO.
+    │   └── ws/                        # WebSocket: conexiones y mensajes.
     ├── presentacion/
-    │   ├── public/                    # CSS, JS, imágenes (archivos estáticos)
-    │   └── views/                     # Plantillas EJS (HTML server-side)
-    └── app.js                         # Composition root (Express + WebSocket)
+    │   ├── public/                    # CSS, JS, imágenes (archivos estáticos).
+    │   └── views/                     # Plantillas EJS (HTML server-side).
+    └── app.js                         # Composition root (Express + WebSocket).
 ```
