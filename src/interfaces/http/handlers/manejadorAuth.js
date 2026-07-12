@@ -48,7 +48,7 @@ class ManejadorAuth {
    */
   async registrar(req, res) {
     logger.logContext(this);
-    const result = await this.controller.registrar(req.body.nombreUsuario, req.body.password);
+    const result = await this.controller.registrar(req.body.nombreUsuario, req.body.password, req.body.email);
     if (!result.ok) return res.status(result.status).json({ error: result.error });
     this.#emitirToken(res, result.data.jugadorId, result.data.nombreUsuario);
     res.status(201).json(result.data);

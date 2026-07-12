@@ -23,6 +23,9 @@ const { requireAuth } = require('#interfaces/http/middleware/middlewareAuth');
 const ManejadorAuth = require('#interfaces/http/handlers/manejadorAuth');
 const ManejadorPartidas = require('#interfaces/http/handlers/manejadorPartidas');
 const ManejadorPuntajes = require('#interfaces/http/handlers/manejadorPuntajes');
+const ManejadorPerfil = require('#interfaces/http/handlers/manejadorPerfil');
+const PerfilController = require('#controladores/PerfilController');
+const mailService = require('#infraestructura/integraciones/email/MailService');
 const AppException = require('#errores/AppException');
 const EmptyException = require('#errores/EmptyException');
 const {
@@ -137,10 +140,12 @@ class Servidor {
     const auth = new ManejadorAuth(new AuthController(db));
     const partidas = new ManejadorPartidas(this.partidaController);
     const puntajes = new ManejadorPuntajes(new PuntajesController(db));
+    const perfil = new ManejadorPerfil(new PerfilController(db));
     this.app
       .use('/api', auth.router)
       .use('/api/partidas', requireAuth, partidas.router)
-      .use('/api/puntajes', puntajes.router); // público: el ranking no requiere login
+      .use('/api/puntajes', puntajes.router) // público: el ranking no requiere login
+      .use('/api/perfil', requireAuth, perfil.router);
   }
 
   #configurarWebSocket() {
@@ -192,6 +197,38 @@ class Servidor {
   }
 }
 
-const puerto = process.env.PORT || 3000;
-const servidor = new Servidor(puerto);
-servidor.iniciar();
+async function arrancar() {
+  // Si hay DB configurada, inicializar el schema antes de levantar el servidor.
+  if (process.env.DB_HOST) {
+    const initDB = require('#infraestructura/persistencia/mysql/initDB');
+    await initDB();
+  }
+
+  const puerto = process.env.PORT || 3000;
+  const servidor = new Servidor(puerto);
+  servidor.iniciar();
+
+  // Envío diario de mails a usuarios en el top 10 (solo en producción y con Resend configurado)
+  if (process.env.NODE_ENV === 'production' && mailService.estaConfigurado()) {
+    const enviarMailsTop10 = async () => {
+      try {
+        const puntajes = await db.obtenerPuntajes();
+        const top10 = puntajes.slice(0, 10).filter((p) => p.email);
+        for (let i = 0; i < top10.length; i++) {
+          const p = top10[i];
+          await mailService.enviarEmailTop10(p.nombreUsuario, p.email, i + 1);
+        }
+      } catch (err) {
+        logger.registerLog('error', `Error en cron de mails top10: ${err.message}`);
+      }
+    };
+
+    enviarMailsTop10();
+    setInterval(enviarMailsTop10, 24 * 60 * 60 * 1000);
+  }
+}
+
+arrancar().catch((err) => {
+  console.error('Error fatal al arrancar:', err);
+  process.exit(1);
+});

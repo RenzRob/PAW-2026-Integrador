@@ -3,6 +3,8 @@ const SalaDeJuego = require('#dominio/SalaDeJuego');
 const BotLLM = require('#infraestructura/integraciones/ia/BotLLM');
 const ManejadorConexiones = require('#interfaces/ws/manejadorConexiones');
 const logger = require('#infraestructura/shared/logger');
+const { xpParaPuesto } = require('#dominio/NivelXP');
+const { verificarLogros } = require('#dominio/Logros');
 
 const NOMBRES_BOTS = ['Bot-A', 'Bot-B', 'Bot-C'];
 
@@ -418,6 +420,7 @@ class PartidaController {
       this.#cancelarUnoTimer(partidaId);
       this.#cancelarTurnoTimer(partidaId);
       await this.persistencia.guardarResultadoPartida(partidaId, res.ranking);
+      await this.#procesarFinPartida(partidaId, res.ranking, sala);
 
       this.#broadcast(sala, 'partida-terminada', { ranking: res.ranking });
 
@@ -775,6 +778,7 @@ class PartidaController {
             });
           }
           await this.persistencia.guardarResultadoPartida(partidaId, res.ranking);
+          await this.#procesarFinPartida(partidaId, res.ranking, salaActual);
           this.#broadcast(salaActual, 'partida-terminada', { ranking: res.ranking });
           this.persistencia.eliminarPartida(partidaId);
           return;
@@ -818,6 +822,39 @@ class PartidaController {
     this.#programarTurnoTimer(partidaId);
     if (salaActual.turnoEsBot()) {
       this.#ejecutarTurnoBot(partidaId);
+    }
+  }
+
+  async #procesarFinPartida(_partidaId, ranking, sala) {
+    for (const r of ranking) {
+      if (r.jugadorId.startsWith('bot-')) continue;
+
+      const xp = xpParaPuesto(r.puesto);
+      await this.persistencia.agregarXPyActualizarNivel(r.jugadorId, xp);
+
+      const [stats, posRanking, logrosActuales] = await Promise.all([
+        this.persistencia.obtenerEstadisticasJugador(r.jugadorId),
+        this.persistencia.obtenerPosicionRanking(r.jugadorId),
+        this.persistencia.obtenerLogrosDesbloqueados(r.jugadorId),
+      ]);
+
+      const idsActuales = logrosActuales.map((l) => l.logro_id);
+      const nuevosLogros = verificarLogros(stats, posRanking, idsActuales);
+
+      if (nuevosLogros.length > 0) {
+        await this.persistencia.desbloquearLogros(r.jugadorId, nuevosLogros);
+        this.manejadorConexiones.emitirA(r.jugadorId, 'logros-desbloqueados', {
+          logros: nuevosLogros,
+          xpGanado: xp,
+          nivelActual: stats.nivel,
+        });
+      } else if (xp > 0) {
+        this.manejadorConexiones.emitirA(r.jugadorId, 'xp-ganado', {
+          xpGanado: xp,
+          nivelActual: stats.nivel,
+          xpTotal: stats.xp,
+        });
+      }
     }
   }
 }

@@ -1,0 +1,8 @@
+[build]
+dockerfile = "Dockerfile"
+
+[deploy]
+healthcheckPath = "/api/puntajes"
+healthcheckTimeout = 30
+restartPolicyType = "on_failure"
+restartPolicyMaxRetries = 3

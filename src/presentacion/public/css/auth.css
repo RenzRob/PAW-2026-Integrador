@@ -119,6 +119,12 @@ body {
   color: #888;
 }
 
+.auth-hint-inline {
+  font-size: 0.78rem;
+  color: #888;
+  font-weight: normal;
+}
+
 .btn-auth {
   background: #ffe14b;
   color: #444;

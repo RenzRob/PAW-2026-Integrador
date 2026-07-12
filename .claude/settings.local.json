@@ -1,7 +1,10 @@
 {
   "permissions": {
     "allow": [
-      "Bash(node *)"
+      "Bash(node *)",
+      "Bash(xargs -I {} basename {})",
+      "Bash(xargs ls -lh)",
+      "Bash(xargs ls -1)"
     ]
   }
 }

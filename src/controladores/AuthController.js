@@ -1,7 +1,9 @@
 const { v4: uuidv4 } = require('uuid');
 const bcrypt = require('bcryptjs');
 const logger = require('#infraestructura/shared/logger');
+
 const NOMBRE_REGEX = /^[a-zA-Z0-9_\-áéíóúñüÁÉÍÓÚÑÜ]{3,50}$/;
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const PASSWORD_MIN = 4;
 const BCRYPT_ROUNDS = 10;
 
@@ -11,17 +13,15 @@ class AuthController {
     this.persistencia = persistencia;
   }
 
-  async registrar(nombreUsuario, password) {
+  async registrar(nombreUsuario, password, email) {
     logger.logContext(this);
 
     const nombre = nombreUsuario?.trim();
     const clave = password?.trim();
+    const correo = email?.trim() || null;
 
     if (!nombre) return { ok: false, status: 400, error: 'El nombre de usuario es requerido' };
 
-    // Verifica si el nombre tiene el formato correcto: se permiten letras acentuadas,
-    // números, guiones y guiones bajos, entre 3 y 50 caracteres. Si no se cumple el formato
-    // se devuelve error.
     if (!NOMBRE_REGEX.test(nombre))
       return {
         ok: false,
@@ -29,8 +29,6 @@ class AuthController {
         error: 'El nombre de usuario debe tener entre 3 y 50 caracteres (letras, números, _ o -)',
       };
 
-    // Verifica la cantidad mínima de la contraseña.
-    // Si no se cumple, se devuelve error.
     if (!clave || clave.length < PASSWORD_MIN)
       return {
         ok: false,
@@ -38,15 +36,15 @@ class AuthController {
         error: `La contraseña debe tener al menos ${PASSWORD_MIN} caracteres`,
       };
 
-    // Verifica que el usuario no exista previamente. Si existe, se devuelve error.
+    if (correo && !EMAIL_REGEX.test(correo))
+      return { ok: false, status: 400, error: 'El email no tiene un formato válido' };
+
     if (await this.persistencia.obtenerJugadorPorNombre(nombre))
       return { ok: false, status: 409, error: 'El nombre de usuario ya está en uso' };
 
-    // Asigna un ID único al jugador, hashea la contraseña, guarda el nuevo jugador en
-    // la base de datos y lo marca como logueado.
     const jugadorId = uuidv4();
     const passwordHash = await bcrypt.hash(clave, BCRYPT_ROUNDS);
-    await this.persistencia.registrarJugador(jugadorId, nombre, passwordHash);
+    await this.persistencia.registrarJugador(jugadorId, nombre, passwordHash, correo);
 
     return { ok: true, data: { jugadorId, nombreUsuario: nombre } };
   }
@@ -62,8 +60,6 @@ class AuthController {
 
     const jugador = await this.persistencia.obtenerJugadorPorNombre(nombre);
 
-    // Mismo mensaje para usuario no encontrado y contraseña incorrecta:
-    // no revelamos si el nombre de usuario existe o no.
     const credencialesInvalidas = {
       ok: false,
       status: 401,
@@ -80,7 +76,6 @@ class AuthController {
       data: { jugadorId: jugador.jugadorId, nombreUsuario: jugador.nombreUsuario },
     };
   }
-
 }
 
 module.exports = AuthController;

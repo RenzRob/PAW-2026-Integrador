@@ -219,6 +219,16 @@ class ManejadorFront {
         ...buildReglasLocals(req),
       });
     });
+
+    this.app.get('/public/perfil', requireAuthWeb, (req, res) => {
+      res.render('perfil', {
+        logLevel: this.#logLevel,
+        title: 'UNO Argentino - Mi Perfil',
+        styles: ['/css/perfil.css'],
+        jugadorId: req.jugadorId,
+        ...this.#buildSeoLocals(req, '/public/perfil'),
+      });
+    });
   }
 }
 

@@ -1,18 +1,28 @@
 const Usuario = require('#dominio/Usuario');
+const { calcularNivel } = require('#dominio/NivelXP');
 const logger = require('#infraestructura/shared/logger');
+
 class JugadorRepositorioMemoria {
   constructor() {
     logger.logContext(this);
     this.jugadores = new Map();
     this.puntajes = new Map();
+    this.xp = new Map();
+    this.historial = new Map(); // jugadorId → [{ fecha, puesto, delta_global, puntaje_ronda }]
+    this.logros = new Map(); // jugadorId → [{ logro_id, fecha_obtenido }]
+    this.emails = new Map(); // jugadorId → email
   }
 
-  async registrarJugador(jugadorId, nombreUsuario, passwordHash) {
+  async registrarJugador(jugadorId, nombreUsuario, passwordHash, email = null) {
     logger.logContext(this);
     const jugador = new Usuario(jugadorId, nombreUsuario, passwordHash);
 
     this.jugadores.set(jugadorId, jugador);
     this.puntajes.set(jugadorId, 0);
+    this.xp.set(jugadorId, 0);
+    this.historial.set(jugadorId, []);
+    this.logros.set(jugadorId, []);
+    if (email) this.emails.set(jugadorId, email);
 
     return jugador;
   }
@@ -37,6 +47,7 @@ class JugadorRepositorioMemoria {
       .map((j) => ({
         jugadorId: j.jugadorId,
         nombreUsuario: j.nombreUsuario,
+        email: this.emails.get(j.jugadorId) || null,
         puntajeGlobal: this.puntajes.get(j.jugadorId) || 0,
       }))
       .sort((a, b) => b.puntajeGlobal - a.puntajeGlobal);
@@ -49,7 +60,74 @@ class JugadorRepositorioMemoria {
 
       const actual = this.puntajes.get(rank.jugadorId) || 0;
       this.puntajes.set(rank.jugadorId, actual + rank.deltaGlobal);
+
+      const hist = this.historial.get(rank.jugadorId) || [];
+      hist.unshift({
+        fecha: new Date(),
+        puesto: rank.puesto,
+        delta_global: rank.deltaGlobal,
+        puntaje_ronda: rank.puntaje,
+      });
+      this.historial.set(rank.jugadorId, hist);
     }
+  }
+
+  async obtenerEstadisticasJugador(jugadorId) {
+    logger.logContext(this);
+    const hist = this.historial.get(jugadorId) || [];
+    const partidas = hist.length;
+    const victorias = hist.filter((h) => h.puesto === 1).length;
+    const xpActual = this.xp.get(jugadorId) || 0;
+
+    return {
+      partidas,
+      victorias,
+      derrotas: partidas - victorias,
+      winrate: partidas > 0 ? Math.round((victorias / partidas) * 100) : 0,
+      puntajeGlobal: this.puntajes.get(jugadorId) || 0,
+      xp: xpActual,
+      nivel: calcularNivel(xpActual),
+    };
+  }
+
+  async obtenerHistorialPartidas(jugadorId, limit = 10) {
+    logger.logContext(this);
+    const hist = this.historial.get(jugadorId) || [];
+    return hist.slice(0, limit);
+  }
+
+  async obtenerLogrosDesbloqueados(jugadorId) {
+    logger.logContext(this);
+    return this.logros.get(jugadorId) || [];
+  }
+
+  async desbloquearLogros(jugadorId, logroIds) {
+    logger.logContext(this);
+    const existentes = this.logros.get(jugadorId) || [];
+    const existentesIds = existentes.map((l) => l.logro_id);
+
+    for (const logroId of logroIds) {
+      if (!existentesIds.includes(logroId)) {
+        existentes.push({ logro_id: logroId, fecha_obtenido: new Date() });
+      }
+    }
+
+    this.logros.set(jugadorId, existentes);
+  }
+
+  async agregarXPyActualizarNivel(jugadorId, xpGanado) {
+    logger.logContext(this);
+    if (xpGanado <= 0) return;
+
+    const actual = this.xp.get(jugadorId) || 0;
+    this.xp.set(jugadorId, actual + xpGanado);
+  }
+
+  async obtenerPosicionRanking(jugadorId) {
+    logger.logContext(this);
+    const ranking = await this.obtenerPuntajes();
+    const idx = ranking.findIndex((r) => r.jugadorId === jugadorId);
+    return idx >= 0 ? idx + 1 : null;
   }
 }
 

@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="es">
+  <%- include('partials/head.ejs') %>
+  <body>
+    <%- include('partials/navbar.ejs') %>
+
+    <div class="perfil-container">
+      <div class="perfil-box" id="perfil-box">
+        <div class="perfil-loading">Cargando perfil...</div>
+      </div>
+    </div>
+
+    <script>
+      const JUGADOR_ID = '<%= jugadorId %>';
+
+      async function cargarPerfil() {
+        const box = document.getElementById('perfil-box');
+        try {
+          const res = await fetch(`/api/perfil/${JUGADOR_ID}`);
+          if (!res.ok) throw new Error('No se pudo cargar el perfil.');
+          const data = await res.json();
+          renderPerfil(data);
+        } catch (err) {
+          box.innerHTML = `<p class="perfil-error">${err.message}</p>`;
+        }
+      }
+
+      function renderPerfil(d) {
+        const box = document.getElementById('perfil-box');
+        const { nombreUsuario, stats, xpInfo, historial, logros } = d;
+
+        const winrateColor = stats.winrate >= 50 ? '#27ae60' : '#c0392b';
+        const logrosDesbloqueados = logros.filter(l => l.desbloqueado).length;
+
+        box.innerHTML = `
+          <!-- Header del perfil -->
+          <div class="perfil-header">
+            <div class="perfil-avatar">${nombreUsuario.charAt(0).toUpperCase()}</div>
+            <div class="perfil-header-info">
+              <h1 class="perfil-nombre">${nombreUsuario}</h1>
+              <div class="perfil-nivel-badge">Nivel ${stats.nivel}</div>
+              <div class="perfil-xp-wrap">
+                <div class="perfil-xp-bar">
+                  <div class="perfil-xp-fill" style="width: ${xpInfo.progresoNivel}%"></div>
+                </div>
+                <span class="perfil-xp-label">${xpInfo.xpEnNivel} / ${xpInfo.xpDelNivel} XP</span>
+              </div>
+              <div class="perfil-puntaje-global">Puntaje global: <strong>${stats.puntajeGlobal}</strong> pts</div>
+            </div>
+          </div>
+
+          <!-- Stats grid -->
+          <div class="perfil-stats-grid">
+            <div class="perfil-stat-card">
+              <span class="stat-numero">${stats.partidas}</span>
+              <span class="stat-label">Partidas</span>
+            </div>
+            <div class="perfil-stat-card">
+              <span class="stat-numero">${stats.victorias}</span>
+              <span class="stat-label">Victorias</span>
+            </div>
+            <div class="perfil-stat-card">
+              <span class="stat-numero">${stats.derrotas}</span>
+              <span class="stat-label">Derrotas</span>
+            </div>
+            <div class="perfil-stat-card">
+              <span class="stat-numero" style="color: ${winrateColor}">${stats.winrate}%</span>
+              <span class="stat-label">Winrate</span>
+            </div>
+          </div>
+
+          <!-- Historial -->
+          <div class="perfil-seccion">
+            <h2 class="perfil-seccion-titulo">Últimas partidas</h2>
+            ${historial.length === 0
+              ? '<p class="perfil-vacio">Todavía no jugaste ninguna partida.</p>'
+              : `<div class="perfil-tabla-wrap"><table class="perfil-tabla">
+                  <thead><tr><th>Fecha</th><th>Puesto</th><th>Pts. ronda</th><th>Delta</th></tr></thead>
+                  <tbody>
+                    ${historial.map(h => {
+                      const fecha = new Date(h.fecha).toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit', year: '2-digit' });
+                      const medalla = h.puesto === 1 ? '🥇' : h.puesto === 2 ? '🥈' : h.puesto === 3 ? '🥉' : `${h.puesto}°`;
+                      const deltaClass = h.delta_global >= 0 ? 'delta-positivo' : 'delta-negativo';
+                      const deltaStr = h.delta_global >= 0 ? `+${h.delta_global}` : `${h.delta_global}`;
+                      return `<tr>
+                        <td>${fecha}</td>
+                        <td>${medalla}</td>
+                        <td>${h.puntaje_ronda}</td>
+                        <td class="${deltaClass}">${deltaStr}</td>
+                      </tr>`;
+                    }).join('')}
+                  </tbody>
+                </table></div>`}
+          </div>
+
+          <!-- Logros -->
+          <div class="perfil-seccion">
+            <h2 class="perfil-seccion-titulo">Logros <span class="logros-contador">${logrosDesbloqueados}/${logros.length}</span></h2>
+            <div class="logros-grid">
+              ${logros.map(l => {
+                const cls = l.desbloqueado ? 'logro-card desbloqueado' : 'logro-card bloqueado';
+                const fechaStr = l.fechaObtenido
+                  ? new Date(l.fechaObtenido).toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit', year: '2-digit' })
+                  : '';
+                return `<div class="${cls}" title="${l.descripcion}">
+                  <span class="logro-emoji">${l.desbloqueado ? l.emoji : '🔒'}</span>
+                  <span class="logro-nombre">${l.nombre}</span>
+                  <span class="logro-desc">${l.descripcion}</span>
+                  ${fechaStr ? `<span class="logro-fecha">${fechaStr}</span>` : ''}
+                </div>`;
+              }).join('')}
+            </div>
+          </div>
+
+          <button class="btn-perfil-volver" onclick="window.location.href='/public/'">VOLVER AL INICIO</button>
+        `;
+      }
+
+      cargarPerfil();
+    </script>
+  </body>
+</html>

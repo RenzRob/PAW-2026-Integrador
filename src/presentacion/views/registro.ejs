@@ -40,6 +40,15 @@
         </div>
         <p class="auth-hint">Mínimo 4 caracteres</p>
 
+        <label for="email">Email <span class="auth-hint-inline">(opcional, para recibir notificaciones)</span></label>
+        <input
+          type="email"
+          id="email"
+          name="email"
+          autocomplete="email"
+          placeholder="tu@email.com"
+        />
+
         <label for="passwordConfirm">Repetir contraseña</label>
         <div class="input-password-wrapper">
           <input
@@ -94,6 +103,7 @@
       const nombreUsuario = e.target.nombreUsuario.value.trim();
       const password = e.target.password.value;
       const passwordConfirm = e.target.passwordConfirm.value;
+      const email = e.target.email.value.trim();
 
       // Validaciones del lado del cliente
       const NOMBRE_REGEX = /^[a-zA-Z0-9_\-áéíóúñüÁÉÍÓÚÑÜ]{3,50}$/;
@@ -123,7 +133,7 @@
         const response = await fetch('/api/registrarse', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ nombreUsuario, password }),
+          body: JSON.stringify({ nombreUsuario, password, email: email || undefined }),
         });
 
         const data = await response.json();
