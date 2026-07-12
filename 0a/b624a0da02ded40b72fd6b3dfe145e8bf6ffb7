@@ -1,0 +1,25 @@
+src/presentacion/views/registro.ejs
+  s_35e7cb0b63b1ea::t_9bf0b520be6065 22-32,106,112-118,142
+src/infraestructura/integraciones/email/MailService.js
+  s_35e7cb0b63b1ea::t_9f259c70f6bd04 15-64
+src/controladores/AuthController.js
+  s_35e7cb0b63b1ea::t_4880c9b354ed9d 40-42
+  s_35e7cb0b63b1ea::t_13de2a8ea11a06 52-54
+  s_35e7cb0b63b1ea::t_0ce1493b7a79c7 4
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.12",
+  "base_commit_sha": "0ab624a0da02ded40b72fd6b3dfe145e8bf6ffb7",
+  "prompts": {},
+  "sessions": {
+    "s_35e7cb0b63b1ea": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "60530d02-4e3f-4333-9714-cf5c712f0786",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "rrobles_meli <renzo.robles@mercadolibre.com>"
+    }
+  }
+}
