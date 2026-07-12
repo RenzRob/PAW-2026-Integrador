@@ -1,6 +1,7 @@
 const { v4: uuidv4 } = require('uuid');
 const bcrypt = require('bcryptjs');
 const logger = require('#infraestructura/shared/logger');
+const mailService = require('#infraestructura/integraciones/email/MailService');
 
 const NOMBRE_REGEX = /^[a-zA-Z0-9_\-áéíóúñüÁÉÍÓÚÑÜ]{3,50}$/;
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -36,7 +37,9 @@ class AuthController {
         error: `La contraseña debe tener al menos ${PASSWORD_MIN} caracteres`,
       };
 
-    if (correo && !EMAIL_REGEX.test(correo))
+    if (!correo) return { ok: false, status: 400, error: 'El email es requerido' };
+
+    if (!EMAIL_REGEX.test(correo))
       return { ok: false, status: 400, error: 'El email no tiene un formato válido' };
 
     if (await this.persistencia.obtenerJugadorPorNombre(nombre))
@@ -45,6 +48,9 @@ class AuthController {
     const jugadorId = uuidv4();
     const passwordHash = await bcrypt.hash(clave, BCRYPT_ROUNDS);
     await this.persistencia.registrarJugador(jugadorId, nombre, passwordHash, correo);
+
+    // No esperamos el mail para no bloquear la respuesta al usuario
+    mailService.enviarEmailBienvenida(nombre, correo).catch(() => {});
 
     return { ok: true, data: { jugadorId, nombreUsuario: nombre } };
   }

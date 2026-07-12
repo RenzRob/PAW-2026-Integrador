@@ -19,6 +19,17 @@
         />
         <p class="auth-hint">3–50 caracteres. Solo letras, números, _ o -</p>
 
+        <label for="email">Email</label>
+        <input
+          type="email"
+          id="email"
+          name="email"
+          required
+          autocomplete="email"
+          placeholder="tu@email.com"
+        />
+        <p class="auth-hint">Para recibir notificaciones de tu ranking</p>
+
         <label for="password">Contraseña</label>
         <div class="input-password-wrapper">
           <input
@@ -39,15 +50,6 @@
           </button>
         </div>
         <p class="auth-hint">Mínimo 4 caracteres</p>
-
-        <label for="email">Email <span class="auth-hint-inline">(opcional, para recibir notificaciones)</span></label>
-        <input
-          type="email"
-          id="email"
-          name="email"
-          autocomplete="email"
-          placeholder="tu@email.com"
-        />
 
         <label for="passwordConfirm">Repetir contraseña</label>
         <div class="input-password-wrapper">
@@ -101,15 +103,19 @@
       error.hidden = true;
 
       const nombreUsuario = e.target.nombreUsuario.value.trim();
+      const email = e.target.email.value.trim();
       const password = e.target.password.value;
       const passwordConfirm = e.target.passwordConfirm.value;
-      const email = e.target.email.value.trim();
 
-      // Validaciones del lado del cliente
       const NOMBRE_REGEX = /^[a-zA-Z0-9_\-áéíóúñüÁÉÍÓÚÑÜ]{3,50}$/;
       if (!NOMBRE_REGEX.test(nombreUsuario)) {
-        error.textContent =
-          'El nombre debe tener entre 3 y 50 caracteres (letras, números, _ o -).';
+        error.textContent = 'El nombre debe tener entre 3 y 50 caracteres (letras, números, _ o -).';
+        error.hidden = false;
+        return;
+      }
+
+      if (!email) {
+        error.textContent = 'El email es requerido.';
         error.hidden = false;
         return;
       }
@@ -133,7 +139,7 @@
         const response = await fetch('/api/registrarse', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ nombreUsuario, password, email: email || undefined }),
+          body: JSON.stringify({ nombreUsuario, email, password }),
         });
 
         const data = await response.json();

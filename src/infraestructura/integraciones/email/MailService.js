@@ -12,6 +12,56 @@ class MailService {
     return this.resend !== null;
   }
 
+  async enviarEmailBienvenida(nombreUsuario, email) {
+    if (!this.resend) return;
+
+    try {
+      await this.resend.emails.send({
+        from: this.from,
+        to: email,
+        subject: `¡Bienvenido a UNO Argentino, ${nombreUsuario}!`,
+        html: `
+<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="UTF-8"/></head>
+<body style="margin:0;padding:0;background:#8ab3d1;font-family:Arial,sans-serif;">
+  <div style="max-width:520px;margin:32px auto;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 4px 16px rgba(0,0,0,0.1);">
+    <div style="background:#1a4971;padding:24px;text-align:center;">
+      <img src="${this.appUrl}/images/uno-logo.png" alt="UNO Argentino" style="height:60px;"/>
+    </div>
+    <div style="padding:28px 32px;">
+      <h1 style="margin:0 0 8px;color:#1a4971;font-size:1.4rem;">¡Hola, ${nombreUsuario}!</h1>
+      <p style="margin:0 0 16px;color:#444;font-size:1rem;">
+        Tu cuenta fue creada exitosamente. Ya podés empezar a jugar partidas de UNO online con otros jugadores o contra bots.
+      </p>
+      <div style="background:#eaf3fa;border-radius:8px;padding:16px;margin-bottom:20px;">
+        <p style="margin:0;font-size:0.95rem;color:#1a4971;"><strong>¿Qué podés hacer?</strong></p>
+        <ul style="margin:8px 0 0;padding-left:20px;color:#444;font-size:0.9rem;line-height:1.8;">
+          <li>Jugar partidas online contra otros jugadores</li>
+          <li>Competir contra bots con IA</li>
+          <li>Subir de nivel y desbloquear logros</li>
+          <li>Escalar en el ranking global</li>
+        </ul>
+      </div>
+      <a href="${this.appUrl}/public/"
+         style="display:block;background:#ffe14b;color:#333;text-decoration:none;text-align:center;
+                padding:14px;border-radius:6px;font-weight:bold;font-size:1rem;">
+        EMPEZAR A JUGAR
+      </a>
+    </div>
+    <div style="background:#f5f5f5;padding:12px;text-align:center;">
+      <p style="margin:0;font-size:0.75rem;color:#999;">UNO Argentino — Jugá online, gratis.</p>
+    </div>
+  </div>
+</body>
+</html>`,
+      });
+      logger.registerLog('info', `Mail de bienvenida enviado a ${nombreUsuario}`);
+    } catch (err) {
+      logger.registerLog('error', `Error enviando bienvenida a ${nombreUsuario}: ${err.message}`);
+    }
+  }
+
   async enviarEmailTop10(nombreUsuario, email, posicion) {
     if (!this.resend) return;
 
