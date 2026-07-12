@@ -1,0 +1,85 @@
+src/app.js
+  s_35e7cb0b63b1ea::t_109814793c3197 26-27
+  s_35e7cb0b63b1ea::t_300be586aa95c1 200-234
+  s_35e7cb0b63b1ea::t_61048077b1942c 28
+  s_35e7cb0b63b1ea::t_2fb3723671fb95 143,147-148
+.claude/settings.local.json
+  s_174c79e687fd85::t_470ff9ef8070d9 4
+  s_174c79e687fd85::t_316be85ecd1d9c 5
+  s_174c79e687fd85::t_9239776d18e833 6-7
+src/infraestructura/persistencia/mysql/sql/init.sql
+  s_35e7cb0b63b1ea::t_830ec963409634 4-7,26-31
+src/controladores/PartidaController.js
+  s_35e7cb0b63b1ea::t_a593a106ae297a 827-859
+  s_35e7cb0b63b1ea::t_896cdf846d9e12 781
+  s_35e7cb0b63b1ea::t_3ebbfa38fbb8b7 6-7
+  s_35e7cb0b63b1ea::t_0906dc3562a97d 423
+src/dominio/Logros.js
+  s_35e7cb0b63b1ea::t_483769f4b98641 1-99
+src/presentacion/public/css/perfil.css
+  s_35e7cb0b63b1ea::t_c4f269a54a87da 1-323
+src/interfaces/http/handlers/manejadorAuth.js
+  s_35e7cb0b63b1ea::t_906f6fd96ae605 51
+src/presentacion/views/perfil.ejs
+  s_35e7cb0b63b1ea::t_7bb164eb1aab7c 1-122
+src/presentacion/public/css/auth.css
+  s_35e7cb0b63b1ea::t_c0f57c9a631957 122-127
+src/infraestructura/integraciones/email/MailService.js
+  s_35e7cb0b63b1ea::t_41adf7efb762ba 1-66
+src/infraestructura/persistencia/memoria/JugadorRepositorioMemoria.js
+  s_35e7cb0b63b1ea::t_9a7aaaf10dfee9 2,4,10-13,16,22-25,50,63-71,74-130
+src/controladores/PerfilController.js
+  s_35e7cb0b63b1ea::t_4b32fa79d31c22 1-62
+src/interfaces/http/handlers/manejadorPerfil.js
+  s_35e7cb0b63b1ea::t_df035d5ad1a339 1-31
+src/controladores/AuthController.js
+  s_35e7cb0b63b1ea::t_f7454056e5c961 4,6,16,21,39-41,47
+package.json
+  s_35e7cb0b63b1ea::t_456463c2369357 32
+src/presentacion/views/partials/navbar.ejs
+  s_35e7cb0b63b1ea::t_aeeabe121c081d 203
+.env.example
+  s_35e7cb0b63b1ea::t_f1c5ac1602b6cb 31-41
+railway.toml
+  s_35e7cb0b63b1ea::t_f4888f42566cf8 1-8
+src/interfaces/http/handlers/manejadorFront.js
+  s_35e7cb0b63b1ea::t_dd0f0ab4422f70 222,224-231
+  s_35e7cb0b63b1ea::t_268a85506ea05f 223
+src/presentacion/views/registro.ejs
+  s_35e7cb0b63b1ea::t_82230db3de174e 43-51
+  s_35e7cb0b63b1ea::t_f68643cfa8c8ba 136
+  s_35e7cb0b63b1ea::t_9a0bcbea564601 106
+src/infraestructura/persistencia/mysql/initDB.js
+  s_35e7cb0b63b1ea::t_f4bdcc1191c792 6-12,14-17,19-29,31-34,36-37,39-42,44-45,47-48
+  s_35e7cb0b63b1ea::t_1da9131581b7f2 1-5,13,18,30,35,38,43,46,49-51
+src/infraestructura/persistencia/Persistencia.js
+  s_35e7cb0b63b1ea::t_bc986a82f54237 19,21,23,36-37,48,50-55,57-58,60-83
+src/infraestructura/persistencia/mysql/JugadorRepositorioMySQL.js
+  s_35e7cb0b63b1ea::t_85c01b375faa86 3,5,7,10-11,45,49,84-182
+src/dominio/NivelXP.js
+  s_35e7cb0b63b1ea::t_1a52b99682d29d 1-42
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "e11505b533f49169d36fd47f45be3a358b1862e8",
+  "prompts": {},
+  "sessions": {
+    "s_174c79e687fd85": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "104a7406-76a8-4385-805a-5d853c512433",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "rrobles_meli <renzo.robles@mercadolibre.com>"
+    },
+    "s_35e7cb0b63b1ea": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "60530d02-4e3f-4333-9714-cf5c712f0786",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "rrobles_meli <renzo.robles@mercadolibre.com>"
+    }
+  }
+}
