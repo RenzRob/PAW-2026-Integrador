@@ -1,0 +1,31 @@
+src/infraestructura/persistencia/Persistencia.js
+  s_af461f2fedde42::t_6de572d999fcef 80-89
+src/presentacion/public/css/auth.css
+  s_af461f2fedde42::t_4229207e94b8b5 52,63
+  s_af461f2fedde42::t_aabbc9eeca38fc 291
+src/app.js
+  s_af461f2fedde42::t_e5b40477b1fc06 213-215,221,223,229-253
+src/infraestructura/persistencia/mysql/sql/init.sql
+  s_af461f2fedde42::t_73bc4cc1beac47 34-38
+src/infraestructura/persistencia/mysql/JugadorRepositorioMySQL.js
+  s_af461f2fedde42::t_bb68ba2a85b3f8 171-184
+src/infraestructura/persistencia/memoria/JugadorRepositorioMemoria.js
+  s_af461f2fedde42::t_9224efd702da80 127-136
+  s_af461f2fedde42::t_d9e416191b83c7 14
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "7ec7a97d5480dd1f2f856d2d0a96b981f05b9949",
+  "prompts": {},
+  "sessions": {
+    "s_af461f2fedde42": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f9c1b35c-1c79-4bd9-bf54-505a6cbe7808",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "rrobles_meli <renzo.robles@mercadolibre.com>"
+    }
+  }
+}
