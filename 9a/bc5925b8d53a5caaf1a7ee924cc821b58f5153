@@ -1,0 +1,40 @@
+src/dominio/SalaDeJuego.js
+  s_af461f2fedde42::t_d9dd20d7e751f8 102,111
+  s_af461f2fedde42::t_1c343ec8b411c5 147
+  s_af461f2fedde42::t_4c9c042b7d95be 614
+.claude/settings.local.json
+  s_af461f2fedde42::t_6798e3f51b2175 7-8
+src/presentacion/public/js/partida.js
+  s_af461f2fedde42::t_17ac644f27a311 1939-1945
+  s_af461f2fedde42::t_a553f9969ffde9 2513-2528
+  s_af461f2fedde42::t_6bb772f755f75c 1013,1015-1016
+  s_af461f2fedde42::t_361aa9d4656f35 2185
+  s_af461f2fedde42::t_30fd9f2b3d21c6 2264-2308
+src/dominio/JugadorEnSala.js
+  s_af461f2fedde42::t_ea4b0c96b5e541 3,10
+src/controladores/PartidaController.js
+  s_af461f2fedde42::t_9eb0122ec18d4a 296,299
+  s_af461f2fedde42::t_74bb06f6426d79 848-850,852
+  s_af461f2fedde42::t_348b19bac3d281 7
+  s_af461f2fedde42::t_b03530ad5a61d6 371-372
+src/presentacion/views/salas.ejs
+  s_af461f2fedde42::t_9d1d3cf5593698 49
+src/presentacion/public/css/partida.css
+  s_af461f2fedde42::t_6f2d8c9739ef95 2032-2115
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "9abc5925b8d53a5caaf1a7ee924cc821b58f5153",
+  "prompts": {},
+  "sessions": {
+    "s_af461f2fedde42": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f9c1b35c-1c79-4bd9-bf54-505a6cbe7808",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "rrobles_meli <renzo.robles@mercadolibre.com>"
+    }
+  }
+}
