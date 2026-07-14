@@ -115,14 +115,17 @@ class JugadorRepositorioMySQL {
 
   async obtenerHistorialPartidas(jugadorId, limit = 10) {
     logger.logContext(this);
+    // mysql2 (prepared statements) no acepta `LIMIT ?`; interpolamos un
+    // entero ya saneado (seguro contra inyección al forzarlo a número).
+    const lim = Number.isInteger(limit) && limit > 0 ? limit : 10;
     const [rows] = await pool.execute(
       `SELECT p.fecha, pj.puesto, pj.delta_global, pj.puntaje_ronda
        FROM partida_jugadores pj
        JOIN partidas p ON pj.partida_id = p.id
        WHERE pj.jugador_id = ?
        ORDER BY p.fecha DESC
-       LIMIT ?`,
-      [jugadorId, limit]
+       LIMIT ${lim}`,
+      [jugadorId]
     );
 
     return rows;

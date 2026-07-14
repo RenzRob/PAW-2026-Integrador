@@ -703,6 +703,10 @@ class PartidaController {
       { jugadorId, puesto: sala.jugadores.length, puntaje: 0, deltaGlobal: -50 },
     ]);
 
+    // La partida abandonada igual cuenta como jugada: verificamos logros
+    // (Debutante, Habitual, etc.) sin otorgar XP.
+    await this.#procesarLogros(jugadorId);
+
     this.persistencia.eliminarPartida(partidaId);
   }
 
@@ -832,23 +836,9 @@ class PartidaController {
       const xp = xpParaPuesto(r.puesto);
       await this.persistencia.agregarXPyActualizarNivel(r.jugadorId, xp);
 
-      const [stats, posRanking, logrosActuales] = await Promise.all([
-        this.persistencia.obtenerEstadisticasJugador(r.jugadorId),
-        this.persistencia.obtenerPosicionRanking(r.jugadorId),
-        this.persistencia.obtenerLogrosDesbloqueados(r.jugadorId),
-      ]);
+      const { nuevosLogros, stats } = await this.#procesarLogros(r.jugadorId, xp);
 
-      const idsActuales = logrosActuales.map((l) => l.logro_id);
-      const nuevosLogros = verificarLogros(stats, posRanking, idsActuales);
-
-      if (nuevosLogros.length > 0) {
-        await this.persistencia.desbloquearLogros(r.jugadorId, nuevosLogros);
-        this.manejadorConexiones.emitirA(r.jugadorId, 'logros-desbloqueados', {
-          logros: nuevosLogros,
-          xpGanado: xp,
-          nivelActual: stats.nivel,
-        });
-      } else if (xp > 0) {
+      if (nuevosLogros.length === 0 && xp > 0) {
         this.manejadorConexiones.emitirA(r.jugadorId, 'xp-ganado', {
           xpGanado: xp,
           nivelActual: stats.nivel,
@@ -856,6 +846,35 @@ class PartidaController {
         });
       }
     }
+  }
+
+  /**
+   * Verifica y desbloquea los logros de un jugador según su estado actual.
+   * No otorga XP; el XP (si corresponde) lo maneja quien llame.
+   * @param {string} jugadorId
+   * @param {number} xpGanado - solo informativo para el evento WS (0 si no hubo XP)
+   * @returns {Promise<{ nuevosLogros: string[], stats: object }>}
+   */
+  async #procesarLogros(jugadorId, xpGanado = 0) {
+    const [stats, posRanking, logrosActuales] = await Promise.all([
+      this.persistencia.obtenerEstadisticasJugador(jugadorId),
+      this.persistencia.obtenerPosicionRanking(jugadorId),
+      this.persistencia.obtenerLogrosDesbloqueados(jugadorId),
+    ]);
+
+    const idsActuales = logrosActuales.map((l) => l.logro_id);
+    const nuevosLogros = verificarLogros(stats, posRanking, idsActuales);
+
+    if (nuevosLogros.length > 0) {
+      await this.persistencia.desbloquearLogros(jugadorId, nuevosLogros);
+      this.manejadorConexiones.emitirA(jugadorId, 'logros-desbloqueados', {
+        logros: nuevosLogros,
+        xpGanado,
+        nivelActual: stats.nivel,
+      });
+    }
+
+    return { nuevosLogros, stats };
   }
 }
 
