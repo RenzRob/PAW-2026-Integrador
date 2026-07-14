@@ -1,12 +1,13 @@
 const logger = require('#infraestructura/shared/logger');
 class JugadorEnSala {
-  constructor(jugadorId, nombreUsuario, esBot = false) {
+  constructor(jugadorId, nombreUsuario, esBot = false, nivel = null) {
     logger.logContext(this);
     this.jugadorId = jugadorId;
     this.nombreUsuario = nombreUsuario;
     this.mano = [];
     this.esBot = esBot;
     this.canto = false;
+    this.nivel = nivel;
   }
 
   recibirCartas(cartas) {

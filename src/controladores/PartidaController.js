@@ -4,7 +4,7 @@ const BotLLM = require('#infraestructura/integraciones/ia/BotLLM');
 const ManejadorConexiones = require('#interfaces/ws/manejadorConexiones');
 const logger = require('#infraestructura/shared/logger');
 const { xpParaPuesto } = require('#dominio/NivelXP');
-const { verificarLogros } = require('#dominio/Logros');
+const { DEFINICIONES_LOGROS, verificarLogros } = require('#dominio/Logros');
 
 const NOMBRES_BOTS = ['Bot-A', 'Bot-B', 'Bot-C'];
 
@@ -293,9 +293,10 @@ class PartidaController {
         error: 'La cantidad de bots no puede dejar la sala sin lugar para vos',
       };
 
+    const stats = await this.persistencia.obtenerEstadisticasJugador(jugadorId);
     const partidaId = uuidv4();
     const sala = new SalaDeJuego(partidaId, jugadorId, max);
-    sala.agregarJugador(jugadorId, jugador.nombreUsuario);
+    sala.agregarJugador(jugadorId, jugador.nombreUsuario, stats.nivel);
 
     for (let i = 0; i < bots; i++) {
       sala.agregarBot(NOMBRES_BOTS[i]);
@@ -367,7 +368,8 @@ class PartidaController {
         return { error: ingreso.error };
       }
 
-      const resultado = sala.agregarJugador(jugadorId, jugador.nombreUsuario);
+      const statsJugador = await this.persistencia.obtenerEstadisticasJugador(jugadorId);
+      const resultado = sala.agregarJugador(jugadorId, jugador.nombreUsuario, statsJugador.nivel);
 
       // Si no se logró agregar al jugador (ej. sala llena), se notifica y se retorna un error.
       if (resultado.error) {
@@ -843,8 +845,11 @@ class PartidaController {
 
       if (nuevosLogros.length > 0) {
         await this.persistencia.desbloquearLogros(r.jugadorId, nuevosLogros);
+        const logrosCompletos = nuevosLogros
+          .map((id) => DEFINICIONES_LOGROS.find((d) => d.id === id))
+          .filter(Boolean);
         this.manejadorConexiones.emitirA(r.jugadorId, 'logros-desbloqueados', {
-          logros: nuevosLogros,
+          logros: logrosCompletos,
           xpGanado: xp,
           nivelActual: stats.nivel,
         });

@@ -4,7 +4,8 @@
       "Bash(node *)",
       "Bash(xargs -I {} basename {})",
       "Bash(xargs ls -lh)",
-      "Bash(xargs ls -1)"
+      "Bash(xargs ls -1)",
+      "Bash(xargs cat)"
     ]
   }
 }

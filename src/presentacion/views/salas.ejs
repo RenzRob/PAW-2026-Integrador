@@ -46,7 +46,7 @@
       }
 
       function nombreSala(s) {
-        const creador = (s.jugadores && s.jugadores[0]) || 'Sala';
+        const creador = (s.jugadores && (s.jugadores[0]?.nombreUsuario || s.jugadores[0])) || 'Sala';
         return `Sala de ${creador}`;
       }
 

@@ -1010,8 +1010,10 @@ class Partida {
     this.lista.innerHTML = jugadores
       .map((j) => {
         const nombre = typeof j === 'string' ? j : j.nombreUsuario;
+        const nivel = typeof j === 'object' && j.nivel != null ? j.nivel : null;
         const esPropio = typeof j === 'object' && String(j.jugadorId) === String(this.jugadorId);
-        return `<li class="jugador-item${esPropio ? ' jugador-propio' : ''}">${nombre}</li>`;
+        const nivelBadge = nivel != null ? `<span class="nivel-badge">Nv.${nivel}</span>` : '';
+        return `<li class="jugador-item${esPropio ? ' jugador-propio' : ''}">${nombre}${nivelBadge}</li>`;
       })
       .join('');
     const cant = jugadores.length;
@@ -1934,6 +1936,13 @@ class Partida {
       texto.textContent = jugador.nombreUsuario;
       etiqueta.appendChild(texto);
 
+      if (jugador.nivel != null) {
+        const badge = document.createElement('span');
+        badge.className = 'nivel-badge';
+        badge.textContent = `Nv.${jugador.nivel}`;
+        etiqueta.appendChild(badge);
+      }
+
       if (juegoActivo) {
         const enTurno = String(jugador.jugadorId) === String(turnoActualId);
         const esYo = String(jugador.jugadorId) === String(this.jugadorId);
@@ -2173,7 +2182,7 @@ class Partida {
       const sala = await response.json();
       this.esCreador = this.#esCreadorDePartida(sala.creadorId);
       this.maxJugadores = sala.maxJugadores;
-      this.titulo.textContent = `Sala de ${sala.jugadores[0] || 'jugador'}`;
+      this.titulo.textContent = `Sala de ${sala.jugadores[0]?.nombreUsuario || sala.jugadores[0] || 'jugador'}`;
       this.#pintarJugadores(sala.jugadores);
       this.#actualizarControlesLobby(sala.estado);
       return true;
@@ -2250,6 +2259,51 @@ class Partida {
     this.timeoutReconexion = setTimeout(() => {
       this.#conectarWS();
     }, delay);
+  }
+
+  #obtenerToastContainer() {
+    let container = document.getElementById('toast-container');
+    if (!container) {
+      container = document.createElement('div');
+      container.id = 'toast-container';
+      container.className = 'toast-container';
+      document.body.appendChild(container);
+    }
+    return container;
+  }
+
+  #mostrarToast(icono, titulo, subtitulo, tipo, duracionMs = 3500) {
+    const container = this.#obtenerToastContainer();
+    const toast = document.createElement('div');
+    toast.className = `toast-notif toast-${tipo}`;
+
+    const iconoEl = document.createElement('span');
+    iconoEl.className = 'toast-icono';
+    iconoEl.textContent = icono;
+
+    const contenido = document.createElement('div');
+    contenido.className = 'toast-contenido';
+
+    const tituloEl = document.createElement('span');
+    tituloEl.className = 'toast-titulo';
+    tituloEl.textContent = titulo;
+
+    const subEl = document.createElement('span');
+    subEl.className = 'toast-subtitulo';
+    subEl.textContent = subtitulo;
+
+    contenido.appendChild(tituloEl);
+    contenido.appendChild(subEl);
+    toast.appendChild(iconoEl);
+    toast.appendChild(contenido);
+    container.appendChild(toast);
+
+    requestAnimationFrame(() => requestAnimationFrame(() => toast.classList.add('toast-visible')));
+
+    setTimeout(() => {
+      toast.classList.remove('toast-visible');
+      setTimeout(() => toast.remove(), 400);
+    }, duracionMs);
   }
 
   /**
@@ -2454,6 +2508,22 @@ class Partida {
       case 'uno-falso': {
         const nombre = this.#nombreJugador(datos.jugadorId);
         this.#mostrarMensaje(`¡${nombre} ES PENALIZADO POR TOCAR UNO!!`, 'error');
+        break;
+      }
+      case 'xp-ganado': {
+        this.#mostrarToast('⭐', `+${datos.xpGanado} XP`, `Nivel ${datos.nivelActual}`, 'xp');
+        break;
+      }
+      case 'logros-desbloqueados': {
+        if (datos.xpGanado > 0) {
+          this.#mostrarToast('⭐', `+${datos.xpGanado} XP`, `Nivel ${datos.nivelActual}`, 'xp');
+        }
+        const logros = datos.logros || [];
+        logros.forEach((logro, i) => {
+          setTimeout(() => {
+            this.#mostrarToast(logro.emoji || '🏆', '¡Logro desbloqueado!', logro.nombre, 'logro', 4500);
+          }, i * 700);
+        });
         break;
       }
     }
