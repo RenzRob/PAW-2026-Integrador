@@ -11,6 +11,7 @@ class JugadorRepositorioMemoria {
     this.historial = new Map(); // jugadorId → [{ fecha, puesto, delta_global, puntaje_ronda }]
     this.logros = new Map(); // jugadorId → [{ logro_id, fecha_obtenido }]
     this.emails = new Map(); // jugadorId → email
+    this.config = new Map(); // clave → valor
   }
 
   async registrarJugador(jugadorId, nombreUsuario, passwordHash, email = null) {
@@ -121,6 +122,16 @@ class JugadorRepositorioMemoria {
 
     const actual = this.xp.get(jugadorId) || 0;
     this.xp.set(jugadorId, actual + xpGanado);
+  }
+
+  async obtenerConfig(clave) {
+    logger.logContext(this);
+    return this.config.get(clave) ?? null;
+  }
+
+  async guardarConfig(clave, valor) {
+    logger.logContext(this);
+    this.config.set(clave, valor);
   }
 
   async obtenerPosicionRanking(jugadorId) {

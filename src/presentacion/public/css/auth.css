@@ -49,6 +49,7 @@ body {
 }
 
 .auth-form input[type='text'],
+.auth-form input[type='email'],
 .auth-form input[type='password'] {
   padding: 0.7rem 1rem;
   border: 1px solid #bbb;
@@ -59,6 +60,7 @@ body {
 }
 
 .auth-form input[type='text']:focus,
+.auth-form input[type='email']:focus,
 .auth-form input[type='password']:focus {
   border-color: #007bff;
 }
@@ -286,6 +288,7 @@ body {
     justify-content: center;
   }
   .auth-form input[type='text'],
+  .auth-form input[type='email'],
   .auth-form input[type='password'] {
     font-size: 16px;
     padding: 0.8rem 1rem;

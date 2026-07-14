@@ -210,21 +210,47 @@ async function arrancar() {
 
   // Envío diario de mails a usuarios en el top 10 (solo en producción y con Resend configurado)
   if (process.env.NODE_ENV === 'production' && mailService.estaConfigurado()) {
+    const INTERVALO_MS = 24 * 60 * 60 * 1000;
+    const CLAVE_CONFIG = 'ultima_ejecucion_top10';
+
     const enviarMailsTop10 = async () => {
       try {
         const puntajes = await db.obtenerPuntajes();
         const top10 = puntajes.slice(0, 10).filter((p) => p.email);
         for (let i = 0; i < top10.length; i++) {
-          const p = top10[i];
-          await mailService.enviarEmailTop10(p.nombreUsuario, p.email, i + 1);
+          await mailService.enviarEmailTop10(top10[i].nombreUsuario, top10[i].email, i + 1);
         }
+        await db.guardarConfig(CLAVE_CONFIG, new Date().toISOString());
       } catch (err) {
         logger.registerLog('error', `Error en cron de mails top10: ${err.message}`);
       }
     };
 
-    enviarMailsTop10();
-    setInterval(enviarMailsTop10, 24 * 60 * 60 * 1000);
+    // Al arrancar, consulta cuándo fue el último envío para no reenviar si el pod se reinició
+    // antes de que pasaran 24h.
+    const programarCron = async () => {
+      try {
+        const ultimaEjecucion = await db.obtenerConfig(CLAVE_CONFIG);
+        const transcurridoMs = ultimaEjecucion ? Date.now() - new Date(ultimaEjecucion).getTime() : Infinity;
+
+        if (transcurridoMs >= INTERVALO_MS) {
+          await enviarMailsTop10();
+          setInterval(enviarMailsTop10, INTERVALO_MS);
+        } else {
+          const restanteMs = INTERVALO_MS - transcurridoMs;
+          logger.registerLog('info', `Próximo envío de mails top10 en ${Math.round(restanteMs / 60000)} min`);
+          setTimeout(async () => {
+            await enviarMailsTop10();
+            setInterval(enviarMailsTop10, INTERVALO_MS);
+          }, restanteMs);
+        }
+      } catch (err) {
+        logger.registerLog('error', `Error al programar cron de mails: ${err.message}`);
+        setInterval(enviarMailsTop10, INTERVALO_MS);
+      }
+    };
+
+    programarCron();
   }
 }
 

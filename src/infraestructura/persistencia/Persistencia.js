@@ -77,6 +77,16 @@ class Persistencia {
     return this.repositorio.obtenerPosicionRanking(jugadorId);
   }
 
+  obtenerConfig(clave) {
+    logger.logContext(this);
+    return this.repositorio.obtenerConfig(clave);
+  }
+
+  guardarConfig(clave, valor) {
+    logger.logContext(this);
+    return this.repositorio.guardarConfig(clave, valor);
+  }
+
   /* ── Partidas en memoria ────────────────────────────────────────────────── */
 
   guardarPartida(partidaId, sala) {

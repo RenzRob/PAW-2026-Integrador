@@ -31,3 +31,8 @@ CREATE TABLE IF NOT EXISTS logros_desbloqueados (
   PRIMARY KEY (jugador_id, logro_id),
   FOREIGN KEY (jugador_id) REFERENCES jugadores(id)
 );
+
+CREATE TABLE IF NOT EXISTS configuracion (
+  clave VARCHAR(50) PRIMARY KEY,
+  valor TEXT NOT NULL
+);

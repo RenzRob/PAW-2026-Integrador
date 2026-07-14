@@ -168,6 +168,20 @@ class JugadorRepositorioMySQL {
     );
   }
 
+  async obtenerConfig(clave) {
+    logger.logContext(this);
+    const [[row]] = await pool.execute('SELECT valor FROM configuracion WHERE clave = ?', [clave]);
+    return row?.valor ?? null;
+  }
+
+  async guardarConfig(clave, valor) {
+    logger.logContext(this);
+    await pool.execute(
+      'INSERT INTO configuracion (clave, valor) VALUES (?, ?) ON DUPLICATE KEY UPDATE valor = ?',
+      [clave, valor, valor]
+    );
+  }
+
   async obtenerPosicionRanking(jugadorId) {
     logger.logContext(this);
     const [rows] = await pool.execute(`
