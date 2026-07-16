@@ -14,16 +14,26 @@ class ManejadorPerfil {
 
     // GET /api/perfil — perfil del jugador autenticado
     this.router.get('/', async (req, res) => {
-      const result = await this.perfilController.obtenerPerfil(req.jugadorId);
-      if (!result.ok) return res.status(result.status).json({ error: result.error });
-      res.json(result.data);
+      try {
+        const result = await this.perfilController.obtenerPerfil(req.jugadorId);
+        if (!result.ok) return res.status(result.status).json({ error: result.error });
+        res.json(result.data);
+      } catch (err) {
+        logger.registerLog('error', `Error en GET /api/perfil: ${err.message}`);
+        res.status(500).json({ error: 'Error al obtener el perfil' });
+      }
     });
 
     // GET /api/perfil/:jugadorId — perfil de cualquier jugador (público)
     this.router.get('/:jugadorId', async (req, res) => {
-      const result = await this.perfilController.obtenerPerfil(req.params.jugadorId);
-      if (!result.ok) return res.status(result.status).json({ error: result.error });
-      res.json(result.data);
+      try {
+        const result = await this.perfilController.obtenerPerfil(req.params.jugadorId);
+        if (!result.ok) return res.status(result.status).json({ error: result.error });
+        res.json(result.data);
+      } catch (err) {
+        logger.registerLog('error', `Error en GET /api/perfil/${req.params.jugadorId}: ${err.message}`);
+        res.status(500).json({ error: 'Error al obtener el perfil' });
+      }
     });
   }
 }

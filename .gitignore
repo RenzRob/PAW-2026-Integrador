@@ -1,3 +1,6 @@
 node_modules/
 .env
 logs/
+
+# Config local para levantar la app (no compartir)
+.claude/launch.json
