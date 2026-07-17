@@ -1,0 +1,25 @@
+src/presentacion/views/perfil.ejs
+  s_4118ad38dd7f80::t_f74426bfabf092 135-143
+  s_4118ad38dd7f80::t_4618fbe2b35e36 87-93,115
+src/presentacion/public/css/perfil.css
+  s_4118ad38dd7f80::t_095ea9c92ba9a8 264-270
+  s_4118ad38dd7f80::t_e2714236a92e35 188,190,192-193,196-210,212-219,221-222
+  s_4118ad38dd7f80::t_f8f3ef24413c15 235,237-251
+  s_4118ad38dd7f80::t_a971b0e5d1a5ef 236
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "c4dab1c5b95b81436b89ccd00336738e988ebb36",
+  "prompts": {},
+  "sessions": {
+    "s_4118ad38dd7f80": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e6fb89a3-e8ea-456c-8292-4c2d7923ca82",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "rrobles_meli <renzo.robles@mercadolibre.com>"
+    }
+  }
+}
