@@ -30,9 +30,12 @@ async function initDB() {
 
   if (Number(rows[0].cnt) > 0) {
     logger.registerLog('info', '[DB] Tablas ya existentes, omitiendo init.');
-    await pool.execute(
-      'ALTER TABLE jugadores ADD COLUMN IF NOT EXISTS foto_path VARCHAR(100) NULL'
+    const [cols] = await pool.execute(
+      "SELECT COUNT(*) AS cnt FROM information_schema.columns WHERE table_schema = DATABASE() AND table_name = 'jugadores' AND column_name = 'foto_path'"
     );
+    if (Number(cols[0].cnt) === 0) {
+      await pool.execute('ALTER TABLE jugadores ADD COLUMN foto_path VARCHAR(100) NULL');
+    }
     return;
   }
 
