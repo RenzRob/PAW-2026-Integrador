@@ -313,6 +313,24 @@ body {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
   gap: 12px;
+  max-height: 260px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-right: 4px;
+}
+
+.logros-grid::-webkit-scrollbar {
+  width: 6px;
+}
+
+.logros-grid::-webkit-scrollbar-track {
+  background: #f0f4f8;
+  border-radius: 3px;
+}
+
+.logros-grid::-webkit-scrollbar-thumb {
+  background: #b0cbe6;
+  border-radius: 3px;
 }
 
 .logro-card {
