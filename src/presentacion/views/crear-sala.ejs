@@ -35,6 +35,19 @@
             required
           />
 
+          <label for="puntaje-para-ganar">Puntaje para ganar <span class="hint">(50–1000)</span></label>
+          <input
+            type="number"
+            id="puntaje-para-ganar"
+            name="puntaje_para_ganar"
+            class="input-crear"
+            min="50"
+            max="1000"
+            step="50"
+            value="200"
+            required
+          />
+
           <p class="error-crear" id="error" hidden></p>
 
           <div class="botones-crear">
@@ -79,6 +92,7 @@
 
         const maxJugadores = parseInt(e.target.num_jugadores.value, 10);
         const cantidadBots = parseInt(e.target.cantidad_bots.value, 10);
+        const puntajeParaGanar = parseInt(e.target.puntaje_para_ganar.value, 10);
 
         if (1 + cantidadBots > maxJugadores) {
           error.textContent =
@@ -87,11 +101,17 @@
           return;
         }
 
+        if (puntajeParaGanar < 50 || puntajeParaGanar > 1000) {
+          error.textContent = 'El puntaje para ganar debe ser entre 50 y 1000.';
+          error.hidden = false;
+          return;
+        }
+
         try {
           const response = await fetch('/api/partidas', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ maxJugadores, cantidadBots }),
+            body: JSON.stringify({ maxJugadores, cantidadBots, puntajeParaGanar }),
           });
           const data = await response.json();
 

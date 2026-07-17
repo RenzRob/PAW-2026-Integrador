@@ -12,12 +12,13 @@ class SalaDeJuego {
    */
   puntajesRonda;
 
-  constructor(partidaId, creadorId, maxJugadores) {
+  constructor(partidaId, creadorId, maxJugadores, puntajeParaGanar = 200) {
     logger.logContext(this);
 
     this.partidaId = partidaId;
     this.creadorId = creadorId;
     this.maxJugadores = maxJugadores;
+    this.puntajeParaGanar = puntajeParaGanar;
     this.estado = 'esperando';
 
     this.jugadores = [];
@@ -146,6 +147,7 @@ class SalaDeJuego {
       estado: this.estado,
       jugadores: this.jugadores.map((j) => ({ jugadorId: j.jugadorId, nombreUsuario: j.nombreUsuario, nivel: j.nivel, fotoPath: j.fotoPath })),
       maxJugadores: this.maxJugadores,
+      puntajeParaGanar: this.puntajeParaGanar,
     };
   }
 
@@ -460,8 +462,6 @@ class SalaDeJuego {
 
   _cerrarRonda(ganadorId, cartaFinal = null) {
     logger.logContext(this);
-    let PUNTAJE_PARA_GANAR = 200;
-
     let puntosGanados = 0;
 
     for (const j of this.jugadores) {
@@ -471,7 +471,7 @@ class SalaDeJuego {
 
     this.puntajesRonda[ganadorId] = (this.puntajesRonda[ganadorId] || 0) + puntosGanados;
 
-    if (this.puntajesRonda[ganadorId] >= PUNTAJE_PARA_GANAR) {
+    if (this.puntajesRonda[ganadorId] >= this.puntajeParaGanar) {
       return this._cerrarPartida(ganadorId, cartaFinal);
     }
 
@@ -599,6 +599,7 @@ class SalaDeJuego {
       partidaId: this.partidaId,
       estado: this.estado,
       creadorId: this.creadorId,
+      puntajeParaGanar: this.puntajeParaGanar,
       numeroRonda: this.numeroRonda,
       iniciadorRondaId: this.jugadores[this.inicioRondaIdx]?.jugadorId || null,
       repartidorId: this.jugadores[this.repartidorIdx]?.jugadorId || null,

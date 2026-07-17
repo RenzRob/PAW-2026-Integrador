@@ -256,8 +256,8 @@ class PartidaController {
     }
   }
 
-  async crearPartida(jugadorId, maxJugadores, cantidadBots = 0) {
-    logger.logContext(this, { jugadorId, maxJugadores, cantidadBots });
+  async crearPartida(jugadorId, maxJugadores, cantidadBots = 0, puntajeParaGanar = 200) {
+    logger.logContext(this, { jugadorId, maxJugadores, cantidadBots, puntajeParaGanar });
 
     if (!jugadorId) throw new NotFoundException('jugadorId requerido');
 
@@ -293,9 +293,13 @@ class PartidaController {
         error: 'La cantidad de bots no puede dejar la sala sin lugar para vos',
       };
 
+    const puntos = parseInt(puntajeParaGanar) || 200;
+    if (puntos < 50 || puntos > 1000)
+      return { ok: false, status: 400, error: 'El puntaje para ganar debe ser entre 50 y 1000' };
+
     const stats = await this.persistencia.obtenerEstadisticasJugador(jugadorId);
     const partidaId = uuidv4();
-    const sala = new SalaDeJuego(partidaId, jugadorId, max);
+    const sala = new SalaDeJuego(partidaId, jugadorId, max, puntos);
     sala.agregarJugador(jugadorId, jugador.nombreUsuario, stats.nivel, stats.fotoPath);
 
     for (let i = 0; i < bots; i++) {

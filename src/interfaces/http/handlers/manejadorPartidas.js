@@ -53,14 +53,15 @@ class ManejadorPartidas {
       logger.logContext(this);
 
       const jugadorId = req.jugadorId;
-      const { maxJugadores, cantidadBots } = req.body;
+      const { maxJugadores, cantidadBots, puntajeParaGanar } = req.body;
 
       logger.registerLog('debug', 'Creando partida.', {
         jugadorId,
         maxJugadores,
         cantidadBots,
+        puntajeParaGanar,
       });
-      const result = await this.controller.crearPartida(jugadorId, maxJugadores, cantidadBots);
+      const result = await this.controller.crearPartida(jugadorId, maxJugadores, cantidadBots, puntajeParaGanar);
 
       if (!result.ok) {
         return res.status(result.status).json({ error: result.error });

@@ -2215,6 +2215,9 @@ class Partida {
       this.esCreador = this.#esCreadorDePartida(sala.creadorId);
       this.maxJugadores = sala.maxJugadores;
       this.titulo.textContent = `Sala de ${sala.jugadores[0]?.nombreUsuario || sala.jugadores[0] || 'jugador'}`;
+      if (sala.puntajeParaGanar) {
+        this.titulo.textContent += ` · ${sala.puntajeParaGanar} pts`;
+      }
       this.#pintarJugadores(sala.jugadores);
       this.#actualizarControlesLobby(sala.estado);
       return true;
