@@ -28,6 +28,7 @@
     "errorhandler": "^1.5.2",
     "express": "^4.18.2",
     "jsonwebtoken": "^9.0.3",
+    "multer": "^2.2.0",
     "mysql2": "^3.11.0",
     "resend": "^6.17.2",
     "uuid": "^9.0.0",

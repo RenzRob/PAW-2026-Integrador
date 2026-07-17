@@ -16,18 +16,22 @@
       async function cargarPerfil() {
         const box = document.getElementById('perfil-box');
         try {
-          const res = await fetch(`/api/perfil/${JUGADOR_ID}`);
-          if (!res.ok) throw new Error('No se pudo cargar el perfil.');
-          const data = await res.json();
-          renderPerfil(data);
+          const [perfilRes, meRes] = await Promise.all([
+            fetch(`/api/perfil/${JUGADOR_ID}`),
+            fetch('/api/me'),
+          ]);
+          if (!perfilRes.ok) throw new Error('No se pudo cargar el perfil.');
+          const data = await perfilRes.json();
+          const me = meRes.ok ? await meRes.json() : null;
+          renderPerfil(data, me?.jugadorId === JUGADOR_ID);
         } catch (err) {
           box.innerHTML = `<p class="perfil-error">${err.message}</p>`;
         }
       }
 
-      function renderPerfil(d) {
+      function renderPerfil(d, esMiPerfil) {
         const box = document.getElementById('perfil-box');
-        const { nombreUsuario, stats, xpInfo, historial, logros } = d;
+        const { nombreUsuario, fotoUrl, stats, xpInfo, historial, logros } = d;
 
         const winrateColor = stats.winrate >= 50 ? '#27ae60' : '#c0392b';
         const logrosDesbloqueados = logros.filter(l => l.desbloqueado).length;
@@ -35,7 +39,18 @@
         box.innerHTML = `
           <!-- Header del perfil -->
           <div class="perfil-header">
-            <div class="perfil-avatar">${nombreUsuario.charAt(0).toUpperCase()}</div>
+            <div class="perfil-avatar-wrap" id="avatar-wrap">
+              ${fotoUrl
+                ? `<img class="perfil-avatar-img" src="${fotoUrl}" alt="Foto de perfil">`
+                : `<div class="perfil-avatar">${nombreUsuario.charAt(0).toUpperCase()}</div>`
+              }
+              ${esMiPerfil ? `
+                <label class="perfil-avatar-btn" for="avatar-input" title="Cambiar foto de perfil">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                </label>
+                <input type="file" id="avatar-input" accept="image/jpeg,image/png,image/webp,image/gif" style="display:none">
+              ` : ''}
+            </div>
             <div class="perfil-header-info">
               <h1 class="perfil-nombre">${nombreUsuario}</h1>
               <div class="perfil-nivel-badge">Nivel ${stats.nivel}</div>
@@ -114,6 +129,44 @@
 
           <button class="btn-perfil-volver" onclick="window.location.href='/public/'">VOLVER AL INICIO</button>
         `;
+
+        if (esMiPerfil) {
+          const input = document.getElementById('avatar-input');
+          input.addEventListener('change', async () => {
+            const file = input.files[0];
+            if (!file) return;
+
+            const formData = new FormData();
+            formData.append('avatar', file);
+
+            const btn = document.querySelector('.perfil-avatar-btn');
+            if (btn) btn.classList.add('cargando');
+
+            try {
+              const res = await fetch('/api/perfil/avatar', { method: 'POST', body: formData });
+              const data = await res.json();
+              if (!res.ok) {
+                alert(data.error || 'Error al subir la foto');
+                return;
+              }
+
+              const wrap = document.getElementById('avatar-wrap');
+              const anterior = wrap.querySelector('.perfil-avatar, .perfil-avatar-img');
+              if (anterior) anterior.remove();
+
+              const img = document.createElement('img');
+              img.className = 'perfil-avatar-img';
+              img.alt = 'Foto de perfil';
+              img.src = data.fotoUrl + '?t=' + Date.now();
+              wrap.insertBefore(img, wrap.firstChild);
+            } catch {
+              alert('Error al subir la foto');
+            } finally {
+              if (btn) btn.classList.remove('cargando');
+              input.value = '';
+            }
+          });
+        }
       }
 
       cargarPerfil();

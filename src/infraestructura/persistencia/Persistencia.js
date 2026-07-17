@@ -72,6 +72,11 @@ class Persistencia {
     return this.repositorio.agregarXPyActualizarNivel(jugadorId, xpGanado);
   }
 
+  actualizarFotoPath(jugadorId, filename) {
+    logger.logContext(this);
+    return this.repositorio.actualizarFotoPath(jugadorId, filename);
+  }
+
   obtenerPosicionRanking(jugadorId) {
     logger.logContext(this);
     return this.repositorio.obtenerPosicionRanking(jugadorId);

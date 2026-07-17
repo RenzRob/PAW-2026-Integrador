@@ -30,6 +30,9 @@ async function initDB() {
 
   if (Number(rows[0].cnt) > 0) {
     logger.registerLog('info', '[DB] Tablas ya existentes, omitiendo init.');
+    await pool.execute(
+      'ALTER TABLE jugadores ADD COLUMN IF NOT EXISTS foto_path VARCHAR(100) NULL'
+    );
     return;
   }
 

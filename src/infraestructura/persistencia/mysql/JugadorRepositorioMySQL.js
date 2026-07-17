@@ -6,10 +6,19 @@ const logger = require('#infraestructura/shared/logger');
 class JugadorRepositorioMySQL {
   async registrarJugador(jugadorId, nombreUsuario, passwordHash, email = null) {
     logger.logContext(this);
-    await pool.execute(
-      'INSERT INTO jugadores (id, nombre_usuario, password_hash, email) VALUES (?, ?, ?, ?)',
-      [jugadorId, nombreUsuario, passwordHash, email || null]
-    );
+    try {
+      await pool.execute(
+        'INSERT INTO jugadores (id, nombre_usuario, password_hash, email) VALUES (?, ?, ?, ?)',
+        [jugadorId, nombreUsuario, passwordHash, email || null]
+      );
+    } catch (err) {
+      if (err.errno === 1062) {
+        const domainError = new Error('El email ya está en uso');
+        domainError.code = 'EMAIL_DUPLICADO';
+        throw domainError;
+      }
+      throw err;
+    }
 
     return new Usuario(jugadorId, nombreUsuario, passwordHash);
   }
@@ -95,7 +104,7 @@ class JugadorRepositorioMySQL {
     );
 
     const [[jugadorRow]] = await pool.execute(
-      'SELECT xp, nivel FROM jugadores WHERE id = ?',
+      'SELECT xp, nivel, foto_path FROM jugadores WHERE id = ?',
       [jugadorId]
     );
 
@@ -110,6 +119,7 @@ class JugadorRepositorioMySQL {
       puntajeGlobal: Number(statsRow.puntajeGlobal) || 0,
       xp: jugadorRow?.xp ?? 0,
       nivel: jugadorRow?.nivel ?? 1,
+      fotoPath: jugadorRow?.foto_path ?? null,
     };
   }
 
@@ -169,6 +179,11 @@ class JugadorRepositorioMySQL {
       'UPDATE jugadores SET xp = ?, nivel = ? WHERE id = ?',
       [nuevoXP, nuevoNivel, jugadorId]
     );
+  }
+
+  async actualizarFotoPath(jugadorId, filename) {
+    logger.logContext(this);
+    await pool.execute('UPDATE jugadores SET foto_path = ? WHERE id = ?', [filename, jugadorId]);
   }
 
   async obtenerConfig(clave) {

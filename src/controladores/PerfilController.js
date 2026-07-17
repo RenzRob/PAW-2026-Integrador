@@ -43,6 +43,7 @@ class PerfilController {
       ok: true,
       data: {
         nombreUsuario: jugador.nombreUsuario,
+        fotoUrl: stats.fotoPath ? `/avatars/${stats.fotoPath}` : null,
         stats,
         xpInfo: {
           xpActual,
@@ -56,6 +57,11 @@ class PerfilController {
         logros,
       },
     };
+  }
+
+  async actualizarFoto(jugadorId, filename) {
+    logger.logContext(this);
+    await this.persistencia.actualizarFotoPath(jugadorId, filename);
   }
 }
 

@@ -81,6 +81,10 @@ class Servidor {
     // referenciar desde los EJS con rutas absolutas (ejemplo, /css/inicio.css).
     this.app.use(express.static(path.join(__dirname, './presentacion/public')));
 
+    // Sirve las fotos de perfil subidas por los usuarios desde el volumen persistente.
+    const AVATARS_DIR = process.env.AVATARS_DIR || '/data/avatars';
+    this.app.use('/avatars', express.static(AVATARS_DIR));
+
     /* Configuración de middleware, rutas HTTP y WebSocket. */
     this.#configurarMiddleware();
     this.#configurarRutasHttp();

@@ -47,7 +47,13 @@ class AuthController {
 
     const jugadorId = uuidv4();
     const passwordHash = await bcrypt.hash(clave, BCRYPT_ROUNDS);
-    await this.persistencia.registrarJugador(jugadorId, nombre, passwordHash, correo);
+    try {
+      await this.persistencia.registrarJugador(jugadorId, nombre, passwordHash, correo);
+    } catch (err) {
+      if (err.code === 'EMAIL_DUPLICADO')
+        return { ok: false, status: 409, error: 'El email ya está en uso' };
+      throw err;
+    }
 
     // No esperamos el mail para no bloquear la respuesta al usuario
     mailService.enviarEmailBienvenida(nombre, correo).catch(() => {});
