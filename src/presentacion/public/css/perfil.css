@@ -25,6 +25,7 @@ body {
   display: flex;
   flex-direction: column;
   gap: 28px;
+  min-height: calc(100dvh - var(--navbar-height, 0px) - 64px);
 }
 
 .perfil-loading,
@@ -313,7 +314,7 @@ body {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
   gap: 12px;
-  max-height: 260px;
+  max-height: 300px;
   overflow-y: auto;
   overflow-x: hidden;
   padding-right: 4px;
@@ -395,6 +396,7 @@ body {
   transition: background 0.2s;
   align-self: center;
   min-height: 44px;
+  margin-top: auto;
 }
 
 .btn-perfil-volver:hover {
