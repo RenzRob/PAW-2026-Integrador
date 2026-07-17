@@ -2072,6 +2072,12 @@ body {
   font-size: 1rem;
 }
 
+/* El avatar lateral no participa del grid de info-jugador */
+.area-jugador-lateral > .mini-avatar {
+  flex-shrink: 0;
+  align-self: center;
+}
+
 /* ─── NIVEL BADGE ─── */
 .nivel-badge {
   display: inline-block;

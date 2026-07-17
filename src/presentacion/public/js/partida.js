@@ -2042,6 +2042,7 @@ class Partida {
     const lateralIzq = document.createElement('div');
     lateralIzq.className = 'area-jugador-lateral izquierda';
     if (rivalIzquierda) {
+      lateralIzq.appendChild(this.#avatarEl(rivalIzquierda));
       lateralIzq.appendChild(crearEtiquetaNombreJugador(rivalIzquierda, 'nombre-lateral'));
       lateralIzq.appendChild(
         this.#etiquetarMano(
@@ -2118,6 +2119,7 @@ class Partida {
     const lateralDer = document.createElement('div');
     lateralDer.className = 'area-jugador-lateral derecha';
     if (rivalDerecha) {
+      lateralDer.appendChild(this.#avatarEl(rivalDerecha));
       lateralDer.appendChild(crearEtiquetaNombreJugador(rivalDerecha, 'nombre-lateral'));
       lateralDer.appendChild(
         this.#etiquetarMano(
