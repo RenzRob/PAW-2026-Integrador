@@ -84,9 +84,13 @@
             </div>
           </div>
 
-          <!-- Historial -->
-          <div class="perfil-seccion">
-            <h2 class="perfil-seccion-titulo">Últimas partidas</h2>
+          <!-- Tabs: Historial / Logros -->
+          <div class="perfil-tabs">
+            <button class="perfil-tab perfil-tab--activo" data-tab="historial">Últimas partidas</button>
+            <button class="perfil-tab" data-tab="logros">Logros <span class="logros-contador">${logrosDesbloqueados}/${logros.length}</span></button>
+          </div>
+
+          <div class="perfil-tab-panel" id="tab-historial">
             ${historial.length === 0
               ? '<p class="perfil-vacio">Todavía no jugaste ninguna partida.</p>'
               : `<div class="perfil-tabla-wrap"><table class="perfil-tabla">
@@ -108,9 +112,7 @@
                 </table></div>`}
           </div>
 
-          <!-- Logros -->
-          <div class="perfil-seccion">
-            <h2 class="perfil-seccion-titulo">Logros <span class="logros-contador">${logrosDesbloqueados}/${logros.length}</span></h2>
+          <div class="perfil-tab-panel" id="tab-logros" hidden>
             <div class="logros-grid">
               ${logros.map(l => {
                 const cls = l.desbloqueado ? 'logro-card desbloqueado' : 'logro-card bloqueado';
@@ -129,6 +131,15 @@
 
           <button class="btn-perfil-volver" onclick="window.location.href='/public/'">VOLVER AL INICIO</button>
         `;
+
+        document.querySelectorAll('.perfil-tab').forEach(btn => {
+          btn.addEventListener('click', () => {
+            document.querySelectorAll('.perfil-tab').forEach(b => b.classList.remove('perfil-tab--activo'));
+            document.querySelectorAll('.perfil-tab-panel').forEach(p => p.hidden = true);
+            btn.classList.add('perfil-tab--activo');
+            document.getElementById('tab-' + btn.dataset.tab).hidden = false;
+          });
+        });
 
         if (esMiPerfil) {
           const input = document.getElementById('avatar-input');

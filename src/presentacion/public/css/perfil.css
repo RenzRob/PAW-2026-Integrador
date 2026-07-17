@@ -185,23 +185,41 @@ body {
   letter-spacing: 0.03em;
 }
 
-/* ── Secciones ────────────────────────────────────── */
+/* ── Tabs ─────────────────────────────────────────── */
 
-.perfil-seccion {
+.perfil-tabs {
+  display: flex;
+  gap: 4px;
+  border-bottom: 2px solid #eaf3fa;
+}
+
+.perfil-tab {
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  padding: 8px 16px;
+  font-size: 0.92rem;
+  font-weight: bold;
+  color: #888;
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
+  white-space: nowrap;
+}
+
+.perfil-tab:hover {
+  color: #1a4971;
+}
+
+.perfil-tab--activo {
+  color: #1a4971;
+  border-bottom-color: #1a4971;
+}
+
+.perfil-tab-panel {
   display: flex;
   flex-direction: column;
   gap: 12px;
-}
-
-.perfil-seccion-titulo {
-  margin: 0;
-  font-size: 1.1rem;
-  color: #1a4971;
-  border-bottom: 2px solid #eaf3fa;
-  padding-bottom: 6px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
 }
 
 .perfil-vacio {
@@ -214,6 +232,23 @@ body {
 
 .perfil-tabla-wrap {
   overflow-x: auto;
+  overflow-y: auto;
+  max-height: 275px;
+  border-radius: 4px;
+}
+
+.perfil-tabla-wrap::-webkit-scrollbar {
+  width: 6px;
+}
+
+.perfil-tabla-wrap::-webkit-scrollbar-track {
+  background: #f0f4f8;
+  border-radius: 3px;
+}
+
+.perfil-tabla-wrap::-webkit-scrollbar-thumb {
+  background: #b0cbe6;
+  border-radius: 3px;
 }
 
 .perfil-tabla {
@@ -223,6 +258,13 @@ body {
 }
 
 .perfil-tabla thead tr {
+  background: #eaf3fa;
+}
+
+.perfil-tabla thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
   background: #eaf3fa;
 }
 
