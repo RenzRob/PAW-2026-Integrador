@@ -296,7 +296,7 @@ class PartidaController {
     const stats = await this.persistencia.obtenerEstadisticasJugador(jugadorId);
     const partidaId = uuidv4();
     const sala = new SalaDeJuego(partidaId, jugadorId, max);
-    sala.agregarJugador(jugadorId, jugador.nombreUsuario, stats.nivel);
+    sala.agregarJugador(jugadorId, jugador.nombreUsuario, stats.nivel, stats.fotoPath);
 
     for (let i = 0; i < bots; i++) {
       sala.agregarBot(NOMBRES_BOTS[i]);
@@ -369,7 +369,7 @@ class PartidaController {
       }
 
       const statsJugador = await this.persistencia.obtenerEstadisticasJugador(jugadorId);
-      const resultado = sala.agregarJugador(jugadorId, jugador.nombreUsuario, statsJugador.nivel);
+      const resultado = sala.agregarJugador(jugadorId, jugador.nombreUsuario, statsJugador.nivel, statsJugador.fotoPath);
 
       // Si no se logró agregar al jugador (ej. sala llena), se notifica y se retorna un error.
       if (resultado.error) {

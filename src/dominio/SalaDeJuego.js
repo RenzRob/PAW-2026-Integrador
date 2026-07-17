@@ -99,7 +99,7 @@ class SalaDeJuego {
    * @returns {Object} { ok: true } si se agregó correctamente, o { error: 'mensaje' }
    * si hubo un error (partida ya comenzó, sala llena, jugador ya en la sala).
    */
-  agregarJugador(jugadorId, nombreUsuario, nivel = null) {
+  agregarJugador(jugadorId, nombreUsuario, nivel = null, fotoPath = null) {
     logger.logContext(this);
 
     if (this.estado !== 'esperando') return { error: 'La partida ya comenzó' };
@@ -108,7 +108,7 @@ class SalaDeJuego {
       return { error: 'Ya estás en la sala' };
 
     // Agrega el jugador a la sala y le asigna un puntaje inicial de 0 para la ronda actual.
-    const jugador = new JugadorEnSala(jugadorId, nombreUsuario, false, nivel);
+    const jugador = new JugadorEnSala(jugadorId, nombreUsuario, false, nivel, fotoPath);
     this.jugadores.push(jugador);
     this.puntajesRonda[jugadorId] = 0;
 
@@ -144,7 +144,7 @@ class SalaDeJuego {
       partidaId: this.partidaId,
       creadorId: this.creadorId,
       estado: this.estado,
-      jugadores: this.jugadores.map((j) => ({ jugadorId: j.jugadorId, nombreUsuario: j.nombreUsuario, nivel: j.nivel })),
+      jugadores: this.jugadores.map((j) => ({ jugadorId: j.jugadorId, nombreUsuario: j.nombreUsuario, nivel: j.nivel, fotoPath: j.fotoPath })),
       maxJugadores: this.maxJugadores,
     };
   }
@@ -612,6 +612,7 @@ class SalaDeJuego {
         jugadorId: j.jugadorId,
         nombreUsuario: j.nombreUsuario,
         nivel: j.nivel,
+        fotoPath: j.fotoPath,
         cantidadCartas: j.cantidadCartas,
         mano: j.jugadorId === jugadorId ? j.mano : undefined,
       })),

@@ -1006,14 +1006,34 @@ class Partida {
    * @param {string[]} jugadores - Nombres de jugadores a renderizar.
    * @returns {void}
    */
+  #avatarEl(jugador) {
+    const fotoPath = typeof jugador === 'object' ? jugador.fotoPath : null;
+    const nombre = typeof jugador === 'string' ? jugador : jugador.nombreUsuario;
+    if (fotoPath) {
+      const img = document.createElement('img');
+      img.className = 'mini-avatar';
+      img.src = `/avatars/${fotoPath}`;
+      img.alt = '';
+      return img;
+    }
+    const span = document.createElement('span');
+    span.className = 'mini-avatar mini-avatar-inicial';
+    span.textContent = (nombre || '?')[0].toUpperCase();
+    return span;
+  }
+
   #pintarJugadores(jugadores) {
     this.lista.innerHTML = jugadores
       .map((j) => {
         const nombre = typeof j === 'string' ? j : j.nombreUsuario;
         const nivel = typeof j === 'object' && j.nivel != null ? j.nivel : null;
+        const fotoPath = typeof j === 'object' ? j.fotoPath : null;
         const esPropio = typeof j === 'object' && String(j.jugadorId) === String(this.jugadorId);
         const nivelBadge = nivel != null ? `<span class="nivel-badge">Nv.${nivel}</span>` : '';
-        return `<li class="jugador-item${esPropio ? ' jugador-propio' : ''}">${nombre}${nivelBadge}</li>`;
+        const avatarHtml = fotoPath
+          ? `<img class="mini-avatar" src="/avatars/${fotoPath}" alt="">`
+          : `<span class="mini-avatar mini-avatar-inicial">${(nombre || '?')[0].toUpperCase()}</span>`;
+        return `<li class="jugador-item${esPropio ? ' jugador-propio' : ''}">${avatarHtml}<span class="jugador-item-nombre">${nombre}${nivelBadge}</span></li>`;
       })
       .join('');
     const cant = jugadores.length;
@@ -1930,6 +1950,10 @@ class Partida {
     const crearEtiquetaNombreJugador = (jugador, claseBase) => {
       const etiqueta = document.createElement('div');
       etiqueta.className = claseNombreTurno(jugador, claseBase);
+
+      if (claseBase === 'info-jugador') {
+        etiqueta.appendChild(this.#avatarEl(jugador));
+      }
 
       const texto = document.createElement('span');
       texto.className = 'jugador-nombre-texto';
