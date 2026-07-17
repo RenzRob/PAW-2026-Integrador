@@ -2082,6 +2082,12 @@ body {
   flex-shrink: 0;
 }
 
+/* En el lateral izquierdo el label está rotado 180°, así que se invierte
+   el orden del wrapper para que el avatar quede debajo del nombre */
+.izquierda .lateral-info {
+  flex-direction: column-reverse;
+}
+
 /* ─── NIVEL BADGE ─── */
 .nivel-badge {
   display: inline-block;
