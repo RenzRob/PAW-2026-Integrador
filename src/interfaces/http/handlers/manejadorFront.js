@@ -4,6 +4,7 @@ const logger = require('#infraestructura/shared/logger');
 const EmptyException = require('#errores/EmptyException');
 const { buildReglasLocals } = require('#interfaces/http/seo/reglas');
 const { requireAuthWeb } = require('#interfaces/http/middleware/middlewareAuth');
+const crearMiddlewareRacha = require('#interfaces/http/middleware/middlewareRacha');
 
 /**
  * Manejador HTTP del frontend web. Registra las rutas que renderizan vistas EJS
@@ -34,6 +35,7 @@ class ManejadorFront {
   #logLevel = process.env.LOG_LEVEL || 'debug';
   #puntajesController;
   #partidaController;
+  #registrarRacha;
 
   #buildSeoLocals(req, path) {
     const baseUrl = `${req.protocol}://${req.get('host')}`;
@@ -49,11 +51,13 @@ class ManejadorFront {
     };
   }
 
-  constructor(app, puntajesController, partidaController) {
+  constructor(app, puntajesController, partidaController, rachaController) {
     logger.logContext(this);
     this.app = app;
     this.#puntajesController = puntajesController;
     this.#partidaController = partidaController;
+    // Registra la conexión del día en toda vista con sesión. Nunca corta la navegación.
+    this.#registrarRacha = crearMiddlewareRacha(rachaController);
 
     this.#registrarRutas();
   }
@@ -75,7 +79,7 @@ class ManejadorFront {
       });
     });
 
-    this.app.get('/public/', requireAuthWeb, (req, res) => {
+    this.app.get('/public/', requireAuthWeb, this.#registrarRacha, (req, res) => {
       res.render('inicio', {
         logLevel: this.#logLevel,
         title: 'UNO Argentino - Inicio',
@@ -99,7 +103,7 @@ class ManejadorFront {
       });
     });
 
-    this.app.get('/public/jugar', requireAuthWeb, (req, res) => {
+    this.app.get('/public/jugar', requireAuthWeb, this.#registrarRacha, (req, res) => {
       res.render('jugar', {
         logLevel: this.#logLevel,
         title: 'UNO Argentino - Jugar',
@@ -115,7 +119,7 @@ class ManejadorFront {
       });
     });
 
-    this.app.get('/public/crear-sala', requireAuthWeb, (req, res) => {
+    this.app.get('/public/crear-sala', requireAuthWeb, this.#registrarRacha, (req, res) => {
       res.render('crear-sala', {
         logLevel: this.#logLevel,
         title: 'UNO Argentino - Crear Sala',
@@ -152,7 +156,7 @@ class ManejadorFront {
       }
     });
 
-    this.app.get('/public/partida', requireAuthWeb, (req, res) => {
+    this.app.get('/public/partida', requireAuthWeb, this.#registrarRacha, (req, res) => {
       const baseUrl = `${req.protocol}://${req.get('host')}`;
       const partidaId = req.query.partidaId;
 
@@ -204,7 +208,7 @@ class ManejadorFront {
       });
     });
 
-    this.app.get('/public/salas', requireAuthWeb, (req, res) => {
+    this.app.get('/public/salas', requireAuthWeb, this.#registrarRacha, (req, res) => {
       res.render('salas', {
         logLevel: this.#logLevel,
         title: 'UNO Argentino - Salas',
@@ -220,7 +224,7 @@ class ManejadorFront {
       });
     });
 
-    this.app.get('/public/perfil', requireAuthWeb, (req, res) => {
+    this.app.get('/public/perfil', requireAuthWeb, this.#registrarRacha, (req, res) => {
       res.render('perfil', {
         logLevel: this.#logLevel,
         title: 'UNO Argentino - Mi Perfil',

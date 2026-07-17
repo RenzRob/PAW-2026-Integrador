@@ -5,6 +5,7 @@ const ManejadorConexiones = require('#interfaces/ws/manejadorConexiones');
 const logger = require('#infraestructura/shared/logger');
 const { xpParaPuesto } = require('#dominio/NivelXP');
 const { DEFINICIONES_LOGROS, verificarLogros } = require('#dominio/Logros');
+const { fechaHoyArg, recompensasDeRacha } = require('#dominio/RachaDiaria');
 
 const NOMBRES_BOTS = ['Bot-A', 'Bot-B', 'Bot-C'];
 
@@ -425,12 +426,7 @@ class PartidaController {
     if (res.partidaTerminada) {
       this.#cancelarUnoTimer(partidaId);
       this.#cancelarTurnoTimer(partidaId);
-      await this.persistencia.guardarResultadoPartida(partidaId, res.ranking);
-      await this.#procesarFinPartida(partidaId, res.ranking, sala);
-
-      this.#broadcast(sala, 'partida-terminada', { ranking: res.ranking });
-
-      this.persistencia.eliminarPartida(partidaId);
+      await this.#finalizarPartida(partidaId, res.ranking, sala);
       return;
     }
 
@@ -787,10 +783,7 @@ class PartidaController {
               carta: res.carta,
             });
           }
-          await this.persistencia.guardarResultadoPartida(partidaId, res.ranking);
-          await this.#procesarFinPartida(partidaId, res.ranking, salaActual);
-          this.#broadcast(salaActual, 'partida-terminada', { ranking: res.ranking });
-          this.persistencia.eliminarPartida(partidaId);
+          await this.#finalizarPartida(partidaId, res.ranking, salaActual);
           return;
         } else if (res.rondaTerminada) {
           this.#cancelarUnoTimer(partidaId);
@@ -835,18 +828,80 @@ class PartidaController {
     }
   }
 
-  async #procesarFinPartida(_partidaId, ranking, sala) {
+  /**
+   * Cierra la partida: aplica las recompensas de racha sobre el ranking, persiste el
+   * resultado, otorga XP y logros, avisa a la sala y libera la partida.
+   *
+   * El bonus de puntos tiene que aplicarse antes de `guardarResultadoPartida`, que es
+   * lo que persiste el delta del ranking global.
+   */
+  async #finalizarPartida(partidaId, ranking, sala) {
+    const boosts = await this.#resolverBoosts(ranking);
+
+    for (const r of ranking) {
+      const bonusPuntos = boosts.get(r.jugadorId)?.bonusPuntos ?? 1;
+      // Sólo los deltas positivos: multiplicar una penalización castigaría al jugador
+      // por tener racha.
+      if (bonusPuntos > 1 && r.deltaGlobal > 0) {
+        r.deltaBase = r.deltaGlobal;
+        r.deltaGlobal = Math.round(r.deltaGlobal * bonusPuntos);
+        r.bonusRacha = true;
+      }
+    }
+
+    await this.persistencia.guardarResultadoPartida(partidaId, ranking);
+    await this.#procesarFinPartida(partidaId, ranking, sala, boosts);
+
+    this.#broadcast(sala, 'partida-terminada', { ranking });
+
+    this.persistencia.eliminarPartida(partidaId);
+  }
+
+  /**
+   * Multiplicadores que cada humano del ranking tiene activos hoy por su racha.
+   * Los bots no tienen racha.
+   * @returns {Promise<Map<string, { boostXP: number, bonusPuntos: number }>>}
+   */
+  async #resolverBoosts(ranking) {
+    const hoy = fechaHoyArg();
+    const humanos = ranking.filter((r) => !r.jugadorId.startsWith('bot-'));
+
+    const entradas = await Promise.all(
+      humanos.map(async (r) => {
+        try {
+          const { rachaDias, ultimaConexion } = await this.persistencia.obtenerRacha(r.jugadorId);
+          return [r.jugadorId, recompensasDeRacha(rachaDias, ultimaConexion, hoy)];
+        } catch (err) {
+          // La racha es un extra: si falla, la partida igual tiene que cerrar.
+          logger.registerLog('warn', `No se pudo resolver la racha de ${r.jugadorId}: ${err.message}`);
+          return [r.jugadorId, { boostXP: 1, bonusPuntos: 1 }];
+        }
+      })
+    );
+
+    return new Map(entradas);
+  }
+
+  async #procesarFinPartida(_partidaId, ranking, sala, boosts = new Map()) {
     for (const r of ranking) {
       if (r.jugadorId.startsWith('bot-')) continue;
 
-      const xp = xpParaPuesto(r.puesto);
+      const boostXP = boosts.get(r.jugadorId)?.boostXP ?? 1;
+      const xpBase = xpParaPuesto(r.puesto);
+      const xp = Math.round(xpBase * boostXP);
       await this.persistencia.agregarXPyActualizarNivel(r.jugadorId, xp);
 
-      const { nuevosLogros, stats } = await this.#procesarLogros(r.jugadorId, xp);
+      const { nuevosLogros, stats } = await this.#procesarLogros(r.jugadorId, {
+        xpGanado: xp,
+        xpBase,
+        boostXP,
+      });
 
       if (nuevosLogros.length === 0 && xp > 0) {
         this.manejadorConexiones.emitirA(r.jugadorId, 'xp-ganado', {
           xpGanado: xp,
+          xpBase,
+          boostXP,
           nivelActual: stats.nivel,
           xpTotal: stats.xp,
         });
@@ -858,10 +913,13 @@ class PartidaController {
    * Verifica y desbloquea los logros de un jugador según su estado actual.
    * No otorga XP; el XP (si corresponde) lo maneja quien llame.
    * @param {string} jugadorId
-   * @param {number} xpGanado - solo informativo para el evento WS (0 si no hubo XP)
+   * @param {{ xpGanado?: number, xpBase?: number, boostXP?: number }} infoXP - solo
+   *   informativo para el evento WS. Viaja acá porque `logros-desbloqueados` y
+   *   `xp-ganado` son excluyentes: si hay logros nuevos, este es el único aviso.
    * @returns {Promise<{ nuevosLogros: string[], stats: object }>}
    */
-  async #procesarLogros(jugadorId, xpGanado = 0) {
+  async #procesarLogros(jugadorId, infoXP = {}) {
+    const { xpGanado = 0, xpBase = 0, boostXP = 1 } = infoXP;
     const [stats, posRanking, logrosActuales] = await Promise.all([
       this.persistencia.obtenerEstadisticasJugador(jugadorId),
       this.persistencia.obtenerPosicionRanking(jugadorId),
@@ -879,6 +937,8 @@ class PartidaController {
       this.manejadorConexiones.emitirA(jugadorId, 'logros-desbloqueados', {
         logros: logrosCompletos,
         xpGanado,
+        xpBase,
+        boostXP,
         nivelActual: stats.nivel,
       });
     }

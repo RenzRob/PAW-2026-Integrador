@@ -25,6 +25,8 @@ const ManejadorPartidas = require('#interfaces/http/handlers/manejadorPartidas')
 const ManejadorPuntajes = require('#interfaces/http/handlers/manejadorPuntajes');
 const ManejadorPerfil = require('#interfaces/http/handlers/manejadorPerfil');
 const PerfilController = require('#controladores/PerfilController');
+const ManejadorRacha = require('#interfaces/http/handlers/manejadorRacha');
+const RachaController = require('#controladores/RachaController');
 const mailService = require('#infraestructura/integraciones/email/MailService');
 const AppException = require('#errores/AppException');
 const EmptyException = require('#errores/EmptyException');
@@ -137,19 +139,28 @@ class Servidor {
   #configurarRutasHttp() {
     logger.logContext(this);
 
+    const rachaController = new RachaController(db);
+
     /* Rutas del frontend. */
-    const manejadorFront = new ManejadorFront(this.app, new PuntajesController(db), this.partidaController);
+    const manejadorFront = new ManejadorFront(
+      this.app,
+      new PuntajesController(db),
+      this.partidaController,
+      rachaController
+    );
 
     /* Rutas del backend. */
     const auth = new ManejadorAuth(new AuthController(db));
     const partidas = new ManejadorPartidas(this.partidaController);
     const puntajes = new ManejadorPuntajes(new PuntajesController(db));
     const perfil = new ManejadorPerfil(new PerfilController(db));
+    const racha = new ManejadorRacha(rachaController);
     this.app
       .use('/api', auth.router)
       .use('/api/partidas', requireAuth, partidas.router)
       .use('/api/puntajes', puntajes.router) // público: el ranking no requiere login
-      .use('/api/perfil', requireAuth, perfil.router);
+      .use('/api/perfil', requireAuth, perfil.router)
+      .use('/api/racha', requireAuth, racha.router);
   }
 
   #configurarWebSocket() {

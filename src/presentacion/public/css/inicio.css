@@ -47,6 +47,130 @@ body {
   color: #222;
 }
 
+/* ─── POP UP DE RACHA DIARIA ─── */
+
+.modal-racha-abierto {
+  overflow: hidden;
+}
+
+.modal-racha {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.modal-racha[hidden] {
+  display: none;
+}
+
+.modal-racha-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(26, 73, 113, 0.55);
+}
+
+.modal-racha-panel {
+  position: relative;
+  z-index: 1;
+  width: min(440px, calc(100vw - 48px));
+  max-height: 90vh;
+  overflow-y: auto;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.12);
+}
+
+.modal-racha-header {
+  padding: 20px 22px 0;
+  text-align: center;
+}
+
+.modal-racha-header h2 {
+  margin: 0;
+  color: #1a4971;
+  font-size: 1.4rem;
+}
+
+.modal-racha-subtitulo {
+  margin: 4px 0 0;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.modal-racha-body {
+  padding: 18px 22px;
+}
+
+.racha-dias {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.racha-dia {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 10px 2px;
+  border-radius: 10px;
+  background: #eaf3fa;
+  border: 2px solid transparent;
+}
+
+.racha-dia.cumplido {
+  border-color: #ffe14b;
+}
+
+.racha-dia.actual {
+  background: #ffe14b;
+  border-color: #ffd600;
+  font-weight: bold;
+}
+
+.racha-dia.pendiente {
+  filter: grayscale(0.6) opacity(0.6);
+}
+
+/* Los días con premio se destacan aunque todavía estén pendientes. */
+.racha-dia.con-premio.pendiente {
+  filter: grayscale(0.3) opacity(0.75);
+}
+
+.racha-dia-icono {
+  font-size: 1.1rem;
+  line-height: 1;
+}
+
+.racha-dia-label {
+  font-size: 0.7rem;
+  color: #444;
+}
+
+.racha-mensaje {
+  margin: 16px 0 0;
+  text-align: center;
+  color: #444;
+  font-size: 0.95rem;
+}
+
+.modal-racha-footer {
+  display: flex;
+  justify-content: center;
+  padding: 0 22px 20px;
+}
+
+.modal-racha-footer .btn-inicio {
+  min-height: 44px;
+}
+
 @media (max-width: 1000px) {
   .logo-inicio {
     width: 16rem;
@@ -62,11 +186,18 @@ body {
     padding: 20px;
     box-sizing: border-box;
   }
+  .modal-racha-footer .btn-inicio {
+    min-width: 0;
+    width: 100%;
+  }
 }
 
 @media (hover: none) and (pointer: coarse) {
   .btn-inicio {
     min-height: 48px;
     font-size: 17px;
+  }
+  .modal-racha-footer .btn-inicio {
+    min-height: 48px;
   }
 }

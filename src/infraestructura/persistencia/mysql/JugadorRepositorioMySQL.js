@@ -187,6 +187,61 @@ class JugadorRepositorioMySQL {
     await pool.execute('UPDATE jugadores SET foto_path = ? WHERE id = ?', [filename, jugadorId]);
   }
 
+  // Las fechas se leen con DATE_FORMAT en vez de configurar `dateStrings` en el pool:
+  // el pool es compartido y devolver strings rompería `fecha` en el historial de partidas.
+  async obtenerRacha(jugadorId) {
+    logger.logContext(this);
+    const [[row]] = await pool.execute(
+      `SELECT racha_dias AS rachaDias,
+              DATE_FORMAT(ultima_conexion, '%Y-%m-%d') AS ultimaConexion,
+              DATE_FORMAT(popup_visto, '%Y-%m-%d') AS popupVisto
+       FROM jugadores WHERE id = ?`,
+      [jugadorId]
+    );
+
+    if (!row) return { rachaDias: 0, ultimaConexion: null, popupVisto: null };
+
+    return {
+      rachaDias: Number(row.rachaDias) || 0,
+      ultimaConexion: row.ultimaConexion,
+      popupVisto: row.popupVisto,
+    };
+  }
+
+  /**
+   * Registra la conexión de hoy y actualiza la racha. El cálculo va en SQL y el
+   * WHERE la vuelve idempotente por día: dos pestañas abriendo a la vez no pueden
+   * incrementar dos veces y saltearse un premio.
+   */
+  async registrarConexion(jugadorId, hoy) {
+    logger.logContext(this);
+    await pool.execute(
+      `UPDATE jugadores
+          SET racha_dias = CASE WHEN ultima_conexion = DATE_SUB(?, INTERVAL 1 DAY)
+                                THEN racha_dias + 1 ELSE 1 END,
+              ultima_conexion = ?
+        WHERE id = ? AND (ultima_conexion IS NULL OR ultima_conexion <> ?)`,
+      [hoy, hoy, jugadorId, hoy]
+    );
+
+    const { rachaDias, ultimaConexion } = await this.obtenerRacha(jugadorId);
+
+    return { rachaDias, ultimaConexion };
+  }
+
+  async marcarPopupVisto(jugadorId, hoy) {
+    logger.logContext(this);
+    const [res] = await pool.execute(
+      `UPDATE jugadores SET popup_visto = ?
+        WHERE id = ? AND (popup_visto IS NULL OR popup_visto <> ?)`,
+      [hoy, jugadorId, hoy]
+    );
+
+    // Sin CLIENT_FOUND_ROWS, affectedRows cuenta filas cambiadas: > 0 sólo si este
+    // request fue el primero del día.
+    return res.affectedRows > 0;
+  }
+
   async obtenerConfig(clave) {
     logger.logContext(this);
     const [[row]] = await pool.execute('SELECT valor FROM configuracion WHERE clave = ?', [clave]);

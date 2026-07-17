@@ -505,7 +505,9 @@ class SalaDeJuego {
 
     ranking.forEach((r, i) => {
       r.puesto = i + 1;
-      r.deltaGlobal = deltas[i] || -50;
+      // `??` y no `||`: el 0 del segundo puesto es falsy y caería al -50, dejándolo
+      // tan penalizado como el último.
+      r.deltaGlobal = deltas[i] ?? -50;
     });
 
     return { ok: true, carta: cartaFinal, partidaTerminada: true, ranking };

@@ -5,7 +5,10 @@ CREATE TABLE IF NOT EXISTS jugadores (
   email VARCHAR(255) UNIQUE NULL,
   xp INT DEFAULT 0 NOT NULL,
   nivel INT DEFAULT 1 NOT NULL,
-  foto_path VARCHAR(100) NULL
+  foto_path VARCHAR(100) NULL,
+  racha_dias INT DEFAULT 0 NOT NULL,
+  ultima_conexion DATE NULL,
+  popup_visto DATE NULL
 );
 
 CREATE TABLE IF NOT EXISTS partidas (

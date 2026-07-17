@@ -82,6 +82,23 @@ class Persistencia {
     return this.repositorio.obtenerPosicionRanking(jugadorId);
   }
 
+  /* ── Racha diaria ───────────────────────────────────────────────────────── */
+
+  obtenerRacha(jugadorId) {
+    logger.logContext(this);
+    return this.repositorio.obtenerRacha(jugadorId);
+  }
+
+  registrarConexion(jugadorId, hoy) {
+    logger.logContext(this);
+    return this.repositorio.registrarConexion(jugadorId, hoy);
+  }
+
+  marcarPopupVisto(jugadorId, hoy) {
+    logger.logContext(this);
+    return this.repositorio.marcarPopupVisto(jugadorId, hoy);
+  }
+
   obtenerConfig(clave) {
     logger.logContext(this);
     return this.repositorio.obtenerConfig(clave);

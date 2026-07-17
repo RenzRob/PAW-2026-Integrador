@@ -19,6 +19,30 @@ async function esperarMySQL() {
   }
 }
 
+// Migraciones para bases ya creadas: cuando las tablas existen se omite init.sql,
+// así que toda columna agregada después tiene que sumarse también acá o los entornos
+// ya desplegados se quedan sin ella.
+const COLUMNAS_JUGADORES = [
+  ['foto_path', 'VARCHAR(100) NULL'],
+  ['racha_dias', 'INT DEFAULT 0 NOT NULL'],
+  ['ultima_conexion', 'DATE NULL'],
+  ['popup_visto', 'DATE NULL'],
+];
+
+async function agregarColumnaSiFalta(tabla, columna, definicion) {
+  const [rows] = await pool.execute(
+    'SELECT COUNT(*) AS cnt FROM information_schema.columns WHERE table_schema = DATABASE() AND table_name = ? AND column_name = ?',
+    [tabla, columna]
+  );
+
+  if (Number(rows[0].cnt) > 0) return;
+
+  // El nombre y la definición son constantes del código, nunca entrada del usuario:
+  // information_schema no acepta placeholders en un ALTER.
+  await pool.query(`ALTER TABLE ${tabla} ADD COLUMN ${columna} ${definicion}`);
+  logger.registerLog('info', `[DB] Columna ${tabla}.${columna} agregada.`);
+}
+
 async function initDB() {
   logger.registerLog('info', '[DB] Esperando conexión con MySQL...');
   await esperarMySQL();
@@ -30,11 +54,8 @@ async function initDB() {
 
   if (Number(rows[0].cnt) > 0) {
     logger.registerLog('info', '[DB] Tablas ya existentes, omitiendo init.');
-    const [cols] = await pool.execute(
-      "SELECT COUNT(*) AS cnt FROM information_schema.columns WHERE table_schema = DATABASE() AND table_name = 'jugadores' AND column_name = 'foto_path'"
-    );
-    if (Number(cols[0].cnt) === 0) {
-      await pool.execute('ALTER TABLE jugadores ADD COLUMN foto_path VARCHAR(100) NULL');
+    for (const [columna, definicion] of COLUMNAS_JUGADORES) {
+      await agregarColumnaSiFalta('jugadores', columna, definicion);
     }
     return;
   }

@@ -1,5 +1,6 @@
 const Usuario = require('#dominio/Usuario');
 const { calcularNivel } = require('#dominio/NivelXP');
+const { calcularRacha } = require('#dominio/RachaDiaria');
 const logger = require('#infraestructura/shared/logger');
 
 class JugadorRepositorioMemoria {
@@ -12,6 +13,15 @@ class JugadorRepositorioMemoria {
     this.logros = new Map(); // jugadorId → [{ logro_id, fecha_obtenido }]
     this.emails = new Map(); // jugadorId → email
     this.config = new Map(); // clave → valor
+    this.rachas = new Map(); // jugadorId → { rachaDias, ultimaConexion, popupVisto }
+  }
+
+  #racha(jugadorId) {
+    if (!this.rachas.has(jugadorId)) {
+      this.rachas.set(jugadorId, { rachaDias: 0, ultimaConexion: null, popupVisto: null });
+    }
+
+    return this.rachas.get(jugadorId);
   }
 
   async registrarJugador(jugadorId, nombreUsuario, passwordHash, email = null) {
@@ -23,6 +33,7 @@ class JugadorRepositorioMemoria {
     this.xp.set(jugadorId, 0);
     this.historial.set(jugadorId, []);
     this.logros.set(jugadorId, []);
+    this.rachas.set(jugadorId, { rachaDias: 0, ultimaConexion: null, popupVisto: null });
     if (email) this.emails.set(jugadorId, email);
 
     return jugador;
@@ -123,6 +134,31 @@ class JugadorRepositorioMemoria {
 
     const actual = this.xp.get(jugadorId) || 0;
     this.xp.set(jugadorId, actual + xpGanado);
+  }
+
+  async obtenerRacha(jugadorId) {
+    logger.logContext(this);
+    return { ...this.#racha(jugadorId) };
+  }
+
+  async registrarConexion(jugadorId, hoy) {
+    logger.logContext(this);
+    const racha = this.#racha(jugadorId);
+
+    racha.rachaDias = calcularRacha(racha.rachaDias, racha.ultimaConexion, hoy);
+    racha.ultimaConexion = hoy;
+
+    return { rachaDias: racha.rachaDias, ultimaConexion: racha.ultimaConexion };
+  }
+
+  async marcarPopupVisto(jugadorId, hoy) {
+    logger.logContext(this);
+    const racha = this.#racha(jugadorId);
+    if (racha.popupVisto === hoy) return false;
+
+    racha.popupVisto = hoy;
+
+    return true;
   }
 
   async obtenerConfig(clave) {

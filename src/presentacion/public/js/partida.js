@@ -2342,6 +2342,23 @@ class Partida {
   }
 
   /**
+   * Toast de XP ganado. Lo comparten los eventos `xp-ganado` y `logros-desbloqueados`,
+   * que son excluyentes entre sí pero informan el mismo XP.
+   *
+   * @param {{ xpGanado: number, nivelActual: number, boostXP?: number }} datos
+   * @returns {void}
+   */
+  #mostrarToastXP(datos) {
+    const conBoost = datos.boostXP > 1;
+    const subtitulo = conBoost
+      ? `Nivel ${datos.nivelActual} · x${datos.boostXP} por tu racha`
+      : `Nivel ${datos.nivelActual}`;
+
+    // El ✨ es el mismo emoji que marca el día del boost en el pop up de racha.
+    this.#mostrarToast(conBoost ? '✨' : '⭐', `+${datos.xpGanado} XP`, subtitulo, 'xp');
+  }
+
+  /**
    * Procesa los eventos recibidos desde el WebSocket y actualiza UI y bitácora.
    *
    * @param {Object} msg - Mensaje recibido desde el servidor.
@@ -2546,12 +2563,12 @@ class Partida {
         break;
       }
       case 'xp-ganado': {
-        this.#mostrarToast('⭐', `+${datos.xpGanado} XP`, `Nivel ${datos.nivelActual}`, 'xp');
+        this.#mostrarToastXP(datos);
         break;
       }
       case 'logros-desbloqueados': {
         if (datos.xpGanado > 0) {
-          this.#mostrarToast('⭐', `+${datos.xpGanado} XP`, `Nivel ${datos.nivelActual}`, 'xp');
+          this.#mostrarToastXP(datos);
         }
         const logros = datos.logros || [];
         logros.forEach((logro, i) => {

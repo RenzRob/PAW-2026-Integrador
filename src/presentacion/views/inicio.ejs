@@ -19,6 +19,29 @@
         <button class="btn-inicio" onclick="salir()">SALIR</button>
       </div>
     </div>
+
+    <div id="modal-racha" class="modal-racha" hidden aria-hidden="true">
+      <div class="modal-racha-backdrop" data-cerrar-racha="true"></div>
+      <section
+        class="modal-racha-panel"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="modal-racha-titulo"
+      >
+        <div class="modal-racha-header">
+          <h2 id="modal-racha-titulo">¡Racha diaria!</h2>
+          <p id="racha-subtitulo" class="modal-racha-subtitulo"></p>
+        </div>
+        <div class="modal-racha-body">
+          <ol id="racha-dias" class="racha-dias"></ol>
+          <p id="racha-mensaje" class="racha-mensaje"></p>
+        </div>
+        <div class="modal-racha-footer">
+          <button type="button" id="btn-cerrar-racha" class="btn-inicio">¡DALE!</button>
+        </div>
+      </section>
+    </div>
+
     <script>
       async function salir() {
         try {
@@ -26,6 +49,87 @@
         } catch (_) {}
         window.location.href = '/public/bienvenida';
       }
+
+      (function () {
+        const modal = document.getElementById('modal-racha');
+        const cerrar = () => {
+          modal.hidden = true;
+          modal.setAttribute('aria-hidden', 'true');
+          document.body.classList.remove('modal-racha-abierto');
+        };
+
+        document.getElementById('btn-cerrar-racha').addEventListener('click', cerrar);
+        modal.addEventListener('click', (e) => {
+          if (e.target.closest('[data-cerrar-racha="true"]')) cerrar();
+        });
+        document.addEventListener('keydown', (e) => {
+          if (e.key === 'Escape' && !modal.hidden) cerrar();
+        });
+
+        const textoMensaje = (data) => {
+          if (data.rachaDias === 0) return '¡Arrancá tu racha entrando mañana!';
+          if (data.recompensas.boostXP > 1) {
+            return `¡Hoy ganás ${data.multiplicadorXP}x de experiencia en cada partida!`;
+          }
+          if (data.recompensas.bonusPuntos > 1) {
+            const extra = Math.round((data.multiplicadorPuntos - 1) * 100);
+            return `¡Hoy ganás ${extra}% más de puntos cuando ganás una partida!`;
+          }
+          const premio =
+            data.proxima.tipo === 'xp'
+              ? `tu boost de ${data.multiplicadorXP}x de experiencia`
+              : 'tu bonus de puntos';
+          const dias = data.proxima.dias === 1 ? 'Falta 1 día' : `Faltan ${data.proxima.dias} días`;
+          return `${dias} para ${premio}.`;
+        };
+
+        const pintarDias = (data) => {
+          const lista = document.getElementById('racha-dias');
+          lista.innerHTML = '';
+
+          for (let dia = 1; dia <= data.cicloDias; dia++) {
+            const li = document.createElement('li');
+            const esPremio = dia === data.diaBoostXP || dia === data.diaBonusPuntos;
+            li.className = 'racha-dia';
+            if (dia < data.diaDelCiclo) li.classList.add('cumplido');
+            if (dia === data.diaDelCiclo) li.classList.add('actual');
+            if (dia > data.diaDelCiclo) li.classList.add('pendiente');
+
+            const icono = document.createElement('span');
+            icono.className = 'racha-dia-icono';
+            // Emojis propios del ciclo: no reusar los de los logros para que el jugador
+            // no los confunda con un logro desbloqueado.
+            if (dia === data.diaBoostXP) icono.textContent = '✨';
+            else if (dia === data.diaBonusPuntos) icono.textContent = '🎁';
+            else icono.textContent = dia < data.diaDelCiclo ? '✓' : '·';
+
+            const etiqueta = document.createElement('span');
+            etiqueta.className = 'racha-dia-label';
+            etiqueta.textContent = `Día ${dia}`;
+
+            li.appendChild(icono);
+            li.appendChild(etiqueta);
+            if (esPremio) li.classList.add('con-premio');
+            lista.appendChild(li);
+          }
+        };
+
+        fetch('/api/racha/visita', { method: 'POST' })
+          .then((r) => (r.ok ? r.json() : null))
+          .then((data) => {
+            if (!data || !data.mostrarPopup) return;
+
+            const dias = data.rachaDias === 1 ? '1 día seguido' : `${data.rachaDias} días seguidos`;
+            document.getElementById('racha-subtitulo').textContent = `Llevás ${dias}`;
+            document.getElementById('racha-mensaje').textContent = textoMensaje(data);
+            pintarDias(data);
+
+            modal.hidden = false;
+            modal.setAttribute('aria-hidden', 'false');
+            document.body.classList.add('modal-racha-abierto');
+          })
+          .catch(() => {});
+      })();
     </script>
   </body>
 </html>
