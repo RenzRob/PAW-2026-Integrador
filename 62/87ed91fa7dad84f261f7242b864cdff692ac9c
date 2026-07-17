@@ -1,0 +1,22 @@
+src/presentacion/public/js/partida.js
+  s_4118ad38dd7f80::t_377bcfd32c005c 2122
+  s_4118ad38dd7f80::t_0a5281a631d7fd 2045
+src/presentacion/public/css/partida.css
+  s_4118ad38dd7f80::t_147eee7b4a28f4 2075-2080
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "6287ed91fa7dad84f261f7242b864cdff692ac9c",
+  "prompts": {},
+  "sessions": {
+    "s_4118ad38dd7f80": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e6fb89a3-e8ea-456c-8292-4c2d7923ca82",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "rrobles_meli <renzo.robles@mercadolibre.com>"
+    }
+  }
+}
