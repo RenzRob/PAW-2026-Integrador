@@ -1,0 +1,35 @@
+src/dominio/SalaDeJuego.js
+  s_4118ad38dd7f80::t_d6d73e5fb7d897 147
+  s_4118ad38dd7f80::t_df50b6f78c316e 102,111
+  s_4118ad38dd7f80::t_58d36d03dd7e62 615
+src/controladores/PartidaController.js
+  s_4118ad38dd7f80::t_0edc9a83188430 299
+  s_4118ad38dd7f80::t_b5d241cf65d971 372
+src/presentacion/public/js/partida.js
+  s_4118ad38dd7f80::t_d5bc8bd4ec4163 1954-1957
+  s_4118ad38dd7f80::t_9b3127904ecf63 1009-1024,1030,1033-1036
+src/presentacion/public/css/partida.css
+  s_4118ad38dd7f80::t_b8be7e1e679a64 1234,1237-1246
+  s_4118ad38dd7f80::t_e497ba23c0281d 529
+  s_4118ad38dd7f80::t_b8e9cf1fe47ef6 2049-2074
+  s_4118ad38dd7f80::t_71e37b861f69fc 434,441-444
+  s_4118ad38dd7f80::t_c302b1551f71c9 509,514
+src/dominio/JugadorEnSala.js
+  s_4118ad38dd7f80::t_e10645103b2652 3,11
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "0ddd60acef38190a8b4d31e9f64d3a1e252e04a2",
+  "prompts": {},
+  "sessions": {
+    "s_4118ad38dd7f80": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e6fb89a3-e8ea-456c-8292-4c2d7923ca82",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "rrobles_meli <renzo.robles@mercadolibre.com>"
+    }
+  }
+}
