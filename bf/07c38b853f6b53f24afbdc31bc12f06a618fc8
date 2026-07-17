@@ -1,0 +1,19 @@
+src/infraestructura/persistencia/mysql/initDB.js
+  s_6b92a9a95d9f1a::t_c0187f0403d88e 60-74
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "bf07c38b853f6b53f24afbdc31bc12f06a618fc8",
+  "prompts": {},
+  "sessions": {
+    "s_6b92a9a95d9f1a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "6198fd6e-4b16-47db-a630-5d3ced12241c",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "rrobles_meli <renzo.robles@mercadolibre.com>"
+    }
+  }
+}
