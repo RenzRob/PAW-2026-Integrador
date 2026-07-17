@@ -84,6 +84,11 @@ class Persistencia {
 
   /* ── Racha diaria ───────────────────────────────────────────────────────── */
 
+  eliminarJugador(jugadorId) {
+    logger.logContext(this);
+    return this.repositorio.eliminarJugador(jugadorId);
+  }
+
   obtenerRacha(jugadorId) {
     logger.logContext(this);
     return this.repositorio.obtenerRacha(jugadorId);

@@ -171,6 +171,17 @@ class JugadorRepositorioMemoria {
     this.config.set(clave, valor);
   }
 
+  async eliminarJugador(jugadorId) {
+    logger.logContext(this);
+    this.jugadores.delete(jugadorId);
+    this.puntajes.delete(jugadorId);
+    this.xp.delete(jugadorId);
+    this.historial.delete(jugadorId);
+    this.logros.delete(jugadorId);
+    this.emails.delete(jugadorId);
+    this.rachas.delete(jugadorId);
+  }
+
   async obtenerPosicionRanking(jugadorId) {
     logger.logContext(this);
     const ranking = await this.obtenerPuntajes();

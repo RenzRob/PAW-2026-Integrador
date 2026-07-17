@@ -1,6 +1,10 @@
+const fs = require('fs');
+const path = require('path');
 const { DEFINICIONES_LOGROS } = require('#dominio/Logros');
 const { xpParaNivel, xpEnNivelActual, xpTotalDelNivel } = require('#dominio/NivelXP');
 const logger = require('#infraestructura/shared/logger');
+
+const AVATARS_DIR = process.env.AVATARS_DIR || '/data/avatars';
 
 class PerfilController {
   constructor(persistencia) {
@@ -62,6 +66,21 @@ class PerfilController {
   async actualizarFoto(jugadorId, filename) {
     logger.logContext(this);
     await this.persistencia.actualizarFotoPath(jugadorId, filename);
+  }
+
+  async eliminarCuenta(jugadorId) {
+    logger.logContext(this);
+    const jugador = await this.persistencia.obtenerJugador(jugadorId);
+    if (!jugador) return { ok: false, status: 404, error: 'Jugador no encontrado' };
+
+    const stats = await this.persistencia.obtenerEstadisticasJugador(jugadorId);
+    if (stats?.fotoPath) {
+      const avatarFile = path.join(AVATARS_DIR, stats.fotoPath);
+      fs.unlink(avatarFile, () => {});
+    }
+
+    await this.persistencia.eliminarJugador(jugadorId);
+    return { ok: true };
   }
 }
 

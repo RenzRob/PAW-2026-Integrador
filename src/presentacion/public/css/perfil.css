@@ -26,6 +26,7 @@ body {
   flex-direction: column;
   gap: 28px;
   min-height: 520px;
+  position: relative;
 }
 
 .perfil-loading,
@@ -515,6 +516,33 @@ body {
 
 .recompensa-card:not(.recompensa-card--activa) .recompensa-card-estado {
   color: #888;
+}
+
+/* ── Botón borrar cuenta ──────────────────────────── */
+
+.btn-borrar-cuenta {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background: none;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  padding: 5px 10px;
+  font-size: 0.75rem;
+  color: #bbb;
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
+}
+
+.btn-borrar-cuenta:hover {
+  color: #c0392b;
+  border-color: #c0392b;
+  background: #fff0ee;
+}
+
+.btn-borrar-cuenta:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 /* ── Botón volver ─────────────────────────────────── */

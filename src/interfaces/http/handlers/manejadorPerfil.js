@@ -84,6 +84,20 @@ class ManejadorPerfil {
       }
     });
 
+    // DELETE /api/perfil — elimina la cuenta del jugador autenticado
+    this.router.delete('/', async (req, res) => {
+      try {
+        const result = await this.perfilController.eliminarCuenta(req.jugadorId);
+        if (!result.ok) return res.status(result.status).json({ error: result.error });
+        res.clearCookie('token');
+        res.clearCookie('nombreUsuario');
+        res.status(204).send();
+      } catch (err) {
+        logger.registerLog('error', `Error en DELETE /api/perfil: ${err.message}`);
+        res.status(500).json({ error: 'Error al eliminar la cuenta' });
+      }
+    });
+
     // GET /api/perfil/:jugadorId — perfil de cualquier jugador (público)
     this.router.get('/:jugadorId', async (req, res) => {
       try {

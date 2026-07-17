@@ -46,7 +46,7 @@
 
         box.innerHTML = `
           <!-- Header del perfil -->
-          <div class="perfil-header">
+          <div class="perfil-header" style="position:relative">
             <div class="perfil-avatar-wrap" id="avatar-wrap">
               ${fotoUrl
                 ? `<img class="perfil-avatar-img" src="${fotoUrl}" alt="Foto de perfil">`
@@ -195,6 +195,8 @@
             </div>`;
           })() : ''}
 
+          ${esMiPerfil ? `<button class="btn-borrar-cuenta" id="btn-borrar-cuenta">Borrar cuenta</button>` : ''}
+
           <button class="btn-perfil-volver" onclick="window.location.href='/public/'">VOLVER AL INICIO</button>
         `;
 
@@ -241,6 +243,31 @@
             } finally {
               if (btn) btn.classList.remove('cargando');
               input.value = '';
+            }
+          });
+
+          document.getElementById('btn-borrar-cuenta').addEventListener('click', async () => {
+            const confirmar = window.confirm('¿Estás seguro de que querés borrar tu cuenta? Esta acción es irreversible y eliminará todos tus datos.');
+            if (!confirmar) return;
+
+            const btnBorrar = document.getElementById('btn-borrar-cuenta');
+            btnBorrar.disabled = true;
+            btnBorrar.textContent = 'Eliminando...';
+
+            try {
+              const res = await fetch('/api/perfil', { method: 'DELETE' });
+              if (!res.ok) {
+                const data = await res.json().catch(() => ({}));
+                alert(data.error || 'No se pudo eliminar la cuenta. Intentá de nuevo.');
+                btnBorrar.disabled = false;
+                btnBorrar.textContent = 'Borrar cuenta';
+                return;
+              }
+              window.location.href = '/';
+            } catch {
+              alert('Error de conexión. Intentá de nuevo.');
+              btnBorrar.disabled = false;
+              btnBorrar.textContent = 'Borrar cuenta';
             }
           });
         }

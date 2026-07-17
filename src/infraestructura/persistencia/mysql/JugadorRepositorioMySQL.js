@@ -256,6 +256,13 @@ class JugadorRepositorioMySQL {
     );
   }
 
+  async eliminarJugador(jugadorId) {
+    logger.logContext(this);
+    await pool.execute('DELETE FROM logros_desbloqueados WHERE jugador_id = ?', [jugadorId]);
+    await pool.execute('DELETE FROM partida_jugadores WHERE jugador_id = ?', [jugadorId]);
+    await pool.execute('DELETE FROM jugadores WHERE id = ?', [jugadorId]);
+  }
+
   async obtenerPosicionRanking(jugadorId) {
     logger.logContext(this);
     const [rows] = await pool.execute(`
