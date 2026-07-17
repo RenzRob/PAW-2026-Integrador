@@ -26,11 +26,24 @@ class ManejadorRacha {
     }
   }
 
+  async estado(req, res) {
+    logger.logContext(this);
+    try {
+      const result = await this.rachaController.obtenerEstado(req.jugadorId);
+      if (!result.ok) return res.status(result.status).json({ error: result.error });
+      res.json(result.data);
+    } catch (err) {
+      logger.registerLog('error', `Error en GET /api/racha/estado: ${err.message}`);
+      res.status(500).json({ error: 'Error al obtener el estado de la racha' });
+    }
+  }
+
   #registrarRutas() {
     logger.logContext(this);
     // POST y no GET: consume el "una vez por día" del pop up. Con GET lo quemaría
     // cualquier prefetch del browser sin llegar a mostrarlo.
     this.router.post('/visita', (req, res) => this.visita(req, res));
+    this.router.get('/estado', (req, res) => this.estado(req, res));
   }
 }
 

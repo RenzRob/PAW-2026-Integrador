@@ -23,18 +23,23 @@
           if (!perfilRes.ok) throw new Error('No se pudo cargar el perfil.');
           const data = await perfilRes.json();
           const me = meRes.ok ? await meRes.json() : null;
-          renderPerfil(data, me?.jugadorId === JUGADOR_ID);
+          const esMiPerfil = me?.jugadorId === JUGADOR_ID;
+
+          let racha = null;
+          if (esMiPerfil) {
+            const rachaRes = await fetch('/api/racha/estado');
+            if (rachaRes.ok) racha = await rachaRes.json();
+          }
+
+          renderPerfil(data, esMiPerfil, racha);
         } catch (err) {
           box.innerHTML = `<p class="perfil-error">${err.message}</p>`;
         }
       }
 
-      function renderPerfil(d, esMiPerfil) {
+      function renderPerfil(d, esMiPerfil, racha) {
         const box = document.getElementById('perfil-box');
         const { nombreUsuario, fotoUrl, stats, xpInfo, historial, logros } = d;
-        const recompensas = logros
-          .filter(l => l.desbloqueado && l.fechaObtenido)
-          .sort((a, b) => new Date(b.fechaObtenido) - new Date(a.fechaObtenido));
 
         const winrateColor = stats.winrate >= 50 ? '#27ae60' : '#c0392b';
         const logrosDesbloqueados = logros.filter(l => l.desbloqueado).length;
@@ -91,7 +96,7 @@
           <div class="perfil-tabs">
             <button class="perfil-tab perfil-tab--activo" data-tab="historial">Últimas partidas</button>
             <button class="perfil-tab" data-tab="logros">Logros <span class="logros-contador">${logrosDesbloqueados}/${logros.length}</span></button>
-            <button class="perfil-tab" data-tab="recompensas">Recompensas ${recompensas.length > 0 ? `<span class="logros-contador">${recompensas.length}</span>` : ''}</button>
+            ${esMiPerfil ? `<button class="perfil-tab" data-tab="recompensas">Recompensas</button>` : ''}
           </div>
 
           <div class="perfil-tab-panel" id="tab-historial">
@@ -133,24 +138,62 @@
             </div>
           </div>
 
-          <div class="perfil-tab-panel" id="tab-recompensas" hidden>
-            ${recompensas.length === 0
-              ? '<p class="perfil-vacio">Todavía no desbloqueaste ninguna recompensa.</p>'
-              : `<div class="recompensas-feed">
-                  ${recompensas.map(r => {
-                    const fecha = new Date(r.fechaObtenido).toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit', year: '2-digit' });
-                    const hora = new Date(r.fechaObtenido).toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' });
-                    return `<div class="recompensa-item">
-                      <span class="recompensa-emoji">${r.emoji}</span>
-                      <div class="recompensa-info">
-                        <span class="recompensa-nombre">${r.nombre}</span>
-                        <span class="recompensa-desc">${r.descripcion}</span>
-                      </div>
-                      <span class="recompensa-fecha">${fecha}<br><small>${hora}</small></span>
-                    </div>`;
-                  }).join('')}
-                </div>`}
-          </div>
+          ${esMiPerfil ? (() => {
+            if (!racha) return '<div class="perfil-tab-panel" id="tab-recompensas" hidden><p class="perfil-vacio">No se pudo cargar el estado de recompensas.</p></div>';
+
+            const { rachaDias, diaDelCiclo: diaActual, cicloDias, diaBoostXP, diaBonusPuntos, multiplicadorXP, multiplicadorPuntos, recompensas: activas } = racha;
+
+            const diasHastaXP = diaActual === 0 ? diaBoostXP : diaActual < diaBoostXP ? diaBoostXP - diaActual : cicloDias - diaActual + diaBoostXP;
+            const diasHastaPuntos = diaActual === 0 ? diaBonusPuntos : diaActual < diaBonusPuntos ? diaBonusPuntos - diaActual : diaActual === diaBonusPuntos ? 0 : cicloDias - diaActual + diaBonusPuntos;
+
+            const xpActivo = activas.boostXP > 1;
+            const puntosActivo = activas.bonusPuntos > 1;
+
+            const diasItems = Array.from({ length: cicloDias }, (_, i) => {
+              const dia = i + 1;
+              const esCurrent = dia === diaActual;
+              const esBoostXP = dia === diaBoostXP;
+              const esBonusPuntos = dia === diaBonusPuntos;
+              const isPast = diaActual > 0 && dia < diaActual;
+              const icono = esBoostXP ? '⚡' : esBonusPuntos ? '🎯' : '•';
+              const cls = ['racha-dia', esCurrent ? 'racha-dia--activo' : '', isPast ? 'racha-dia--pasado' : '', esBoostXP ? 'racha-dia--boost-xp' : '', esBonusPuntos ? 'racha-dia--bonus-pts' : ''].filter(Boolean).join(' ');
+              const label = esBoostXP ? 'Boost XP' : esBonusPuntos ? 'Bonus pts' : '';
+              return `<div class="${cls}">
+                <span class="racha-dia-icono">${icono}</span>
+                <span class="racha-dia-num">Día ${dia}</span>
+                ${label ? `<span class="racha-dia-label">${label}</span>` : ''}
+              </div>`;
+            }).join('');
+
+            const xpCard = `<div class="recompensa-card ${xpActivo ? 'recompensa-card--activa' : ''}">
+              <span class="recompensa-card-emoji">⚡</span>
+              <div class="recompensa-card-info">
+                <span class="recompensa-card-nombre">Boost de XP</span>
+                <span class="recompensa-card-desc">Ganás <strong>x${multiplicadorXP}</strong> XP en tus partidas</span>
+                <span class="recompensa-card-estado">${xpActivo ? '¡Activo hoy!' : diasHastaXP === 1 ? 'Mañana' : `En ${diasHastaXP} días`}</span>
+              </div>
+            </div>`;
+
+            const puntosCard = `<div class="recompensa-card ${puntosActivo ? 'recompensa-card--activa' : ''}">
+              <span class="recompensa-card-emoji">🎯</span>
+              <div class="recompensa-card-info">
+                <span class="recompensa-card-nombre">Bonus de Puntos</span>
+                <span class="recompensa-card-desc">Ganás <strong>x${multiplicadorPuntos}</strong> puntos en tus partidas</span>
+                <span class="recompensa-card-estado">${puntosActivo ? '¡Activo hoy!' : diasHastaPuntos === 1 ? 'Mañana' : `En ${diasHastaPuntos} días`}</span>
+              </div>
+            </div>`;
+
+            return `<div class="perfil-tab-panel" id="tab-recompensas" hidden>
+              <div class="racha-ciclo-wrap">
+                <p class="racha-ciclo-titulo">Tu racha: <strong>${rachaDias} ${rachaDias === 1 ? 'día' : 'días'}</strong> consecutivos${diaActual > 0 ? ` · Ciclo día ${diaActual}/${cicloDias}` : ''}</p>
+                <div class="racha-ciclo">${diasItems}</div>
+              </div>
+              <div class="recompensas-cards">
+                ${xpCard}
+                ${puntosCard}
+              </div>
+            </div>`;
+          })() : ''}
 
           <button class="btn-perfil-volver" onclick="window.location.href='/public/'">VOLVER AL INICIO</button>
         `;

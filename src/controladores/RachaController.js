@@ -32,6 +32,30 @@ class RachaController {
   }
 
   /**
+   * Estado del ciclo sin registrar nada. Solo lectura, para mostrarlo en el perfil.
+   */
+  async obtenerEstado(jugadorId) {
+    logger.logContext(this);
+    const hoy = fechaHoyArg();
+    const { rachaDias, ultimaConexion } = await this.persistencia.obtenerRacha(jugadorId);
+
+    return {
+      ok: true,
+      data: {
+        rachaDias,
+        diaDelCiclo: diaDelCiclo(rachaDias),
+        cicloDias: CICLO_DIAS,
+        diaBoostXP: DIA_BOOST_XP,
+        diaBonusPuntos: DIA_BONUS_PUNTOS,
+        multiplicadorXP: MULTIPLICADOR_XP,
+        multiplicadorPuntos: MULTIPLICADOR_PUNTOS,
+        recompensas: recompensasDeRacha(rachaDias, ultimaConexion, hoy),
+        proxima: diasHastaProximaRecompensa(rachaDias),
+      },
+    };
+  }
+
+  /**
    * Estado del ciclo para pintar el pop up. `mostrarPopup` es true una sola vez por
    * día: lo decide la DB, no el cliente, así que un F5 no lo vuelve a abrir.
    */
