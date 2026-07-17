@@ -222,6 +222,10 @@ body {
   gap: 12px;
 }
 
+.perfil-tab-panel[hidden] {
+  display: none;
+}
+
 .perfil-vacio {
   color: #888;
   font-size: 0.9rem;
