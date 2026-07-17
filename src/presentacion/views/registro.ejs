@@ -145,10 +145,7 @@
         const data = await response.json();
 
         if (!response.ok) {
-          error.textContent =
-            response.status === 409
-              ? 'Ese nombre de usuario ya está en uso.'
-              : data.error || 'Error al registrarse.';
+          error.textContent = data.error || 'Error al registrarse.';
           error.hidden = false;
           return;
         }

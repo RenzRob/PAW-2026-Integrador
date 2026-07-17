@@ -356,7 +356,7 @@
     <div class="card card-accent">
       <span class="card-icon">🧑‍💻</span>
       <h3>Perfil de Usuario</h3>
-      <p>Página pública de perfil con foto, nivel, XP, stats y navegación por tabs (historial / logros).</p>
+      <p>Página pública con foto, nivel, XP, stats, tabs (historial / logros) y opción de eliminar la cuenta.</p>
     </div>
     <div class="card card-accent">
       <span class="card-icon">⚡</span>
@@ -486,17 +486,117 @@
 
 
 <!-- ══════════════════════════════════
+     SLIDE 4 — Borrar Cuenta
+══════════════════════════════════ -->
+<div class="slide slide-gris">
+  <div class="slide-header">
+    <div class="slide-num">04 — Perfil · Borrar Cuenta</div>
+    <h2 class="slide-titulo">Eliminación de Cuenta</h2>
+    <p class="slide-subtitulo">El jugador puede borrar su cuenta de forma permanente desde su perfil</p>
+    <div class="divider"></div>
+  </div>
+
+  <div class="feature-row">
+    <div class="feature-text">
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-content">
+            <h4>Solo visible para el dueño de la cuenta</h4>
+            <p>El botón "Borrar cuenta" aparece únicamente en el propio perfil del jugador autenticado, nunca en el perfil de otro jugador.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-content">
+            <h4>Confirmación explícita</h4>
+            <p>Antes de proceder, se le pide al jugador que confirme la acción con un diálogo que aclara que es irreversible y que se eliminarán todos sus datos.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-content">
+            <h4>Eliminación completa de datos</h4>
+            <p>Se borran el avatar del volumen de Railway, todos los logros desbloqueados, el historial de partidas y finalmente el registro del jugador en la base de datos.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">4</div>
+          <div class="step-content">
+            <h4>Sesión cerrada automáticamente</h4>
+            <p>Una vez eliminada la cuenta, el servidor cierra la sesión (borra las cookies) y redirige al jugador a la pantalla de bienvenida.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="feature-visual">
+      <!-- Mockup del perfil con botón de borrar -->
+      <div class="perfil-mockup">
+        <div style="position:relative;">
+          <div class="perfil-header-mock">
+            <div class="perfil-avatar-mock">R</div>
+            <div>
+              <div class="perfil-nombre-mock">Renzo</div>
+              <span class="nivel-badge-demo">Nivel 7</span>
+              <div class="xp-bar-wrap">
+                <div class="xp-bar-bg"><div class="xp-bar-fill"></div></div>
+                <div class="xp-label">320 / 700 XP</div>
+              </div>
+            </div>
+          </div>
+          <!-- Botón borrar en la esquina -->
+          <div style="position:absolute;top:0;right:0;">
+            <button style="background:none;border:1px solid #fca5a5;color:#dc2626;font-size:.75rem;font-weight:600;padding:5px 12px;border-radius:6px;cursor:pointer;">Borrar cuenta</button>
+          </div>
+        </div>
+
+        <!-- Diálogo de confirmación -->
+        <div style="margin-top:16px;background:#fff7f7;border:1px solid #fecaca;border-radius:12px;padding:18px;">
+          <div style="display:flex;gap:10px;align-items:flex-start;">
+            <div style="font-size:1.4rem;flex-shrink:0;">⚠️</div>
+            <div>
+              <div style="font-weight:700;color:#991b1b;font-size:.9rem;margin-bottom:6px;">¿Estás seguro?</div>
+              <p style="font-size:.82rem;color:#7f1d1d;line-height:1.5;margin-bottom:14px;">Esta acción es <strong>irreversible</strong> y eliminará todos tus datos: perfil, historial de partidas, logros y foto de perfil.</p>
+              <div style="display:flex;gap:8px;">
+                <button style="flex:1;background:#dc2626;color:#fff;border:none;border-radius:6px;padding:8px;font-size:.82rem;font-weight:700;cursor:pointer;">Sí, borrar cuenta</button>
+                <button style="flex:1;background:#e5e7eb;color:#374151;border:none;border-radius:6px;padding:8px;font-size:.82rem;font-weight:600;cursor:pointer;">Cancelar</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tabla de qué se borra -->
+        <div style="margin-top:16px;">
+          <h3 style="font-size:.88rem;margin-bottom:10px;color:var(--azul);">¿Qué se elimina?</h3>
+          <table class="tabla-bonita" style="font-size:.8rem;">
+            <thead><tr><th>Dato</th><th>Dónde se elimina</th></tr></thead>
+            <tbody>
+              <tr><td>Foto de perfil (avatar)</td><td>Volumen de Railway</td></tr>
+              <tr><td>Logros desbloqueados</td><td>Tabla <code>logros_desbloqueados</code></td></tr>
+              <tr><td>Historial de partidas</td><td>Tabla <code>partida_jugadores</code></td></tr>
+              <tr><td>Cuenta del jugador</td><td>Tabla <code>jugadores</code></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════
      BREAK — XP & Niveles
 ══════════════════════════════════ -->
 <div class="section-break">Feature 2 — <span>XP &amp; Niveles</span></div>
 
 
 <!-- ══════════════════════════════════
-     SLIDE 4 — XP y Niveles
+     SLIDE 5 — XP y Niveles
 ══════════════════════════════════ -->
 <div class="slide slide-blanco">
   <div class="slide-header">
-    <div class="slide-num">04 — XP &amp; Niveles</div>
+    <div class="slide-num">05 — XP &amp; Niveles</div>
     <h2 class="slide-titulo">Sistema de Experiencia y Niveles</h2>
     <p class="slide-subtitulo">Cada partida recompensa al jugador según su posición final</p>
     <div class="divider"></div>
@@ -548,11 +648,11 @@
 
 
 <!-- ══════════════════════════════════
-     SLIDE 5 — Logros
+     SLIDE 6 — Logros
 ══════════════════════════════════ -->
 <div class="slide slide-gris">
   <div class="slide-header">
-    <div class="slide-num">05 — Logros</div>
+    <div class="slide-num">06 — Logros</div>
     <h2 class="slide-titulo">11 Logros Desbloqueables</h2>
     <p class="slide-subtitulo">Se evalúan y desbloquean automáticamente al finalizar cada partida</p>
     <div class="divider"></div>
@@ -594,11 +694,11 @@
 
 
 <!-- ══════════════════════════════════
-     SLIDE 6 — Historial
+     SLIDE 7 — Historial
 ══════════════════════════════════ -->
 <div class="slide slide-azul-suave">
   <div class="slide-header">
-    <div class="slide-num">06 — Historial</div>
+    <div class="slide-num">07 — Historial</div>
     <h2 class="slide-titulo">Historial de Partidas</h2>
     <p class="slide-subtitulo">Las últimas 10 partidas de cada jugador, accesibles desde su perfil</p>
     <div class="divider"></div>
@@ -652,11 +752,11 @@
 
 
 <!-- ══════════════════════════════════
-     SLIDE 7 — Avatares
+     SLIDE 8 — Avatares
 ══════════════════════════════════ -->
 <div class="slide slide-blanco">
   <div class="slide-header">
-    <div class="slide-num">07 — Avatares</div>
+    <div class="slide-num">08 — Avatares</div>
     <h2 class="slide-titulo">Foto de Perfil y Avatares en Partida</h2>
     <p class="slide-subtitulo">El jugador sube su foto desde el perfil y aparece en todo el juego</p>
     <div class="divider"></div>
@@ -761,11 +861,11 @@
 
 
 <!-- ══════════════════════════════════
-     SLIDE 8 — Emails con Resend
+     SLIDE 9 — Emails con Resend
 ══════════════════════════════════ -->
 <div class="slide slide-gris">
   <div class="slide-header">
-    <div class="slide-num">08 — Emails</div>
+    <div class="slide-num">09 — Emails</div>
     <h2 class="slide-titulo">Emails Automáticos con Resend</h2>
     <p class="slide-subtitulo">Dos tipos de correo: bienvenida al registrarse y recordatorio diario al top 10</p>
     <div class="divider"></div>
@@ -872,11 +972,11 @@
 
 
 <!-- ══════════════════════════════════
-     SLIDE 9 — Rachas Diarias
+     SLIDE 10 — Rachas Diarias
 ══════════════════════════════════ -->
 <div class="slide slide-blanco">
   <div class="slide-header">
-    <div class="slide-num">09 — Rachas Diarias</div>
+    <div class="slide-num">10 — Rachas Diarias</div>
     <h2 class="slide-titulo">Sistema de Racha Diaria</h2>
     <p class="slide-subtitulo">Se premia al jugador por entrar al juego en días consecutivos</p>
     <div class="divider"></div>
@@ -979,11 +1079,11 @@
 
 
 <!-- ══════════════════════════════════
-     SLIDE 10 — Railway
+     SLIDE 11 — Railway
 ══════════════════════════════════ -->
 <div class="slide slide-oscuro">
   <div class="slide-header">
-    <div class="slide-num">10 — Infraestructura</div>
+    <div class="slide-num">11 — Infraestructura</div>
     <h2 class="slide-titulo">Deploy en Railway con Volumen Persistente</h2>
     <p class="slide-subtitulo">Los avatares sobreviven a los reinicios del contenedor</p>
     <div class="divider" style="background:var(--amarillo);"></div>
@@ -1034,11 +1134,11 @@
 
 
 <!-- ══════════════════════════════════
-     SLIDE 11 — Stack técnico
+     SLIDE 12 — Stack técnico
 ══════════════════════════════════ -->
 <div class="slide slide-blanco">
   <div class="slide-header">
-    <div class="slide-num">11 — Stack técnico</div>
+    <div class="slide-num">12 — Stack técnico</div>
     <h2 class="slide-titulo">Tecnologías Utilizadas</h2>
     <p class="slide-subtitulo">Qué servicio cumple qué rol en la segunda iteración</p>
     <div class="divider"></div>
@@ -1090,17 +1190,18 @@
 
 
 <!-- ══════════════════════════════════
-     SLIDE 12 — Cierre
+     SLIDE 13 — Cierre
 ══════════════════════════════════ -->
 <div class="slide slide-final">
   <div class="portada-tag" style="background:var(--amarillo);color:var(--azul);">Entrega Final · PAW 2026</div>
   <h2>UNO <span>Argentino</span> — Segunda Iteración</h2>
   <p>Perfil de usuario, XP y niveles, logros, historial, avatares en lobby y partida, emails transaccionales y deploy en Railway con volumen persistente.</p>
   <div class="portada-pills" style="justify-content:center;">
-    <span class="pill" style="background:rgba(255,225,75,.15);border-color:rgba(255,225,75,.3);">✅ 7 features nuevos</span>
+    <span class="pill" style="background:rgba(255,225,75,.15);border-color:rgba(255,225,75,.3);">✅ 8 features nuevos</span>
     <span class="pill" style="background:rgba(255,225,75,.15);border-color:rgba(255,225,75,.3);">✅ 11 logros</span>
     <span class="pill" style="background:rgba(255,225,75,.15);border-color:rgba(255,225,75,.3);">✅ 2 tipos de email</span>
     <span class="pill" style="background:rgba(255,225,75,.15);border-color:rgba(255,225,75,.3);">✅ Rachas diarias con recompensas</span>
+    <span class="pill" style="background:rgba(255,225,75,.15);border-color:rgba(255,225,75,.3);">✅ Eliminación de cuenta</span>
     <span class="pill" style="background:rgba(255,225,75,.15);border-color:rgba(255,225,75,.3);">✅ Avatares persistentes en Railway</span>
   </div>
 </div>
