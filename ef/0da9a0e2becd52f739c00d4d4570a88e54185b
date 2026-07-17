@@ -1,0 +1,51 @@
+src/infraestructura/persistencia/Persistencia.js
+  s_bc77a796f288dd::t_c1ce31f700e324 87-91
+src/presentacion/public/css/perfil.css
+  s_bc77a796f288dd::t_3ae54adc7d4c8f 29
+  s_bc77a796f288dd::t_2c2c1a616b4d6d 521-547
+src/presentacion/views/perfil.ejs
+  s_bc77a796f288dd::t_b9cf53892415bf 248-272
+  s_bc77a796f288dd::t_e899551af17167 198-199
+  s_bc77a796f288dd::t_807dfa6b5bd5e5 49
+src/infraestructura/persistencia/mysql/JugadorRepositorioMySQL.js
+  s_bc77a796f288dd::t_809c2fe7bb921c 259-265
+presentacion-final.html
+  s_6b92a9a95d9f1a::t_3e51dcab5d2517 1100,1103
+  s_6b92a9a95d9f1a::t_9130c92bb64f84 386-390
+  s_6b92a9a95d9f1a::t_3ff335291433c0 982
+  s_6b92a9a95d9f1a::t_272171a13c6bab 986
+  s_6b92a9a95d9f1a::t_bf2c545d9c9aa4 1037
+  s_6b92a9a95d9f1a::t_ef8e78c0585251 1041
+  s_6b92a9a95d9f1a::t_0f502c87ac570b 1093
+src/infraestructura/persistencia/memoria/JugadorRepositorioMemoria.js
+  s_bc77a796f288dd::t_a192eb917c0406 174-184
+src/controladores/PerfilController.js
+  s_bc77a796f288dd::t_3e245b746c431c 70-84
+  s_bc77a796f288dd::t_cdbe708ae63772 1-2,7
+src/interfaces/http/handlers/manejadorPerfil.js
+  s_bc77a796f288dd::t_5cdca386da7388 87-100
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "ef0da9a0e2becd52f739c00d4d4570a88e54185b",
+  "prompts": {},
+  "sessions": {
+    "s_6b92a9a95d9f1a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "6198fd6e-4b16-47db-a630-5d3ced12241c",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "rrobles_meli <renzo.robles@mercadolibre.com>"
+    },
+    "s_bc77a796f288dd": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a8da25b8-3f35-4d69-936a-8359bccc3392",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "rrobles_meli <renzo.robles@mercadolibre.com>"
+    }
+  }
+}
