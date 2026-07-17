@@ -318,6 +318,63 @@
     @media print {
       .slide { page-break-after: always; min-height: 100vh; }
     }
+
+    /* ── Modo presentación: una diapositiva a la vez ── */
+    body.modo-presentacion { overflow: hidden; height: 100vh; }
+
+    body.modo-presentacion .slide,
+    body.modo-presentacion .section-break {
+      display: none;
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100vh;
+      overflow-y: auto;
+    }
+
+    @keyframes fadeInSlide { from { opacity: 0; } to { opacity: 1; } }
+
+    body.modo-presentacion .slide.slide-activa,
+    body.modo-presentacion .section-break.slide-activa {
+      display: flex;
+      animation: fadeInSlide .35s ease;
+    }
+
+    .controles-presentacion {
+      position: fixed; left: 50%; bottom: 22px; transform: translateX(-50%);
+      z-index: 1000;
+      display: flex; align-items: center; gap: 14px;
+      background: rgba(15,34,54,.82); backdrop-filter: blur(6px);
+      padding: 8px 16px; border-radius: 999px;
+      box-shadow: 0 4px 20px rgba(0,0,0,.25);
+    }
+    body:not(.modo-presentacion) .controles-presentacion { display: none; }
+
+    .control-btn {
+      width: 32px; height: 32px; border-radius: 50%; border: none;
+      background: var(--amarillo); color: var(--azul);
+      font-size: 1.1rem; font-weight: 800; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      line-height: 1;
+    }
+    .control-btn:disabled { opacity: .35; cursor: default; }
+    .contador-slide { color: #fff; font-size: .82rem; font-weight: 600; min-width: 52px; text-align: center; }
+
+    .btn-modo-toggle {
+      position: fixed; top: 18px; right: 18px; z-index: 1000;
+      background: rgba(15,34,54,.82); backdrop-filter: blur(6px);
+      color: #fff; border: 1px solid rgba(255,255,255,.2);
+      font-size: .78rem; font-weight: 600;
+      padding: 8px 14px; border-radius: 999px; cursor: pointer;
+    }
+
+    @media print {
+      .controles-presentacion, .btn-modo-toggle { display: none !important; }
+      body.modo-presentacion .slide,
+      body.modo-presentacion .section-break {
+        display: flex !important; position: static !important; height: auto !important;
+      }
+    }
   </style>
 </head>
 <body>
@@ -1205,6 +1262,97 @@
     <span class="pill" style="background:rgba(255,225,75,.15);border-color:rgba(255,225,75,.3);">✅ Avatares persistentes en Railway</span>
   </div>
 </div>
+
+<!-- ══════════════════════════════════
+     Controles de presentación
+══════════════════════════════════ -->
+<div class="controles-presentacion">
+  <button id="btn-anterior" class="control-btn" aria-label="Diapositiva anterior">‹</button>
+  <span id="contador-slide" class="contador-slide">1 / 1</span>
+  <button id="btn-siguiente" class="control-btn" aria-label="Siguiente diapositiva">›</button>
+</div>
+<button id="btn-modo" class="btn-modo-toggle" type="button">📄 Ver como documento</button>
+
+<script>
+  (function () {
+    const slides = Array.from(document.querySelectorAll('.slide, .section-break'));
+    const contador = document.getElementById('contador-slide');
+    const btnAnterior = document.getElementById('btn-anterior');
+    const btnSiguiente = document.getElementById('btn-siguiente');
+    const btnModo = document.getElementById('btn-modo');
+    let indiceActual = 0;
+
+    function actualizarContador() {
+      contador.textContent = `${indiceActual + 1} / ${slides.length}`;
+      btnAnterior.disabled = indiceActual === 0;
+      btnSiguiente.disabled = indiceActual === slides.length - 1;
+    }
+
+    function mostrarSlide(indice) {
+      if (indice < 0 || indice >= slides.length) return;
+      slides[indiceActual].classList.remove('slide-activa');
+      indiceActual = indice;
+      slides[indiceActual].classList.add('slide-activa');
+      slides[indiceActual].scrollTop = 0;
+      actualizarContador();
+    }
+
+    function siguiente() { mostrarSlide(indiceActual + 1); }
+    function anterior() { mostrarSlide(indiceActual - 1); }
+
+    function activarModoPresentacion() {
+      document.body.classList.add('modo-presentacion');
+      mostrarSlide(indiceActual);
+      btnModo.textContent = '📄 Ver como documento';
+    }
+
+    function desactivarModoPresentacion() {
+      document.body.classList.remove('modo-presentacion');
+      slides.forEach((s) => s.classList.remove('slide-activa'));
+      btnModo.textContent = '▶ Ver como presentación';
+    }
+
+    btnSiguiente.addEventListener('click', siguiente);
+    btnAnterior.addEventListener('click', anterior);
+
+    btnModo.addEventListener('click', () => {
+      if (document.body.classList.contains('modo-presentacion')) {
+        desactivarModoPresentacion();
+      } else {
+        activarModoPresentacion();
+      }
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (!document.body.classList.contains('modo-presentacion')) return;
+      if (['ArrowRight', 'ArrowDown', 'PageDown', ' '].includes(e.key)) {
+        e.preventDefault();
+        siguiente();
+      } else if (['ArrowLeft', 'ArrowUp', 'PageUp'].includes(e.key)) {
+        e.preventDefault();
+        anterior();
+      } else if (e.key === 'Home') {
+        mostrarSlide(0);
+      } else if (e.key === 'End') {
+        mostrarSlide(slides.length - 1);
+      }
+    });
+
+    // Click cerca de los bordes izquierdo/derecho para avanzar o retroceder,
+    // como en Google Slides. Se ignora si el click fue sobre los controles.
+    document.addEventListener('click', (e) => {
+      if (!document.body.classList.contains('modo-presentacion')) return;
+      if (e.target.closest('.controles-presentacion, .btn-modo-toggle')) return;
+
+      const x = e.clientX;
+      const ancho = window.innerWidth;
+      if (x < ancho * 0.12) anterior();
+      else if (x > ancho * 0.88) siguiente();
+    });
+
+    activarModoPresentacion();
+  })();
+</script>
 
 </body>
 </html>
