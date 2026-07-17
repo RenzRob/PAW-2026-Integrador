@@ -76,7 +76,7 @@ body {
 .modal-racha-panel {
   position: relative;
   z-index: 1;
-  width: min(440px, calc(100vw - 48px));
+  width: min(600px, calc(100vw - 48px));
   max-height: 90vh;
   overflow-y: auto;
   background: #fff;
@@ -108,7 +108,7 @@ body {
 .racha-dias {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
-  gap: 6px;
+  gap: 12px;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -118,15 +118,20 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
-  padding: 10px 2px;
-  border-radius: 10px;
+  gap: 8px;
+  padding: 18px 4px;
+  border-radius: 12px;
   background: #eaf3fa;
   border: 2px solid transparent;
 }
 
 .racha-dia.cumplido {
-  border-color: #ffe14b;
+  background: #e6f6ea;
+  border-color: #7bc98d;
+}
+
+.racha-dia.cumplido .racha-dia-icono {
+  color: #2f9e52;
 }
 
 .racha-dia.actual {
@@ -145,13 +150,14 @@ body {
 }
 
 .racha-dia-icono {
-  font-size: 1.1rem;
+  font-size: 1.8rem;
   line-height: 1;
 }
 
 .racha-dia-label {
-  font-size: 0.7rem;
+  font-size: 0.85rem;
   color: #444;
+  white-space: nowrap;
 }
 
 .racha-mensaje {
@@ -189,6 +195,26 @@ body {
   .modal-racha-footer .btn-inicio {
     min-width: 0;
     width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .modal-racha-body {
+    padding: 18px 14px;
+  }
+  .racha-dias {
+    gap: 6px;
+  }
+  .racha-dia {
+    padding: 12px 2px;
+    gap: 4px;
+    border-radius: 10px;
+  }
+  .racha-dia-icono {
+    font-size: 1.3rem;
+  }
+  .racha-dia-label {
+    font-size: 0.65rem;
   }
 }
 
