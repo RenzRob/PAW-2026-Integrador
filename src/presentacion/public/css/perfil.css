@@ -25,7 +25,7 @@ body {
   display: flex;
   flex-direction: column;
   gap: 28px;
-  min-height: calc(100dvh - var(--navbar-height, 0px) - 64px);
+  min-height: 520px;
 }
 
 .perfil-loading,
