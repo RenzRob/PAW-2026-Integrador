@@ -1,0 +1,46 @@
+src/presentacion/public/css/perfil.css
+  s_4118ad38dd7f80::t_c0e2744ae1689c 46-47,51-56,67-98
+src/app.js
+  s_4118ad38dd7f80::t_c40d443c858856 84-87
+src/infraestructura/persistencia/mysql/sql/init.sql
+  s_4118ad38dd7f80::t_2fe11fc76c5e4c 7-8
+src/controladores/PerfilController.js
+  s_4118ad38dd7f80::t_e9bac1e17f13ed 61-65
+  s_4118ad38dd7f80::t_b7bc969387267d 46
+src/infraestructura/persistencia/mysql/JugadorRepositorioMySQL.js
+  s_4118ad38dd7f80::t_e09722fcaeaf75 184-188
+  s_4118ad38dd7f80::t_398852b3843ccd 9-21
+  s_4118ad38dd7f80::t_cea986d57be6ce 107,122
+src/interfaces/http/handlers/manejadorPerfil.js
+  s_4118ad38dd7f80::t_29977039986b40 2-3,6-40,64-83
+src/infraestructura/persistencia/mysql/initDB.js
+  s_4118ad38dd7f80::t_0a32816beb49ea 33-35
+src/controladores/AuthController.js
+  s_4118ad38dd7f80::t_26287240e5d7e1 50-56
+src/presentacion/views/perfil.ejs
+  s_4118ad38dd7f80::t_9de6a63c32e351 19-26,32,34
+  s_4118ad38dd7f80::t_5baf55e522d8a9 42-53
+  s_4118ad38dd7f80::t_04cbfde640741a 132-169
+package-lock.json
+  s_4118ad38dd7f80::t_baaf3d68b0f8ba 20,114-119,203-219,308-322,1052-1070,1486-1493,1535-1539
+package.json
+  s_4118ad38dd7f80::t_c20e1fe31568e1 31
+src/infraestructura/persistencia/Persistencia.js
+  s_4118ad38dd7f80::t_c6b43d41d30f49 75-79
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "121ce9837816fe96901bd9604245112f9d6f02c5",
+  "prompts": {},
+  "sessions": {
+    "s_4118ad38dd7f80": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e6fb89a3-e8ea-456c-8292-4c2d7923ca82",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "rrobles_meli <renzo.robles@mercadolibre.com>"
+    }
+  }
+}
