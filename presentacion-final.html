@@ -861,6 +861,113 @@
 
 
 <!-- ══════════════════════════════════
+     BREAK — Rachas
+══════════════════════════════════ -->
+<div class="section-break">Feature 7 — <span>Rachas Diarias</span></div>
+
+
+<!-- ══════════════════════════════════
+     SLIDE 9 — Rachas Diarias
+══════════════════════════════════ -->
+<div class="slide slide-blanco">
+  <div class="slide-header">
+    <div class="slide-num">09 — Rachas Diarias</div>
+    <h2 class="slide-titulo">Sistema de Racha Diaria</h2>
+    <p class="slide-subtitulo">Se premia al jugador por entrar al juego en días consecutivos</p>
+    <div class="divider"></div>
+  </div>
+
+  <div class="feature-row" style="gap:48px;">
+    <div class="feature-text">
+      <div class="cards" style="grid-template-columns:1fr;gap:20px;">
+        <div class="card">
+          <span class="card-icon">🔥</span>
+          <h3>¿Cómo funciona?</h3>
+          <p>Cada vez que el jugador entra al inicio, el servidor registra su conexión del día. Si entró ayer también, la racha sube un día. Si saltó un día o más, la racha se reinicia desde 1.</p>
+        </div>
+        <div class="card">
+          <span class="card-icon">🔄</span>
+          <h3>Ciclo de 5 días con 2 recompensas</h3>
+          <p>El ciclo se repite cada 5 días. En el <strong>día 3</strong> el jugador recibe un <strong>boost de 1.5× de XP</strong> en todas las partidas de ese día. En el <strong>día 5</strong> recibe un <strong>+10% de puntos globales</strong> al ganar.</p>
+        </div>
+        <div class="card">
+          <span class="card-icon">💡</span>
+          <h3>Pop-up de bienvenida</h3>
+          <p>Al entrar al inicio, se muestra un pop-up con el estado del ciclo: días cumplidos, día actual y días que faltan para la próxima recompensa. El pop-up aparece <strong>una sola vez por día</strong> — la base de datos guarda si ya se mostró, para que un F5 no lo reabra.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mockup del popup de racha -->
+    <div class="feature-visual">
+      <div style="background:rgba(0,0,0,.35);border-radius:16px;padding:32px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#0f2236,#1a4971);">
+        <div style="background:#fff;border-radius:16px;width:100%;max-width:340px;overflow:hidden;box-shadow:0 8px 40px rgba(0,0,0,.3);">
+          <!-- Header del modal -->
+          <div style="background:linear-gradient(135deg,var(--azul),var(--azul2));padding:20px 24px;text-align:center;">
+            <div style="font-size:2rem;margin-bottom:4px;">🔥</div>
+            <h3 style="color:#fff;font-size:1.1rem;margin:0;">¡Racha diaria!</h3>
+            <p style="color:rgba(255,255,255,.75);font-size:.82rem;margin:4px 0 0;">Llevas <strong style="color:var(--amarillo);">3 días seguidos</strong></p>
+          </div>
+
+          <!-- Días del ciclo -->
+          <div style="padding:20px 24px;">
+            <ol style="list-style:none;display:flex;gap:8px;justify-content:center;margin-bottom:16px;padding:0;">
+              <!-- Día 1 cumplido -->
+              <li style="display:flex;flex-direction:column;align-items:center;gap:4px;flex:1;">
+                <div style="width:40px;height:40px;border-radius:50%;background:var(--verde);color:#fff;display:flex;align-items:center;justify-content:center;font-size:1rem;font-weight:700;">✓</div>
+                <span style="font-size:.65rem;color:var(--suave);">Día 1</span>
+              </li>
+              <!-- Día 2 cumplido -->
+              <li style="display:flex;flex-direction:column;align-items:center;gap:4px;flex:1;">
+                <div style="width:40px;height:40px;border-radius:50%;background:var(--verde);color:#fff;display:flex;align-items:center;justify-content:center;font-size:1rem;font-weight:700;">✓</div>
+                <span style="font-size:.65rem;color:var(--suave);">Día 2</span>
+              </li>
+              <!-- Día 3 ACTUAL con boost XP -->
+              <li style="display:flex;flex-direction:column;align-items:center;gap:4px;flex:1;">
+                <div style="width:40px;height:40px;border-radius:50%;background:var(--amarillo);color:var(--azul);display:flex;align-items:center;justify-content:center;font-size:1.1rem;font-weight:700;box-shadow:0 0 0 3px rgba(255,225,75,.4);">✨</div>
+                <span style="font-size:.65rem;color:var(--azul);font-weight:700;">Día 3</span>
+              </li>
+              <!-- Día 4 pendiente -->
+              <li style="display:flex;flex-direction:column;align-items:center;gap:4px;flex:1;">
+                <div style="width:40px;height:40px;border-radius:50%;background:#e5e7eb;color:#94a3b8;display:flex;align-items:center;justify-content:center;font-size:1rem;">·</div>
+                <span style="font-size:.65rem;color:var(--suave);">Día 4</span>
+              </li>
+              <!-- Día 5 con bonus puntos -->
+              <li style="display:flex;flex-direction:column;align-items:center;gap:4px;flex:1;">
+                <div style="width:40px;height:40px;border-radius:50%;background:#e5e7eb;color:#94a3b8;display:flex;align-items:center;justify-content:center;font-size:1rem;">🎁</div>
+                <span style="font-size:.65rem;color:var(--suave);">Día 5</span>
+              </li>
+            </ol>
+
+            <div style="background:#fef9c3;border-radius:10px;padding:12px;text-align:center;margin-bottom:16px;">
+              <p style="font-size:.85rem;color:#854d0e;font-weight:600;margin:0;">¡Hoy ganás 1.5× de experiencia en cada partida!</p>
+            </div>
+
+            <button style="width:100%;background:var(--amarillo);color:var(--azul);border:none;border-radius:8px;padding:12px;font-weight:800;font-size:.95rem;cursor:pointer;">¡DALE!</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tabla resumen debajo del mockup -->
+      <div class="card" style="margin-top:16px;">
+        <h3 style="margin-bottom:12px;">Ciclo de recompensas</h3>
+        <table class="tabla-bonita">
+          <thead><tr><th>Día del ciclo</th><th>Recompensa</th></tr></thead>
+          <tbody>
+            <tr><td>Día 1</td><td>Sin recompensa especial</td></tr>
+            <tr><td>Día 2</td><td>Sin recompensa especial</td></tr>
+            <tr><td>Día 3 ✨</td><td><strong>1.5× XP</strong> en todas las partidas del día</td></tr>
+            <tr><td>Día 4</td><td>Sin recompensa especial</td></tr>
+            <tr><td>Día 5 🎁</td><td><strong>+10% de puntos globales</strong> al ganar una partida</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════
      BREAK — Infraestructura
 ══════════════════════════════════ -->
 <div class="section-break">Infraestructura — <span>Railway &amp; Volumen Persistente</span></div>
