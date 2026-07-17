@@ -57,6 +57,21 @@ async function initDB() {
     for (const [columna, definicion] of COLUMNAS_JUGADORES) {
       await agregarColumnaSiFalta('jugadores', columna, definicion);
     }
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS configuracion (
+        clave VARCHAR(50) PRIMARY KEY,
+        valor TEXT NOT NULL
+      )
+    `);
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS logros_desbloqueados (
+        jugador_id VARCHAR(36) NOT NULL,
+        logro_id VARCHAR(50) NOT NULL,
+        fecha_obtenido DATETIME DEFAULT CURRENT_TIMESTAMP,
+        PRIMARY KEY (jugador_id, logro_id),
+        FOREIGN KEY (jugador_id) REFERENCES jugadores(id)
+      )
+    `);
     return;
   }
 
