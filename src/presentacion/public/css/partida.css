@@ -431,7 +431,7 @@ body {
 
 .mesa.juego-activo .info-jugador {
   display: grid;
-  grid-template-columns: 28px max-content 11ch 44px;
+  grid-template-columns: 42px max-content 11ch 44px;
   column-gap: 8px;
   align-items: center;
   color: #ffffff;
@@ -2065,11 +2065,11 @@ body {
   font-weight: bold;
 }
 
-/* En la mesa de juego el avatar es más compacto */
+/* En la mesa de juego */
 .mesa .mini-avatar {
-  width: 28px;
-  height: 28px;
-  font-size: 0.72rem;
+  width: 42px;
+  height: 42px;
+  font-size: 1rem;
 }
 
 /* ─── NIVEL BADGE ─── */
