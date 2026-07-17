@@ -1,0 +1,996 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>UNO Argentino — Entrega Final PAW 2026</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --azul:    #1a4971;
+      --azul2:   #2563a8;
+      --celeste: #8ab3d1;
+      --amarillo:#ffe14b;
+      --verde:   #27ae60;
+      --rojo:    #e74c3c;
+      --gris:    #f5f7fa;
+      --texto:   #1e1e2e;
+      --suave:   #64748b;
+    }
+
+    html { font-size: 16px; scroll-behavior: smooth; }
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: var(--gris);
+      color: var(--texto);
+      line-height: 1.6;
+    }
+
+    /* ── Slides ── */
+    .slide {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 60px 80px;
+      position: relative;
+      overflow: hidden;
+    }
+    .slide-blanco     { background: #fff; }
+    .slide-gris       { background: var(--gris); }
+    .slide-azul-suave { background: linear-gradient(160deg, #eaf3fa 0%, #fff 100%); }
+    .slide-oscuro     { background: linear-gradient(135deg, #0f2236 0%, var(--azul) 100%); color: #fff; }
+
+    /* ── Portada ── */
+    .slide-portada {
+      background: linear-gradient(135deg, var(--azul) 0%, var(--azul2) 60%, #0e2f50 100%);
+      color: #fff;
+      text-align: center;
+      gap: 24px;
+    }
+    .slide-portada::before {
+      content: ''; position: absolute; top: -80px; right: -80px;
+      width: 350px; height: 350px; border-radius: 50%;
+      background: rgba(255,225,75,.08);
+    }
+    .portada-tag {
+      display: inline-block;
+      background: var(--amarillo); color: var(--azul);
+      font-weight: 700; font-size: .8rem;
+      letter-spacing: .12em; text-transform: uppercase;
+      padding: 6px 18px; border-radius: 999px; margin-bottom: 16px;
+    }
+    .portada-titulo {
+      font-size: clamp(2.2rem, 5vw, 3.8rem);
+      font-weight: 800; letter-spacing: -1px; line-height: 1.1;
+    }
+    .portada-titulo span { color: var(--amarillo); }
+    .portada-subtitulo {
+      font-size: 1.1rem; opacity: .75;
+      max-width: 560px; margin: 0 auto;
+    }
+    .portada-pills {
+      display: flex; gap: 12px;
+      justify-content: center; flex-wrap: wrap; margin-top: 8px;
+    }
+    .pill {
+      background: rgba(255,255,255,.12);
+      border: 1px solid rgba(255,255,255,.2);
+      color: #fff; padding: 6px 16px;
+      border-radius: 999px; font-size: .85rem;
+    }
+    .portada-meta { font-size: .8rem; opacity: .5; margin-top: 32px; }
+
+    /* ── Cabecera de slide ── */
+    .slide-header { margin-bottom: 40px; }
+    .slide-num {
+      font-size: .75rem; font-weight: 700;
+      letter-spacing: .15em; text-transform: uppercase;
+      color: var(--azul2); margin-bottom: 6px;
+    }
+    .slide-oscuro .slide-num { color: var(--amarillo); }
+    .slide-titulo {
+      font-size: clamp(1.8rem, 3.5vw, 2.8rem);
+      font-weight: 800; letter-spacing: -.5px; line-height: 1.15;
+    }
+    .slide-subtitulo { font-size: 1rem; color: var(--suave); margin-top: 6px; }
+    .slide-oscuro .slide-subtitulo { color: rgba(255,255,255,.65); }
+    .divider { width: 60px; height: 4px; background: var(--amarillo); border-radius: 2px; margin: 16px 0; }
+
+    /* ── Cards ── */
+    .cards { display: grid; gap: 24px; }
+    .cards-2 { grid-template-columns: repeat(2, 1fr); }
+    .cards-3 { grid-template-columns: repeat(3, 1fr); }
+    .cards-4 { grid-template-columns: repeat(4, 1fr); }
+
+    .card {
+      background: #fff; border-radius: 16px; padding: 28px;
+      box-shadow: 0 2px 12px rgba(0,0,0,.06);
+      border: 1px solid rgba(0,0,0,.05);
+    }
+    .card-accent { border-left: 4px solid var(--azul2); }
+    .card-icon { font-size: 2.2rem; margin-bottom: 12px; display: block; }
+    .card h3 { font-size: 1.05rem; font-weight: 700; margin-bottom: 8px; color: var(--azul); }
+    .card p, .card li { font-size: .9rem; color: var(--suave); line-height: 1.6; }
+    .card ul { padding-left: 18px; }
+    .card ul li { margin-bottom: 4px; }
+
+    .card-dark {
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.15); color: #fff;
+    }
+    .card-dark h3 { color: var(--amarillo); }
+    .card-dark p, .card-dark li { color: rgba(255,255,255,.75); }
+
+    /* ── Highlight box ── */
+    .highlight-box {
+      background: linear-gradient(135deg, var(--azul), var(--azul2));
+      color: #fff; border-radius: 16px; padding: 28px 32px;
+    }
+    .highlight-box h3 { font-size: 1.1rem; margin-bottom: 8px; color: var(--amarillo); }
+    .highlight-box p  { font-size: .9rem; opacity: .85; }
+
+    /* ── Feature row ── */
+    .feature-row { display: flex; gap: 40px; align-items: flex-start; }
+    .feature-row .feature-text  { flex: 1; }
+    .feature-row .feature-visual { flex: 1; }
+
+    /* ── Steps ── */
+    .steps { display: flex; flex-direction: column; gap: 16px; }
+    .step  { display: flex; gap: 16px; align-items: flex-start; }
+    .step-num {
+      min-width: 36px; height: 36px; border-radius: 50%;
+      background: var(--azul); color: #fff;
+      font-weight: 700; font-size: .9rem;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .step-content h4 { font-size: .95rem; font-weight: 700; margin-bottom: 4px; }
+    .step-content p  { font-size: .85rem; color: var(--suave); }
+
+    /* ── Tablas ── */
+    .tabla-bonita { width: 100%; border-collapse: collapse; font-size: .88rem; }
+    .tabla-bonita th {
+      background: var(--azul); color: #fff;
+      padding: 10px 16px; text-align: left; font-weight: 600;
+    }
+    .tabla-bonita td { padding: 10px 16px; border-bottom: 1px solid #e5e7eb; }
+    .tabla-bonita tr:nth-child(even) td { background: var(--gris); }
+
+    /* ── Logros grid ── */
+    .logros-mini {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+      gap: 12px;
+    }
+    .logro-mini {
+      background: #fff; border: 1px solid #e5e7eb;
+      border-radius: 12px; padding: 14px; text-align: center;
+    }
+    .logro-mini .emoji  { font-size: 1.6rem; display: block; margin-bottom: 6px; }
+    .logro-mini .nombre { font-size: .78rem; font-weight: 700; color: var(--azul); display: block; }
+    .logro-mini .desc   { font-size: .7rem; color: var(--suave); margin-top: 2px; }
+
+    /* ── Avatar mockup ── */
+    .avatar-circle {
+      width: 72px; height: 72px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--azul2), var(--celeste));
+      color: #fff; font-size: 1.8rem; font-weight: 800;
+      display: flex; align-items: center; justify-content: center;
+      border: 3px solid #fff;
+      box-shadow: 0 4px 14px rgba(0,0,0,.15);
+    }
+    .avatar-photo {
+      width: 72px; height: 72px; border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid #fff;
+      box-shadow: 0 4px 14px rgba(0,0,0,.15);
+      background: #ccc;
+      /* simulamos una foto con gradiente */
+      background: linear-gradient(135deg, #f6a623, #e05c23);
+      display: flex; align-items: center; justify-content: center;
+      color: #fff; font-size: 1.8rem; font-weight: 800;
+    }
+    .nivel-badge-demo {
+      background: var(--amarillo); color: var(--azul);
+      font-size: .72rem; font-weight: 800;
+      padding: 2px 8px; border-radius: 999px;
+      display: inline-block; margin-top: 6px;
+    }
+
+    .jugador-card {
+      display: flex; align-items: center; gap: 12px;
+      background: #fff; border-radius: 12px;
+      padding: 12px 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,.07);
+      border: 1px solid #e5e7eb;
+    }
+    .jugador-info h4 { font-size: .9rem; font-weight: 700; margin: 0; }
+    .jugador-info p  { font-size: .78rem; color: var(--suave); margin: 0; }
+
+    /* ── Perfil mockup completo ── */
+    .perfil-mockup {
+      background: #fff; border-radius: 16px;
+      padding: 24px; box-shadow: 0 4px 20px rgba(0,0,0,.08);
+      border: 1px solid #e5e7eb;
+    }
+    .perfil-header-mock {
+      display: flex; gap: 20px; align-items: center;
+      margin-bottom: 20px; padding-bottom: 20px;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    .perfil-avatar-mock {
+      width: 80px; height: 80px; border-radius: 50%;
+      background: linear-gradient(135deg, #f6a623, #e05c23);
+      color: #fff; font-size: 2rem; font-weight: 800;
+      display: flex; align-items: center; justify-content: center;
+      border: 3px solid var(--azul); flex-shrink: 0;
+    }
+    .perfil-nombre-mock { font-size: 1.2rem; font-weight: 800; color: var(--azul); }
+    .xp-bar-wrap { margin-top: 8px; }
+    .xp-bar-bg { background: #e5e7eb; border-radius: 4px; height: 8px; width: 180px; }
+    .xp-bar-fill { background: var(--amarillo); border-radius: 4px; height: 8px; width: 45%; }
+    .xp-label { font-size: .72rem; color: var(--suave); margin-top: 3px; }
+
+    .stats-mock {
+      display: grid; grid-template-columns: repeat(4,1fr); gap: 10px;
+      margin-bottom: 16px;
+    }
+    .stat-mock {
+      text-align: center; padding: 10px 6px;
+      background: var(--gris); border-radius: 10px;
+    }
+    .stat-mock .num { font-size: 1.3rem; font-weight: 800; color: var(--azul); display: block; }
+    .stat-mock .lbl { font-size: .7rem; color: var(--suave); }
+
+    .tab-mock { display: flex; gap: 0; margin-bottom: 12px; border-bottom: 2px solid #e5e7eb; }
+    .tab-btn {
+      padding: 8px 16px; font-size: .82rem; font-weight: 600;
+      background: none; border: none; cursor: pointer; color: var(--suave);
+    }
+    .tab-btn.activo { color: var(--azul); border-bottom: 2px solid var(--azul); margin-bottom: -2px; }
+
+    /* ── Mail preview ── */
+    .mail-preview {
+      background: #fff; border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,.1);
+      overflow: hidden; font-size: .82rem;
+      border: 1px solid #e5e7eb;
+    }
+    .mail-header-bar {
+      background: var(--azul); padding: 16px 20px;
+      display: flex; align-items: center; gap: 12px;
+    }
+    .mail-logo {
+      width: 40px; height: 40px; border-radius: 8px;
+      background: var(--amarillo);
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 900; font-size: 1rem; color: var(--azul);
+    }
+    .mail-header-bar span { color: #fff; font-weight: 600; font-size: .95rem; }
+    .mail-body { padding: 20px; }
+    .mail-body h3 { color: var(--azul); margin-bottom: 8px; font-size: 1rem; }
+    .mail-body p  { color: #555; margin-bottom: 12px; line-height: 1.5; }
+    .mail-cta {
+      display: block; background: var(--amarillo); color: var(--azul);
+      text-align: center; padding: 12px; border-radius: 6px;
+      font-weight: 800; font-size: .88rem; text-decoration: none;
+    }
+    .mail-footer { background: #f5f5f5; padding: 10px 20px; text-align: center; }
+    .mail-footer p { font-size: .7rem; color: #999; }
+
+    /* ── Arch / flujo ── */
+    .arch-flow { display: flex; align-items: center; gap: 0; }
+    .arch-box {
+      flex: 1; text-align: center; padding: 16px 10px;
+      border-radius: 12px; font-size: .82rem; font-weight: 600;
+    }
+    .arch-arrow { font-size: 1.4rem; color: var(--suave); padding: 0 8px; flex: 0; }
+
+    /* ── Section break ── */
+    .section-break {
+      min-height: 18vh;
+      display: flex; align-items: center; justify-content: center;
+      background: linear-gradient(135deg, var(--azul) 0%, #0a2540 100%);
+      color: #fff; text-align: center;
+      font-size: clamp(1.6rem, 4vw, 2.8rem);
+      font-weight: 800; letter-spacing: -.5px;
+      padding: 40px 80px;
+    }
+    .section-break span { color: var(--amarillo); }
+
+    /* ── Final ── */
+    .slide-final {
+      background: linear-gradient(135deg, var(--azul) 0%, #0a2540 100%);
+      color: #fff; text-align: center; gap: 20px;
+    }
+    .slide-final h2 { font-size: clamp(2rem, 4vw, 3rem); font-weight: 800; }
+    .slide-final h2 span { color: var(--amarillo); }
+    .slide-final p { opacity: .7; font-size: 1rem; max-width: 500px; margin: 0 auto; }
+
+    /* ── Responsive ── */
+    @media (max-width: 900px) {
+      .slide { padding: 40px 32px; }
+      .cards-2, .cards-3, .cards-4 { grid-template-columns: 1fr; }
+      .feature-row { flex-direction: column; }
+      .stats-mock { grid-template-columns: repeat(2,1fr); }
+    }
+    @media print {
+      .slide { page-break-after: always; min-height: 100vh; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════
+     SLIDE 1 — Portada
+══════════════════════════════════ -->
+<div class="slide slide-portada">
+  <div class="portada-tag">Entrega Final · PAW 2026</div>
+  <h1 class="portada-titulo">UNO <span>Argentino</span></h1>
+  <p class="portada-subtitulo">Segunda iteración — Features implementados para la entrega final de Programación de Aplicaciones Web</p>
+  <div class="portada-pills">
+    <span class="pill">🧑 Perfil de usuario</span>
+    <span class="pill">🏆 Logros</span>
+    <span class="pill">⚡ XP &amp; Niveles</span>
+    <span class="pill">📋 Historial</span>
+    <span class="pill">🖼 Avatares</span>
+    <span class="pill">📧 Emails</span>
+    <span class="pill">☁️ Railway + Volumen</span>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════
+     SLIDE 2 — Resumen
+══════════════════════════════════ -->
+<div class="slide slide-blanco">
+  <div class="slide-header">
+    <div class="slide-num">02 — Overview</div>
+    <h2 class="slide-titulo">¿Qué se implementó?</h2>
+    <p class="slide-subtitulo">Todos los features nuevos de esta iteración, de un vistazo</p>
+    <div class="divider"></div>
+  </div>
+
+  <div class="cards cards-3">
+    <div class="card card-accent">
+      <span class="card-icon">🧑‍💻</span>
+      <h3>Perfil de Usuario</h3>
+      <p>Página pública de perfil con foto, nivel, XP, stats y navegación por tabs (historial / logros).</p>
+    </div>
+    <div class="card card-accent">
+      <span class="card-icon">⚡</span>
+      <h3>XP &amp; Niveles</h3>
+      <p>Cada partida otorga XP según el puesto. Los niveles siguen una progresión cuadrática y se muestran en tiempo real.</p>
+    </div>
+    <div class="card card-accent">
+      <span class="card-icon">🏆</span>
+      <h3>Logros</h3>
+      <p>11 logros desbloqueables automáticamente al terminar cada partida, visibles en el perfil de cada jugador.</p>
+    </div>
+    <div class="card card-accent">
+      <span class="card-icon">📋</span>
+      <h3>Historial de Partidas</h3>
+      <p>Últimas 10 partidas del jugador: fecha, posición, puntaje de ronda y variación en el ranking global.</p>
+    </div>
+    <div class="card card-accent">
+      <span class="card-icon">🖼</span>
+      <h3>Avatares</h3>
+      <p>Foto de perfil subida por el usuario. Visible en el perfil, el lobby y la partida (rivales laterales).</p>
+    </div>
+    <div class="card card-accent">
+      <span class="card-icon">📧</span>
+      <h3>Emails Automáticos</h3>
+      <p>Mail de bienvenida al registrarse y recordatorio diario para los jugadores del top 10 del ranking.</p>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════
+     BREAK — Perfil
+══════════════════════════════════ -->
+<div class="section-break">Feature 1 — <span>Perfil de Usuario</span></div>
+
+
+<!-- ══════════════════════════════════
+     SLIDE 3 — Perfil
+══════════════════════════════════ -->
+<div class="slide slide-azul-suave">
+  <div class="slide-header">
+    <div class="slide-num">03 — Perfil</div>
+    <h2 class="slide-titulo">Página de Perfil</h2>
+    <p class="slide-subtitulo">Accesible de forma pública para cualquier jugador</p>
+    <div class="divider"></div>
+  </div>
+
+  <div class="feature-row">
+    <div class="feature-text">
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-content">
+            <h4>Foto + Nivel + XP</h4>
+            <p>Se muestra la foto de perfil (o inicial del nombre), el nivel actual y una barra de progreso de XP dentro del nivel.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-content">
+            <h4>Grilla de estadísticas</h4>
+            <p>Partidas totales, victorias, derrotas y winrate. El winrate se colorea en verde si supera el 50% y en rojo si no.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-content">
+            <h4>Tabs: Historial / Logros</h4>
+            <p>El jugador puede navegar entre el historial de sus últimas 10 partidas y la grilla de logros desbloqueados o pendientes.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">4</div>
+          <div class="step-content">
+            <h4>Solo el dueño puede editar</h4>
+            <p>El botón para cambiar la foto solo aparece si el perfil visitado es el propio. Los demás lo ven en modo solo lectura.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mockup visual del perfil -->
+    <div class="feature-visual">
+      <div class="perfil-mockup">
+        <div class="perfil-header-mock">
+          <div class="perfil-avatar-mock">R</div>
+          <div>
+            <div class="perfil-nombre-mock">Renzo</div>
+            <span class="nivel-badge-demo">Nivel 7</span>
+            <div class="xp-bar-wrap">
+              <div class="xp-bar-bg"><div class="xp-bar-fill"></div></div>
+              <div class="xp-label">320 / 700 XP</div>
+            </div>
+            <div style="font-size:.75rem;color:var(--suave);margin-top:4px;">Puntaje global: <strong>3.150 pts</strong></div>
+          </div>
+        </div>
+
+        <div class="stats-mock">
+          <div class="stat-mock"><span class="num">42</span><span class="lbl">Partidas</span></div>
+          <div class="stat-mock"><span class="num">24</span><span class="lbl">Victorias</span></div>
+          <div class="stat-mock"><span class="num">18</span><span class="lbl">Derrotas</span></div>
+          <div class="stat-mock"><span class="num" style="color:var(--verde);">57%</span><span class="lbl">Winrate</span></div>
+        </div>
+
+        <div class="tab-mock">
+          <button class="tab-btn activo">Últimas partidas</button>
+          <button class="tab-btn">Logros <span style="background:#e5e7eb;border-radius:999px;padding:1px 7px;font-size:.7rem;">8/11</span></button>
+        </div>
+
+        <table class="tabla-bonita" style="font-size:.78rem;">
+          <thead><tr><th>Fecha</th><th>Puesto</th><th>Pts.</th><th>Delta</th></tr></thead>
+          <tbody>
+            <tr><td>16/07/26</td><td>🥇</td><td>412</td><td style="color:var(--verde);font-weight:700;">+38</td></tr>
+            <tr><td>15/07/26</td><td>🥈</td><td>287</td><td style="color:var(--verde);font-weight:700;">+12</td></tr>
+            <tr><td>14/07/26</td><td>4°</td><td>95</td><td style="color:var(--rojo);font-weight:700;">−21</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════
+     BREAK — XP & Niveles
+══════════════════════════════════ -->
+<div class="section-break">Feature 2 — <span>XP &amp; Niveles</span></div>
+
+
+<!-- ══════════════════════════════════
+     SLIDE 4 — XP y Niveles
+══════════════════════════════════ -->
+<div class="slide slide-blanco">
+  <div class="slide-header">
+    <div class="slide-num">04 — XP &amp; Niveles</div>
+    <h2 class="slide-titulo">Sistema de Experiencia y Niveles</h2>
+    <p class="slide-subtitulo">Cada partida recompensa al jugador según su posición final</p>
+    <div class="divider"></div>
+  </div>
+
+  <div class="cards cards-2" style="margin-bottom:32px;">
+    <div class="card">
+      <h3>XP ganado por puesto</h3>
+      <table class="tabla-bonita" style="margin-top:12px;">
+        <thead><tr><th>Posición final</th><th>XP obtenido</th></tr></thead>
+        <tbody>
+          <tr><td>🥇 1° lugar</td><td><strong style="color:var(--azul);">150 XP</strong></td></tr>
+          <tr><td>🥈 2° lugar</td><td><strong style="color:var(--azul);">75 XP</strong></td></tr>
+          <tr><td>🥉 3° lugar</td><td><strong style="color:var(--azul);">40 XP</strong></td></tr>
+          <tr><td>4° en adelante</td><td><strong style="color:var(--azul);">15 XP</strong></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <h3>Progresión de niveles</h3>
+      <p style="margin-bottom:14px;">Cada nivel es progresivamente más difícil. Cuanto más alto el nivel, más XP se necesita para seguir subiendo.</p>
+      <table class="tabla-bonita">
+        <thead><tr><th>Nivel</th><th>XP acumulada necesaria</th></tr></thead>
+        <tbody>
+          <tr><td>Nivel 1</td><td>0 XP</td></tr>
+          <tr><td>Nivel 5</td><td>1.000 XP</td></tr>
+          <tr><td>Nivel 10</td><td>4.500 XP</td></tr>
+          <tr><td>Nivel 20</td><td>19.000 XP</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="highlight-box">
+    <h3>Notificación en tiempo real</h3>
+    <p>
+      Al terminar cada partida, el servidor notifica al jugador por la conexión WebSocket ya existente.
+      El jugador ve inmediatamente cuánto XP ganó, su nivel actual y si desbloqueó algún logro — sin necesidad de recargar la página.
+    </p>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════
+     BREAK — Logros
+══════════════════════════════════ -->
+<div class="section-break">Feature 3 — <span>Sistema de Logros</span></div>
+
+
+<!-- ══════════════════════════════════
+     SLIDE 5 — Logros
+══════════════════════════════════ -->
+<div class="slide slide-gris">
+  <div class="slide-header">
+    <div class="slide-num">05 — Logros</div>
+    <h2 class="slide-titulo">11 Logros Desbloqueables</h2>
+    <p class="slide-subtitulo">Se evalúan y desbloquean automáticamente al finalizar cada partida</p>
+    <div class="divider"></div>
+  </div>
+
+  <div class="logros-mini" style="margin-bottom:32px;">
+    <div class="logro-mini"><span class="emoji">🎮</span><span class="nombre">Debutante</span><span class="desc">Primera partida</span></div>
+    <div class="logro-mini"><span class="emoji">🏆</span><span class="nombre">Primer triunfo</span><span class="desc">Primera victoria</span></div>
+    <div class="logro-mini"><span class="emoji">🔥</span><span class="nombre">En racha</span><span class="desc">5 victorias</span></div>
+    <div class="logro-mini"><span class="emoji">👑</span><span class="nombre">Dominador</span><span class="desc">10 victorias</span></div>
+    <div class="logro-mini"><span class="emoji">🃏</span><span class="nombre">Habitual</span><span class="desc">10 partidas</span></div>
+    <div class="logro-mini"><span class="emoji">⚔️</span><span class="nombre">Veterano</span><span class="desc">50 partidas</span></div>
+    <div class="logro-mini"><span class="emoji">🌟</span><span class="nombre">Élite</span><span class="desc">Top 10 ranking</span></div>
+    <div class="logro-mini"><span class="emoji">🥇</span><span class="nombre">Podio</span><span class="desc">Top 3 ranking</span></div>
+    <div class="logro-mini"><span class="emoji">📈</span><span class="nombre">Subiendo</span><span class="desc">Nivel 5</span></div>
+    <div class="logro-mini"><span class="emoji">💎</span><span class="nombre">Experto</span><span class="desc">Nivel 10</span></div>
+    <div class="logro-mini"><span class="emoji">🎯</span><span class="nombre">Consistente</span><span class="desc">Winrate &gt;50%</span></div>
+  </div>
+
+  <div class="cards cards-2">
+    <div class="card">
+      <span class="card-icon">🔄</span>
+      <h3>Verificación automática</h3>
+      <p>Al terminar cada partida (o si un jugador abandona), el sistema revisa las estadísticas actuales del jugador — victorias, partidas, nivel, posición en ranking — y desbloquea todos los logros que correspondan en ese momento.</p>
+    </div>
+    <div class="card">
+      <span class="card-icon">💾</span>
+      <h3>Persistencia y fecha</h3>
+      <p>Cada logro se guarda en la base de datos con la fecha exacta en que fue obtenido. Si el jugador ya lo tiene, no se vuelve a guardar. Los logros bloqueados se muestran con un candado 🔒 en el perfil.</p>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════
+     BREAK — Historial
+══════════════════════════════════ -->
+<div class="section-break">Feature 4 — <span>Historial de Partidas</span></div>
+
+
+<!-- ══════════════════════════════════
+     SLIDE 6 — Historial
+══════════════════════════════════ -->
+<div class="slide slide-azul-suave">
+  <div class="slide-header">
+    <div class="slide-num">06 — Historial</div>
+    <h2 class="slide-titulo">Historial de Partidas</h2>
+    <p class="slide-subtitulo">Las últimas 10 partidas de cada jugador, accesibles desde su perfil</p>
+    <div class="divider"></div>
+  </div>
+
+  <div class="feature-row">
+    <div class="feature-text">
+      <div class="card" style="margin-bottom:20px;">
+        <h3>¿Qué muestra cada fila?</h3>
+        <table class="tabla-bonita" style="margin-top:12px;">
+          <thead><tr><th>Columna</th><th>Descripción</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Fecha</strong></td><td>Día/mes/año de la partida</td></tr>
+            <tr><td><strong>Puesto</strong></td><td>Medalla 🥇🥈🥉 o número ordinal</td></tr>
+            <tr><td><strong>Pts. de ronda</strong></td><td>Puntaje acumulado de cartas en esa partida</td></tr>
+            <tr><td><strong>Delta</strong></td><td>Variación en el ranking global: verde si subió, rojo si bajó</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <span class="card-icon">📊</span>
+        <h3>Almacenamiento en base de datos</h3>
+        <p>Cada partida queda registrada con el puesto, puntaje de ronda y la variación de puntos que tuvo ese jugador en el ranking global. Esto permite reconstruir el historial completo en cualquier momento.</p>
+      </div>
+    </div>
+
+    <div class="feature-visual">
+      <div class="card">
+        <h3 style="margin-bottom:14px;">Vista del historial en el perfil</h3>
+        <table class="tabla-bonita">
+          <thead><tr><th>Fecha</th><th>Puesto</th><th>Pts.</th><th>Delta</th></tr></thead>
+          <tbody>
+            <tr><td>16/07/26</td><td>🥇</td><td>412</td><td style="color:var(--verde);font-weight:700;">+38</td></tr>
+            <tr><td>15/07/26</td><td>🥈</td><td>287</td><td style="color:var(--verde);font-weight:700;">+12</td></tr>
+            <tr><td>14/07/26</td><td>4°</td><td>95</td><td style="color:var(--rojo);font-weight:700;">−21</td></tr>
+            <tr><td>13/07/26</td><td>🥇</td><td>503</td><td style="color:var(--verde);font-weight:700;">+45</td></tr>
+            <tr><td>11/07/26</td><td>🥉</td><td>198</td><td style="color:var(--verde);font-weight:700;">+8</td></tr>
+            <tr><td>10/07/26</td><td>4°</td><td>72</td><td style="color:var(--rojo);font-weight:700;">−18</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════
+     BREAK — Avatares
+══════════════════════════════════ -->
+<div class="section-break">Feature 5 — <span>Avatares de Jugadores</span></div>
+
+
+<!-- ══════════════════════════════════
+     SLIDE 7 — Avatares
+══════════════════════════════════ -->
+<div class="slide slide-blanco">
+  <div class="slide-header">
+    <div class="slide-num">07 — Avatares</div>
+    <h2 class="slide-titulo">Foto de Perfil y Avatares en Partida</h2>
+    <p class="slide-subtitulo">El jugador sube su foto desde el perfil y aparece en todo el juego</p>
+    <div class="divider"></div>
+  </div>
+
+  <div class="cards cards-3" style="margin-bottom:32px;">
+    <div class="card">
+      <span class="card-icon">📤</span>
+      <h3>Subida de imagen</h3>
+      <p>El jugador selecciona una foto desde su perfil. Se aceptan formatos JPEG, PNG, WEBP y GIF con un máximo de 2 MB. La imagen reemplaza a la anterior si ya tenía una.</p>
+    </div>
+    <div class="card">
+      <span class="card-icon">☁️</span>
+      <h3>Almacenamiento en Railway</h3>
+      <p>Las imágenes se guardan en un <strong>volumen persistente</strong> montado en el contenedor de Railway. Así los avatares no se pierden cuando el servidor se reinicia o se redeploya.</p>
+    </div>
+    <div class="card">
+      <span class="card-icon">🎮</span>
+      <h3>Visible en el juego</h3>
+      <p>El avatar se muestra junto al nombre en el <strong>lobby</strong> y en los paneles laterales de la <strong>partida</strong> (rival izquierda y derecha). Si no hay foto, se usa la inicial del nombre.</p>
+    </div>
+  </div>
+
+  <!-- Mockup visual de avatares -->
+  <div class="cards cards-2">
+    <div class="card">
+      <h3 style="margin-bottom:16px;">Avatares en el lobby</h3>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div class="jugador-card">
+          <div style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#f6a623,#e05c23);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:1.1rem;border:2px solid var(--azul);">R</div>
+          <div class="jugador-info">
+            <h4>Renzo</h4>
+            <p>Nivel 7 · Creador de sala</p>
+          </div>
+          <span style="margin-left:auto;font-size:.75rem;background:#d1fae5;color:#065f46;padding:2px 8px;border-radius:999px;font-weight:600;">✓ Listo</span>
+        </div>
+        <div class="jugador-card">
+          <div style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#7c3aed,#a78bfa);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:1.1rem;border:2px solid #e5e7eb;">M</div>
+          <div class="jugador-info">
+            <h4>Matías</h4>
+            <p>Nivel 4</p>
+          </div>
+          <span style="margin-left:auto;font-size:.75rem;background:#fef9c3;color:#854d0e;padding:2px 8px;border-radius:999px;font-weight:600;">Esperando</span>
+        </div>
+        <div class="jugador-card">
+          <div style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#059669,#6ee7b7);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:1.1rem;border:2px solid #e5e7eb;">S</div>
+          <div class="jugador-info">
+            <h4>Sol</h4>
+            <p>Nivel 12</p>
+          </div>
+          <span style="margin-left:auto;font-size:.75rem;background:#d1fae5;color:#065f46;padding:2px 8px;border-radius:999px;font-weight:600;">✓ Listo</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-bottom:16px;">Avatares en la partida (rivales laterales)</h3>
+      <div style="display:flex;align-items:center;justify-content:space-between;background:var(--gris);border-radius:12px;padding:16px;">
+        <!-- Rival izquierda -->
+        <div style="display:flex;flex-direction:column;align-items:center;gap:6px;">
+          <div style="width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,#7c3aed,#a78bfa);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:1.3rem;border:2px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.15);">M</div>
+          <div style="font-size:.72rem;font-weight:700;color:var(--azul);">Matías</div>
+          <div style="font-size:.65rem;background:var(--amarillo);color:var(--azul);border-radius:999px;padding:1px 6px;font-weight:700;">Nv.4</div>
+          <!-- cartas de mano lateral -->
+          <div style="display:flex;gap:-4px;">
+            <div style="width:14px;height:24px;background:#e74c3c;border-radius:3px;border:1px solid #fff;"></div>
+            <div style="width:14px;height:24px;background:#2563a8;border-radius:3px;border:1px solid #fff;margin-left:-4px;"></div>
+            <div style="width:14px;height:24px;background:#f6c90e;border-radius:3px;border:1px solid #fff;margin-left:-4px;"></div>
+          </div>
+          <div style="font-size:.65rem;color:var(--suave);">3 cartas</div>
+        </div>
+
+        <!-- Mesa central -->
+        <div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
+          <div style="width:40px;height:60px;background:#27ae60;border-radius:6px;border:2px solid #fff;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:900;font-size:1.1rem;box-shadow:0 2px 8px rgba(0,0,0,.2);">7</div>
+          <div style="font-size:.65rem;color:var(--suave);">Carta en mesa</div>
+        </div>
+
+        <!-- Rival derecha -->
+        <div style="display:flex;flex-direction:column;align-items:center;gap:6px;">
+          <div style="width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,#059669,#6ee7b7);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:1.3rem;border:2px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.15);">S</div>
+          <div style="font-size:.72rem;font-weight:700;color:var(--azul);">Sol</div>
+          <div style="font-size:.65rem;background:var(--amarillo);color:var(--azul);border-radius:999px;padding:1px 6px;font-weight:700;">Nv.12</div>
+          <div style="display:flex;">
+            <div style="width:14px;height:24px;background:#2563a8;border-radius:3px;border:1px solid #fff;"></div>
+            <div style="width:14px;height:24px;background:#e74c3c;border-radius:3px;border:1px solid #fff;margin-left:-4px;"></div>
+            <div style="width:14px;height:24px;background:#27ae60;border-radius:3px;border:1px solid #fff;margin-left:-4px;"></div>
+            <div style="width:14px;height:24px;background:#f6c90e;border-radius:3px;border:1px solid #fff;margin-left:-4px;"></div>
+          </div>
+          <div style="font-size:.65rem;color:var(--suave);">4 cartas</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════
+     BREAK — Emails
+══════════════════════════════════ -->
+<div class="section-break">Feature 6 — <span>Emails Automáticos</span></div>
+
+
+<!-- ══════════════════════════════════
+     SLIDE 8 — Emails con Resend
+══════════════════════════════════ -->
+<div class="slide slide-gris">
+  <div class="slide-header">
+    <div class="slide-num">08 — Emails</div>
+    <h2 class="slide-titulo">Emails Automáticos con Resend</h2>
+    <p class="slide-subtitulo">Dos tipos de correo: bienvenida al registrarse y recordatorio diario al top 10</p>
+    <div class="divider"></div>
+  </div>
+
+  <!-- Qué es Resend -->
+  <div style="background:linear-gradient(135deg,var(--azul),var(--azul2));border-radius:14px;padding:20px 28px;margin-bottom:28px;display:flex;align-items:center;gap:20px;">
+    <div style="font-size:2rem;flex-shrink:0;">📨</div>
+    <div>
+      <div style="color:var(--amarillo);font-weight:700;font-size:.85rem;margin-bottom:4px;">¿Qué es Resend?</div>
+      <p style="color:rgba(255,255,255,.85);font-size:.9rem;margin:0;">
+        Resend es un servicio externo de envío de emails transaccionales. Provee una API simple a la que le pasamos destinatario, asunto y contenido HTML, y se encarga del delivery confiable. Es una alternativa moderna a configurar un servidor SMTP propio.
+      </p>
+    </div>
+  </div>
+
+  <div class="cards cards-2">
+    <!-- Mail bienvenida -->
+    <div>
+      <div style="margin-bottom:12px;display:flex;align-items:center;gap:8px;">
+        <span style="background:#d1fae5;color:#065f46;font-size:.78rem;font-weight:700;padding:3px 10px;border-radius:999px;">Al registrarse</span>
+        <span style="background:#f0fdf4;color:#166534;font-size:.75rem;padding:3px 10px;border-radius:999px;border:1px solid #bbf7d0;">Fire-and-forget · no bloquea el registro</span>
+      </div>
+      <div class="mail-preview" style="margin-bottom:14px;">
+        <div class="mail-header-bar">
+          <div class="mail-logo">U</div>
+          <span>UNO Argentino</span>
+        </div>
+        <div class="mail-body">
+          <h3>¡Hola, Renzo!</h3>
+          <p>Tu cuenta fue creada exitosamente. Ya podés empezar a jugar partidas online o contra bots.</p>
+          <div style="background:#eaf3fa;border-radius:8px;padding:12px;margin-bottom:12px;">
+            <p style="color:var(--azul);font-weight:600;margin-bottom:6px;">¿Qué podés hacer?</p>
+            <ul style="padding-left:16px;color:#555;">
+              <li>Jugar contra otros jugadores</li>
+              <li>Competir contra bots con IA</li>
+              <li>Subir de nivel y desbloquear logros</li>
+              <li>Escalar en el ranking global</li>
+            </ul>
+          </div>
+          <a class="mail-cta">EMPEZAR A JUGAR</a>
+        </div>
+        <div class="mail-footer"><p>UNO Argentino — Jugá online, gratis.</p></div>
+      </div>
+      <div class="card" style="padding:14px 18px;">
+        <p style="font-size:.82rem;color:var(--suave);">
+          El envío se dispara de forma <strong style="color:var(--azul);">asíncrona</strong> al crear la cuenta: el usuario recibe su respuesta de registro de forma inmediata, sin esperar a que el mail llegue al servidor de Resend.
+        </p>
+      </div>
+    </div>
+
+    <!-- Mail top 10 -->
+    <div>
+      <div style="margin-bottom:12px;display:flex;align-items:center;gap:8px;">
+        <span style="background:#dbeafe;color:#1e40af;font-size:.78rem;font-weight:700;padding:3px 10px;border-radius:999px;">Cada 24 horas · Top 10</span>
+        <span style="background:#eff6ff;color:#1d4ed8;font-size:.75rem;padding:3px 10px;border-radius:999px;border:1px solid #bfdbfe;">Solo en producción</span>
+      </div>
+      <div class="mail-preview" style="margin-bottom:14px;">
+        <div class="mail-header-bar">
+          <div class="mail-logo">U</div>
+          <span>UNO Argentino</span>
+        </div>
+        <div class="mail-body">
+          <h3>¡Hola, Sol!</h3>
+          <p>Seguís en el ranking global. ¡No pierdas tu lugar!</p>
+          <div style="background:#eaf3fa;border-radius:8px;padding:16px;text-align:center;margin-bottom:12px;">
+            <div style="font-size:2.2rem;">🥉</div>
+            <div style="font-size:1rem;font-weight:800;color:var(--azul);margin-top:6px;">Posición 3 del ranking</div>
+            <div style="font-size:.78rem;color:var(--suave);margin-top:4px;">Puntaje global: 4.820 pts</div>
+          </div>
+          <a class="mail-cta">IR A JUGAR</a>
+        </div>
+        <div class="mail-footer"><p>Recibís este mail porque estás en el top 10.</p></div>
+      </div>
+      <div class="card" style="padding:14px 18px;">
+        <table style="width:100%;border-collapse:collapse;font-size:.8rem;">
+          <tr style="border-bottom:1px solid #f0f0f0;">
+            <td style="padding:6px 0;font-weight:700;color:var(--azul);width:40%;">¿Cuándo corre?</td>
+            <td style="padding:6px 0;color:var(--suave);">Al arrancar el servidor, consulta en la base de datos cuándo fue el último envío</td>
+          </tr>
+          <tr style="border-bottom:1px solid #f0f0f0;">
+            <td style="padding:6px 0;font-weight:700;color:var(--azul);">Si pasaron 24h</td>
+            <td style="padding:6px 0;color:var(--suave);">Envía inmediatamente y programa el próximo ciclo en 24h</td>
+          </tr>
+          <tr style="border-bottom:1px solid #f0f0f0;">
+            <td style="padding:6px 0;font-weight:700;color:var(--azul);">Si no pasaron 24h</td>
+            <td style="padding:6px 0;color:var(--suave);">Espera el tiempo restante antes del primer envío del ciclo</td>
+          </tr>
+          <tr>
+            <td style="padding:6px 0;font-weight:700;color:var(--azul);">¿Por qué así?</td>
+            <td style="padding:6px 0;color:var(--suave);">Evita reenvíos duplicados si el servidor se reinicia antes de que pasen las 24h</td>
+          </tr>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════
+     BREAK — Infraestructura
+══════════════════════════════════ -->
+<div class="section-break">Infraestructura — <span>Railway &amp; Volumen Persistente</span></div>
+
+
+<!-- ══════════════════════════════════
+     SLIDE 9 — Railway
+══════════════════════════════════ -->
+<div class="slide slide-oscuro">
+  <div class="slide-header">
+    <div class="slide-num">09 — Infraestructura</div>
+    <h2 class="slide-titulo">Deploy en Railway con Volumen Persistente</h2>
+    <p class="slide-subtitulo">Los avatares sobreviven a los reinicios del contenedor</p>
+    <div class="divider" style="background:var(--amarillo);"></div>
+  </div>
+
+  <div class="cards cards-2" style="margin-bottom:36px;">
+    <div class="card card-dark">
+      <span class="card-icon">🚂</span>
+      <h3>Railway como plataforma</h3>
+      <ul>
+        <li>La app Node.js corre en un contenedor Docker en Railway</li>
+        <li>La base de datos MySQL también está hosteada en Railway como servicio separado</li>
+        <li>Las variables de entorno (claves de API, URLs, rutas) se configuran desde el dashboard sin exponer datos sensibles en el código</li>
+      </ul>
+    </div>
+    <div class="card card-dark">
+      <span class="card-icon">💾</span>
+      <h3>¿Por qué un volumen persistente?</h3>
+      <ul>
+        <li>Sin volumen, los archivos subidos al contenedor <strong>se pierden</strong> en cada redeploy o reinicio</li>
+        <li>Railway permite montar un volumen en una ruta del contenedor</li>
+        <li>Los avatares se guardan ahí y persisten indefinidamente, independientemente de cuántas veces se redeploya</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Diagrama conceptual -->
+  <div style="max-width:720px;">
+    <div style="margin-bottom:8px;font-size:.8rem;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.1em;">Flujo de subida de avatar</div>
+    <div class="arch-flow" style="margin-bottom:8px;">
+      <div class="arch-box" style="background:rgba(125,211,252,.12);border:2px solid #7dd3fc;color:#7dd3fc;">🌐 Navegador<br><small style="font-weight:400;opacity:.8;">El usuario elige una foto</small></div>
+      <div class="arch-arrow">→</div>
+      <div class="arch-box" style="background:rgba(253,230,138,.12);border:2px solid #fde68a;color:#fde68a;">⚙️ Servidor<br><small style="font-weight:400;opacity:.8;">Valida formato y tamaño</small></div>
+      <div class="arch-arrow">→</div>
+      <div class="arch-box" style="background:rgba(134,239,172,.12);border:2px solid #86efac;color:#86efac;">💾 Volumen Railway<br><small style="font-weight:400;opacity:.8;">Guardado permanente</small></div>
+    </div>
+    <div style="text-align:center;color:rgba(255,255,255,.35);font-size:1.2rem;padding:6px 0;">⬇</div>
+    <div style="margin-bottom:8px;font-size:.8rem;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.1em;">Flujo de visualización</div>
+    <div class="arch-flow">
+      <div class="arch-box" style="background:rgba(125,211,252,.12);border:2px solid #7dd3fc;color:#7dd3fc;">🌐 Navegador<br><small style="font-weight:400;opacity:.8;">Solicita la imagen</small></div>
+      <div class="arch-arrow">←</div>
+      <div class="arch-box" style="background:rgba(253,230,138,.12);border:2px solid #fde68a;color:#fde68a;">⚙️ Express<br><small style="font-weight:400;opacity:.8;">Sirve el archivo estático</small></div>
+      <div class="arch-arrow">←</div>
+      <div class="arch-box" style="background:rgba(134,239,172,.12);border:2px solid #86efac;color:#86efac;">💾 Volumen Railway<br><small style="font-weight:400;opacity:.8;">Lee el archivo</small></div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════
+     SLIDE 10 — Stack técnico
+══════════════════════════════════ -->
+<div class="slide slide-blanco">
+  <div class="slide-header">
+    <div class="slide-num">10 — Stack técnico</div>
+    <h2 class="slide-titulo">Tecnologías Utilizadas</h2>
+    <p class="slide-subtitulo">Qué servicio cumple qué rol en la segunda iteración</p>
+    <div class="divider"></div>
+  </div>
+
+  <div class="cards cards-4">
+    <div class="card" style="text-align:center;">
+      <span class="card-icon">🟢</span>
+      <h3>Node.js + Express</h3>
+      <p>Servidor principal. Maneja HTTP y WebSocket. Arquitectura por capas: dominio, controladores, infraestructura.</p>
+    </div>
+    <div class="card" style="text-align:center;">
+      <span class="card-icon">🐬</span>
+      <h3>MySQL</h3>
+      <p>Base de datos relacional. Almacena jugadores, partidas, logros y el historial de variaciones de ranking.</p>
+    </div>
+    <div class="card" style="text-align:center;">
+      <span class="card-icon">📨</span>
+      <h3>Resend</h3>
+      <p>Servicio de envío de emails transaccionales. Usado para la bienvenida y el recordatorio diario del top 10.</p>
+    </div>
+    <div class="card" style="text-align:center;">
+      <span class="card-icon">📁</span>
+      <h3>Multer</h3>
+      <p>Middleware para recibir archivos en el servidor. Valida tipo de imagen y limita el tamaño máximo a 2 MB.</p>
+    </div>
+    <div class="card" style="text-align:center;">
+      <span class="card-icon">🚂</span>
+      <h3>Railway</h3>
+      <p>Plataforma de deploy. Corre el contenedor, hostea MySQL y provee el volumen persistente para los avatares.</p>
+    </div>
+    <div class="card" style="text-align:center;">
+      <span class="card-icon">⚡</span>
+      <h3>WebSocket</h3>
+      <p>Conexión en tiempo real entre servidor y cliente. Notifica XP ganado y logros desbloqueados al instante.</p>
+    </div>
+    <div class="card" style="text-align:center;">
+      <span class="card-icon">🎨</span>
+      <h3>EJS + CSS</h3>
+      <p>Templates del servidor para las vistas. CSS propio sin frameworks. El perfil se carga dinámicamente con Fetch.</p>
+    </div>
+    <div class="card" style="text-align:center;">
+      <span class="card-icon">🔒</span>
+      <h3>Autenticación</h3>
+      <p>Sesiones por cookie. Passwords hasheados. Endpoints protegidos. Solo el dueño puede editar su propio perfil.</p>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════
+     SLIDE 11 — Cierre
+══════════════════════════════════ -->
+<div class="slide slide-final">
+  <div class="portada-tag" style="background:var(--amarillo);color:var(--azul);">Entrega Final · PAW 2026</div>
+  <h2>UNO <span>Argentino</span> — Segunda Iteración</h2>
+  <p>Perfil de usuario, XP y niveles, logros, historial, avatares en lobby y partida, emails transaccionales y deploy en Railway con volumen persistente.</p>
+  <div class="portada-pills" style="justify-content:center;">
+    <span class="pill" style="background:rgba(255,225,75,.15);border-color:rgba(255,225,75,.3);">✅ 6 features nuevos</span>
+    <span class="pill" style="background:rgba(255,225,75,.15);border-color:rgba(255,225,75,.3);">✅ 11 logros</span>
+    <span class="pill" style="background:rgba(255,225,75,.15);border-color:rgba(255,225,75,.3);">✅ 2 tipos de email</span>
+    <span class="pill" style="background:rgba(255,225,75,.15);border-color:rgba(255,225,75,.3);">✅ Avatares persistentes en Railway</span>
+  </div>
+</div>
+
+</body>
+</html>

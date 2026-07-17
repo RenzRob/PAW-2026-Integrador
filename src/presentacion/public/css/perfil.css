@@ -382,6 +382,79 @@ body {
   margin-top: 2px;
 }
 
+/* ── Recompensas feed ─────────────────────────────── */
+
+.recompensas-feed {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 300px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-right: 4px;
+}
+
+.recompensas-feed::-webkit-scrollbar {
+  width: 6px;
+}
+
+.recompensas-feed::-webkit-scrollbar-track {
+  background: #f0f4f8;
+  border-radius: 3px;
+}
+
+.recompensas-feed::-webkit-scrollbar-thumb {
+  background: #b0cbe6;
+  border-radius: 3px;
+}
+
+.recompensa-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: #eaf3fa;
+  border: 2px solid #ffe14b;
+  border-radius: 10px;
+  padding: 12px 14px;
+  transition: transform 0.15s;
+}
+
+.recompensa-item:hover {
+  transform: translateY(-2px);
+}
+
+.recompensa-emoji {
+  font-size: 1.8rem;
+  flex-shrink: 0;
+}
+
+.recompensa-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.recompensa-nombre {
+  font-size: 0.88rem;
+  font-weight: bold;
+  color: #1a4971;
+}
+
+.recompensa-desc {
+  font-size: 0.75rem;
+  color: #555;
+  line-height: 1.3;
+}
+
+.recompensa-fecha {
+  font-size: 0.72rem;
+  color: #999;
+  text-align: right;
+  flex-shrink: 0;
+  line-height: 1.4;
+}
+
 /* ── Botón volver ─────────────────────────────────── */
 
 .btn-perfil-volver {
