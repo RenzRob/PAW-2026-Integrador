@@ -1,0 +1,49 @@
+src/presentacion/views/registro.ejs
+  s_bc77a796f288dd::t_214059d4a3e517 148
+presentacion-final.html
+  s_6b92a9a95d9f1a::t_6af5e66d5dd22b 359
+  s_6b92a9a95d9f1a::t_b1da57d9c979fa 864
+  s_6b92a9a95d9f1a::t_d45af13889f6b7 1137
+  s_6b92a9a95d9f1a::t_bc8c10565838a6 701
+  s_6b92a9a95d9f1a::t_3640bcc13b623e 697
+  s_6b92a9a95d9f1a::t_5ac71372a6c7ea 868
+  s_6b92a9a95d9f1a::t_797a85e45e1c6b 979
+  s_6b92a9a95d9f1a::t_64c482a635f695 759
+  s_6b92a9a95d9f1a::t_a5366722be29b7 1141
+  s_6b92a9a95d9f1a::t_9c311657285ab6 1200
+  s_6b92a9a95d9f1a::t_106c9a98e3a5e3 489-587
+  s_6b92a9a95d9f1a::t_bf6a1aab54ab90 975
+  s_6b92a9a95d9f1a::t_c70bef9a9d6492 1082
+  s_6b92a9a95d9f1a::t_8dad8f02fd700d 1193
+  s_6b92a9a95d9f1a::t_083a00a528568b 599
+  s_6b92a9a95d9f1a::t_e47c506d4a787c 595
+  s_6b92a9a95d9f1a::t_297d618d851508 651
+  s_6b92a9a95d9f1a::t_42336a1e45c2eb 655
+  s_6b92a9a95d9f1a::t_9217ea405efea6 1086
+  s_6b92a9a95d9f1a::t_a12a15a9639b70 1204
+  s_6b92a9a95d9f1a::t_80b8c23c971d1e 755
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "cf4ed332018fbd04fd50d402663e33366ffc4039",
+  "prompts": {},
+  "sessions": {
+    "s_6b92a9a95d9f1a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "6198fd6e-4b16-47db-a630-5d3ced12241c",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "rrobles_meli <renzo.robles@mercadolibre.com>"
+    },
+    "s_bc77a796f288dd": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a8da25b8-3f35-4d69-936a-8359bccc3392",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "rrobles_meli <renzo.robles@mercadolibre.com>"
+    }
+  }
+}
