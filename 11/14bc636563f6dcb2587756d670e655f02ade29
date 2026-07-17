@@ -1,0 +1,19 @@
+src/presentacion/public/css/perfil.css
+  s_4118ad38dd7f80::t_49857f6103bc6b 316-333
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "1114bc636563f6dcb2587756d670e655f02ade29",
+  "prompts": {},
+  "sessions": {
+    "s_4118ad38dd7f80": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e6fb89a3-e8ea-456c-8292-4c2d7923ca82",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "rrobles_meli <renzo.robles@mercadolibre.com>"
+    }
+  }
+}
