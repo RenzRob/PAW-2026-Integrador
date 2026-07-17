@@ -52,10 +52,11 @@ class JugadorRepositorioMySQL {
     const [rows] = await pool.execute(`
       SELECT j.id AS jugadorId, j.nombre_usuario AS nombreUsuario,
              j.email AS email,
+             j.nivel AS nivel,
              COALESCE(SUM(pj.delta_global), 0) AS puntajeGlobal
       FROM jugadores j
       LEFT JOIN partida_jugadores pj ON j.id = pj.jugador_id
-      GROUP BY j.id, j.nombre_usuario, j.email
+      GROUP BY j.id, j.nombre_usuario, j.email, j.nivel
       ORDER BY puntajeGlobal DESC
     `);
 

@@ -78,6 +78,20 @@ body {
   font-weight: bold;
 }
 
+.tabla-puntajes .nivel-valor {
+  width: 90px;
+}
+
+.tabla-puntajes .nivel-valor span {
+  display: inline-block;
+  background: #ffe14b;
+  color: #333;
+  font-weight: bold;
+  font-size: 0.8rem;
+  padding: 2px 10px;
+  border-radius: 20px;
+}
+
 .tabla-puntajes .puntaje-valor {
   text-align: right;
   font-weight: bold;

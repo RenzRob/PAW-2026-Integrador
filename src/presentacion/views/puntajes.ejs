@@ -16,13 +16,14 @@
               <tr>
                 <th>#</th>
                 <th>Jugador</th>
+                <th>Nivel</th>
                 <th>Puntaje</th>
               </tr>
             </thead>
             <tbody>
               <% if (_puntajes.length === 0) { %>
                 <tr>
-                  <td colspan="3" class="vacio-puntajes">Todavía no hay puntajes registrados.</td>
+                  <td colspan="4" class="vacio-puntajes">Todavía no hay puntajes registrados.</td>
                 </tr>
               <% } else { %>
                 <% _puntajes.forEach(function(p, i) { %>
@@ -32,6 +33,7 @@
                   <tr data-jugador-id="<%= p.jugadorId %>">
                     <td class="puesto"><%= medalla %></td>
                     <td><%= p.nombreUsuario %></td>
+                    <td class="nivel-valor"><span>Nivel <%= p.nivel ?? 1 %></span></td>
                     <td class="puntaje-valor"><%= p.puntajeGlobal %></td>
                   </tr>
                 <% }); %>
@@ -59,7 +61,7 @@
           "@type": "ListItem",
           "position": i + 1,
           "name": p.nombreUsuario,
-          "description": "Puntaje global: " + p.puntajeGlobal
+          "description": "Nivel " + (p.nivel ?? 1) + " — Puntaje global: " + p.puntajeGlobal
         };
       })
     }) %>

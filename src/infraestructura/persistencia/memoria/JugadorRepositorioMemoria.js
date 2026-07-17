@@ -49,6 +49,7 @@ class JugadorRepositorioMemoria {
         jugadorId: j.jugadorId,
         nombreUsuario: j.nombreUsuario,
         email: this.emails.get(j.jugadorId) || null,
+        nivel: calcularNivel(this.xp.get(j.jugadorId) || 0),
         puntajeGlobal: this.puntajes.get(j.jugadorId) || 0,
       }))
       .sort((a, b) => b.puntajeGlobal - a.puntajeGlobal);
