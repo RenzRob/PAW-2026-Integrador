@@ -2072,10 +2072,14 @@ body {
   font-size: 1rem;
 }
 
-/* El avatar lateral no participa del grid de info-jugador */
-.area-jugador-lateral > .mini-avatar {
-  flex-shrink: 0;
+/* Wrapper que agrupa avatar + label lateral para que se muevan juntos */
+.lateral-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
   align-self: center;
+  flex-shrink: 0;
 }
 
 /* ─── NIVEL BADGE ─── */

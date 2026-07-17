@@ -2042,8 +2042,11 @@ class Partida {
     const lateralIzq = document.createElement('div');
     lateralIzq.className = 'area-jugador-lateral izquierda';
     if (rivalIzquierda) {
-      lateralIzq.appendChild(this.#avatarEl(rivalIzquierda));
-      lateralIzq.appendChild(crearEtiquetaNombreJugador(rivalIzquierda, 'nombre-lateral'));
+      const infoIzq = document.createElement('div');
+      infoIzq.className = 'lateral-info';
+      infoIzq.appendChild(this.#avatarEl(rivalIzquierda));
+      infoIzq.appendChild(crearEtiquetaNombreJugador(rivalIzquierda, 'nombre-lateral'));
+      lateralIzq.appendChild(infoIzq);
       lateralIzq.appendChild(
         this.#etiquetarMano(
           this.#crearManoLateral(this.#crearCartasPlaceholder(rivalIzquierda.cantidadCartas), true),
@@ -2119,8 +2122,11 @@ class Partida {
     const lateralDer = document.createElement('div');
     lateralDer.className = 'area-jugador-lateral derecha';
     if (rivalDerecha) {
-      lateralDer.appendChild(this.#avatarEl(rivalDerecha));
-      lateralDer.appendChild(crearEtiquetaNombreJugador(rivalDerecha, 'nombre-lateral'));
+      const infoDer = document.createElement('div');
+      infoDer.className = 'lateral-info';
+      infoDer.appendChild(this.#avatarEl(rivalDerecha));
+      infoDer.appendChild(crearEtiquetaNombreJugador(rivalDerecha, 'nombre-lateral'));
+      lateralDer.appendChild(infoDer);
       lateralDer.appendChild(
         this.#etiquetarMano(
           this.#crearManoLateral(this.#crearCartasPlaceholder(rivalDerecha.cantidadCartas), true),
